@@ -25,11 +25,11 @@
                 <sheet>
                     <group>
                         <group colspan = "2">
-                            <field name="parent_id" string="Проект: "/>
+                            <field name="project_id" string="Проект: "/>
                             <field name="name"/>
                         </group>
                         <group>
-                            <field name="type" string="Тип:"/>
+                            <field name="assettype_id" string="Тип:"/>
                             <field name="short_description" string="Краткое описание:"/>
                             <field name="size" string="Размер:"/>
                         </group>
@@ -59,10 +59,13 @@
                     <group>
                         <field name="name"/>
                         <group>
-                            <field name="type" string="Тип работ:"/>
+                            <field name="tasktype_id" string="Тип работ:"/>
                             <field name="description" string="Описание задачи:"/>
-                            <field name="factor" string="Сложность:"/>
-                                <!-- стоимость -->
+							<group>
+								<field name="factor" string="Сложность:"/>
+								<field name="compute_price_method" string="Способ рассчета стоимости:"/>
+							</group>                     
+                            <field name="computed_price" string="Cтоимость: "/>
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
@@ -83,6 +86,20 @@
             </form>
         </field>
     </record>
+	
+    <record model="ir.ui.view" id="tasktype_form_view">
+        <field name="name">tasktype.form</field>
+        <field name="model">toonproject.tasktype</field>
+        <field name="arch" type="xml">
+            <form string="Asset Form">
+                <sheet>
+					<field name="name" />
+					<field name="description" />
+					<field name="valid_assettypes" widget="many2many_checkboxes"  string="Применимо к" />
+				</sheet>
+			</form>
+		</field>
+	</record>
 
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
@@ -101,7 +118,7 @@
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
         <tree>
-          <field name="type" string="тип"/>
+          <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
         </tree>
@@ -119,7 +136,19 @@
           <field name="real_finish" string="закончена"/>
         </tree>
       </field>
-    </record>    
+    </record> 
+
+    <record model="ir.ui.view" id="price_list">
+      <field name="name">price.list</field>
+      <field name="model">toonproject.price</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="project_id" string="проект"/>
+          <field name="tasktype_id" string="вид работ"/>
+          <field name="value" string="расценка"/>
+        </tree>
+      </field>
+    </record> 	
 
     <record model="ir.actions.act_window" id="cartoons_list_action">
         <field name="name">Projects</field>
@@ -152,7 +181,18 @@
             <p class="o_view_nocontent_smiling_face">Создайте первую задачу
             </p>
         </field>
-    </record>    
+    </record>
+
+    <record model="ir.actions.act_window" id="prices_list_action">
+        <field name="name">Prices</field>
+        <field name="res_model">toonproject.price</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Добавьте расценку на какой-нибудь вид работ
+            </p>
+        </field>
+    </record>   
     
     <menuitem id="main_toonproject_menu" name="Toon Project"/>
     <menuitem id="lists_menu" name="Списки" parent="main_toonproject_menu"/>
@@ -161,7 +201,9 @@
     <menuitem id="assets_menu" name="Материалы" parent="lists_menu"
                   action="assets_list_action"/>    
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
-                  action="tasks_list_action"/>                      
+                  action="tasks_list_action"/> 
+    <menuitem id="prices_menu" name="Расценки" parent="lists_menu"
+                  action="prices_list_action"/>				  
 
     <!-- explicit list view definition -->
     <!--

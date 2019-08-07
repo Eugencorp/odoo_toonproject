@@ -2,17 +2,27 @@
 
 from odoo import models, fields, api
 
-# class toonproject(models.Model):
-#     _name = 'toonproject.toonproject'
+class assettype(models.Model):
+    _name = 'toonproject.assettype'
+    
+    name = fields.Char(string="Тип")
+    description = fields.Text()
+    valid_tasktypes = fields.Many2many('toonproject.tasktype', string = "Возможные виды работ:")
 
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         self.value2 = float(self.value) / 100
+class tasktype(models.Model):
+    _name = 'toonproject.tasktype'
+    
+    name = fields.Char(string="Вид работ")
+    description = fields.Text()
+    valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")    
+    
+class price(models.Model):
+    _name = 'toonproject.price'
+    
+    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
+    tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
+    value = fields.Float(string="Расценка за единицу")
+    
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
@@ -61,9 +71,9 @@ class asset(models.Model, StoresImages):
     short_description = fields.Char()
     size = fields.Float(default=1)
     
-    type = fields.Selection([('scene','сцена'),('bg','фон'),('rig','риг'),],'Тип', default='scene')
+    assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=0)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
-    parent_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
+    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
     
@@ -92,7 +102,8 @@ class task(models.Model):
     _inherit = 'mail.thread'
     
     name = fields.Char()
-    type = fields.Selection([('anim','мультипиликат'),('lo','лэй-аут'),('compose','композ'),('rig','риг'),('draw','графика'),('paint','живопись')],'Тип работ', default='anim')
+    #type = fields.Selection([('anim','мультипиликат'),('lo','лэй-аут'),('compose','композ'),('rig','риг'),('draw','графика'),('paint','живопись')],'Тип работ', default='anim')
+    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
     factor = fields.Float(default=1)    
     description = fields.Text()
     
@@ -103,8 +114,31 @@ class task(models.Model):
     real_finish = fields.Date()
     
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
+    compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
+    computed_price = fields.Float(compute='_compute_price')
     
-    # price (calculate)
+    @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
+    def _compute_price(self):
+        for record in self:
+            # so first we have to collect one or many pairs for valid assets
+            sum = 0
+            for asset in record.asset_ids:
+                assettype = asset.assettype_id
+                # get is it valid for record.tasktype_id
+                # if not valid:
+                #   continue
+                
+                project = asset.project_id
+                # get price for record.tasktype_id and this project_id or its parent while it has one
+                # if not found:
+                #   break (or continue?)
+                
+                # sum = sum + foundprice * record.factor * asset.size
+                if record.compute_price_method == 'first':
+                    break
+                
+            record.computed_price = sum
+    
     # last_status (calculate?)
 
     

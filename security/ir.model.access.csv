@@ -2,3 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 asset_manager,asset manager,model_toonproject_asset,group_manager,1,1,1,1
 task_manager,task manager,model_toonproject_task,group_manager,1,1,1,1
 cartoon_manager,cartoon manager,model_toonproject_cartoon,group_manager,1,1,1,1
+price_manager,price manager,model_toonproject_price,group_manager,1,1,1,1
+tasktype_manager,tasktype manager,model_toonproject_tasktype,group_manager,1,1,1,1
+assettype_manager,assettype manager,model_toonproject_assettype,group_manager,1,1,1,1
