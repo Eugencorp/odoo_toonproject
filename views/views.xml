@@ -61,10 +61,8 @@
                         <group>
                             <field name="tasktype_id" string="Тип работ:"/>
                             <field name="description" string="Описание задачи:"/>
-							<group>
-								<field name="factor" string="Сложность:"/>
-								<field name="compute_price_method" string="Способ рассчета стоимости:"/>
-							</group>                     
+							<field name="factor" string="Сложность:"/>
+							<field name="compute_price_method" string="Способ рассчета стоимости:"/>							                     
                             <field name="computed_price" string="Cтоимость: "/>
                             <field name="controler_id" string="Контролер:"/>
                         </group>

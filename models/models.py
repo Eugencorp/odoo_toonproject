@@ -31,7 +31,7 @@ class cartoon(models.Model):
     description = fields.Text()
     
     parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='set null')
-
+    price_ids = fields.One2many('toonproject.price', 'project_id')
 
 import requests, logging, base64
 _logger = logging.getLogger(__name__)
@@ -120,23 +120,27 @@ class task(models.Model):
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
-            # so first we have to collect one or many pairs for valid assets
             sum = 0
             for asset in record.asset_ids:
                 assettype = asset.assettype_id
-                # get is it valid for record.tasktype_id
-                # if not valid:
-                #   continue
-                
+                is_valid = False
+                for validtype in assettype.valid_tasktypes:
+                    if validtype == record.tasktype_id:
+                        is_valid = True
+                        break
+                if not is_valid:
+                    continue                    
                 project = asset.project_id
-                # get price for record.tasktype_id and this project_id or its parent while it has one
-                # if not found:
-                #   break (or continue?)
-                
-                # sum = sum + foundprice * record.factor * asset.size
+                foundprice = 0
+                while project:
+                    for price in project.price_ids:
+                        if price.tasktype_id == record.tasktype_id:
+                            foundprice = price.value
+                            break
+                    project = project.parent_id     
+                sum = sum + foundprice * record.factor * asset.size
                 if record.compute_price_method == 'first':
-                    break
-                
+                    break                
             record.computed_price = sum
     
     # last_status (calculate?)
