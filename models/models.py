@@ -80,6 +80,14 @@ class asset(models.Model, StoresImages):
     icon_video_url = fields.Char(string='URL иконки:')
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
+    
+    '''
+    def create_multiple_tasks(self, cursor, uid, ids, tasktype_ids, context):
+        n = 0 #temporal placeholder
+        for id in ids:
+            n = n + 1 #temporal placeholder
+        return True
+    '''
 
     @api.multi
     @api.depends('icon_video_url')
@@ -137,7 +145,7 @@ class task(models.Model):
                         if price.tasktype_id == record.tasktype_id:
                             foundprice = price.value
                             break
-                    project = project.parent_id     
+                    project = project.parent_idnam     
                 sum = sum + foundprice * record.factor * asset.size
                 if record.compute_price_method == 'first':
                     break                
@@ -145,4 +153,21 @@ class task(models.Model):
     
     # last_status (calculate?)
 
+class CreateTasksWizard(models.TransientModel):
+    _name = 'toonproject.createtasks_wizard'
+    _description = "Wizard: Create tasks for selected assets"
+
+    def _default_assets(self):
+        return self.env['toonproject.asset'].browse(self._context.get('active_ids'))
+
+    asset_ids = fields.Many2many('toonproject.asset',
+        string="Материалы", required=True, default=_default_assets)
+    tasktype_ids = fields.Many2many('toonproject.tasktype', string="Типы задач")
     
+    @api.multi
+    def create_tasks(self):
+        for asset in self.asset_ids:
+            for tasktype in self.tasktype_ids:
+                name = tasktype.name + " " + asset.name 
+                # create the new task (if not exist)
+        return {}    

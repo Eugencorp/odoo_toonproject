@@ -76,10 +76,10 @@
                     <label for="asset_ids"/>
                     <field name="asset_ids"/>
                 
-                    <div class = "oe_chatter">
+                    <!--<div class = "oe_chatter">-->
                          <field name="message_follower_ids" widget="mail_followers"/>
                          <field name="message_ids" widget="mail_thread"/>                    
-                    </div>
+                    <!--</div>-->
                 </sheet>
             </form>
         </field>
@@ -116,6 +116,7 @@
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="project_id" string="проект"/>		
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
@@ -201,7 +202,37 @@
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
                   action="tasks_list_action"/> 
     <menuitem id="prices_menu" name="Расценки" parent="lists_menu"
-                  action="prices_list_action"/>				  
+                  action="prices_list_action"/>	
+
+	<record model="ir.ui.view" id="createtasks_wizard_form_view">
+		<field name="name">createtasks_wizard.form</field>
+		<field name="model">toonproject.createtasks_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Создать задачи">
+				<group>
+					<field name="asset_ids"/>
+					<field name="tasktype_ids"  widget="many2many_checkboxes"/>
+				</group>
+				<footer>
+					<button name="create_tasks" type="object"
+							string="Создать" class="oe_highlight"/>
+					or
+					<button special="отмена" string="Cancel"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
+	<act_window id="launch_createtasks_wizard"
+				name="Создать задачи..."
+				src_model="toonproject.asset"
+				res_model="toonproject.createtasks_wizard"
+				view_mode="form"
+				target="new"
+				key2="client_action_multi"/>
+
+
+
 
     <!-- explicit list view definition -->
     <!--
