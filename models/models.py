@@ -145,7 +145,7 @@ class task(models.Model):
                         if price.tasktype_id == record.tasktype_id:
                             foundprice = price.value
                             break
-                    project = project.parent_idnam     
+                    project = project.parent_id     
                 sum = sum + foundprice * record.factor * asset.size
                 if record.compute_price_method == 'first':
                     break                
@@ -168,6 +168,18 @@ class CreateTasksWizard(models.TransientModel):
     def create_tasks(self):
         for asset in self.asset_ids:
             for tasktype in self.tasktype_ids:
-                name = tasktype.name + " " + asset.name 
-                # create the new task (if not exist)
+                tasktype_is_valid = False
+                for valid_assettype in tasktype.valid_assettypes:
+                    if valid_assettype == asset.assettype_id:
+                        tasktype_is_valid = True
+                        break
+                if tasktype_is_valid:
+                    name = tasktype.name + " " + asset.name 
+                    self.env['toonproject.task'].create(
+                        {
+                            'name': name,
+                            'tasktype_id': tasktype.id,
+                            'asset_ids': [(4,asset.id)]
+                        }
+                    )
         return {}    
