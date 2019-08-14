@@ -32,6 +32,12 @@ class cartoon(models.Model):
     
     parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='set null')
     price_ids = fields.One2many('toonproject.price', 'project_id')
+    
+class status(models.Model):
+    _name='toonproject.status'
+    
+    name = fields.Char()
+    internal_name = fields.Char()
 
 import requests, logging, base64
 _logger = logging.getLogger(__name__)
@@ -125,6 +131,8 @@ class task(models.Model):
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     
+    status_id = fields.Many2one('toonproject.status', string="Статус", default=1) #default=lambda self: self.env['toonproject.status'].search([('internal_name','=','pending')]))
+    
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
@@ -151,7 +159,7 @@ class task(models.Model):
                     break                
             record.computed_price = sum
     
-    # last_status (calculate?)
+
 
 class CreateTasksWizard(models.TransientModel):
     _name = 'toonproject.createtasks_wizard'
