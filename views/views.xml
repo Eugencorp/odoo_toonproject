@@ -71,8 +71,12 @@
                             <field name="work_start" string="принято в работу:"/>
                             <field name="plan_finish" string="планируемое окончание:"/>
                             <field name="real_finish" string="фактическое окончание:"/>
-                            <field name="status_id" string="Статус:"/>
+                            <field name="status" string="Статус:"/>
                         </group>
+                        <button name="button_start" string="взять в работу" type="object"/>
+                        <button name="button_control" string="отправить в проверку" type="object"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object"/>
+                        <button name="button_accept" string="принять" type="object"/>
                     </group>
                     <label for="asset_ids"/>
                     <field name="asset_ids"/>
@@ -132,7 +136,7 @@
           <field name="name" string="задача"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>   
-          <field name="status_id" string="статус"/>          
+          <field name="status" string="статус"/>          
           <field name="worker_id" string="исполнитель"/>
           <field name="work_start" string="начата"/>
           <field name="real_finish" string="закончена"/>
