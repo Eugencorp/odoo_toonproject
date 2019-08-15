@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="toonproject.tasktype" id="anim">
+            <field name="name">мультипликат</field>
+        </record>
+        <record model="toonproject.tasktype" id="lo">
+            <field name="name">lay-out</field>
+        </record>
+        <record model="toonproject.tasktype" id="composing">
+            <field name="name">композ</field>
+        </record>
+        <record model="toonproject.tasktype" id="riging">
+            <field name="name">риг</field>
+        </record>
+        <record model="toonproject.tasktype" id="drawing">
+            <field name="name">графика</field>
+        </record>	
+        <record model="toonproject.tasktype" id="painting">
+            <field name="name">живопись</field>
+        </record>
+
+		<record model="toonproject.assettype" id="scene">
+            <field name="name">сцена</field>
+        </record>		
+		<record model="toonproject.assettype" id="bg">
+            <field name="name">фон</field>
+        </record>
+		<record model="toonproject.assettype" id="rig">
+            <field name="name">риг</field>
+        </record>
+       
+	</data>
+</odoo>
