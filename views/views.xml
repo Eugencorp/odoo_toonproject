@@ -224,7 +224,7 @@
 					<button name="create_tasks" type="object"
 							string="Создать" class="oe_highlight"/>
 					or
-					<button special="отмена" string="Cancel"/>
+					<button special="cancel" string="Отмена"/>
 				</footer>
 			</form>
 		</field>

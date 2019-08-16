@@ -22,12 +22,15 @@
 
 		<record model="toonproject.assettype" id="scene">
             <field name="name">сцена</field>
+			<field name="valid_assettypes" eval="[(6,0,[ref('lo'), ref('anim'), ref('composing')])]"/>
         </record>		
 		<record model="toonproject.assettype" id="bg">
             <field name="name">фон</field>
+			<field name="valid_assettypes" eval="[(6,0,[ref('drawing'), ref('painting')])]"/>
         </record>
 		<record model="toonproject.assettype" id="rig">
             <field name="name">риг</field>
+			<field name="valid_assettypes" eval="[(6,0,[ref('riging')])]"/>
         </record>
        
 	</data>
