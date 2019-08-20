@@ -73,10 +73,10 @@
                             <field name="real_finish" string="фактическое окончание:"/>
                             <field name="status" string="Статус:"/>
                         </group>
-                        <button name="button_start" string="взять в работу" type="object"/>
-                        <button name="button_control" string="отправить в проверку" type="object"/>
-                        <button name="button_reject" string="вернуть на доработку" type="object"/>
-                        <button name="button_accept" string="принять" type="object"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':[('status','!=', 'ready')]}"/>
+                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':[('status','!=', 'progress')]}"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':[('status','!=', 'control')]}"/>
+                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':[('status','!=', 'control')]}"/>
                     </group>
                     <label for="asset_ids"/>
                     <field name="asset_ids"/>
