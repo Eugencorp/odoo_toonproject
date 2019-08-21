@@ -128,6 +128,16 @@ class task(models.Model):
     
     status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending')
     
+    # by default store = False this means the value of this field
+    # is always computed.
+    current_user = fields.Many2one('res.users', compute='_get_current_user')
+
+    @api.depends()
+    def _get_current_user(self):
+        for rec in self:
+            rec.current_user = self.env.user
+        # i think this work too so you don't have to loop
+        self.update({'current_user' : self.env.user.id})
     
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
