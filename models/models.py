@@ -150,12 +150,16 @@ class task(models.Model):
         for rec in self:
             rec.isWorker = (self.env.user.id == rec.worker_id.id)
 
-    @api.depends('worker_id')
+    @api.depends('worker_id','valid_groups')
     def _is_valid_worker(self):
         for rec in self:
-            #some group conditions must be added later
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
-
+            if not rec.worker_id.id:
+                for valid_group in rec.valid_groups:
+                    if self.env.user.id in valid_group.users.ids:
+                        rec.isValidWorker = True
+                        return
+                rec.isValidWorker = False
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
@@ -188,7 +192,8 @@ class task(models.Model):
         for rec in self:
             rec.status = 'progress'
             rec.work_start = fields.Date.today()
-            
+            if not rec.worker_id:
+                rec.worker_id = self.env.user.id
     @api.multi
     def button_control(self):
         for rec in self:
