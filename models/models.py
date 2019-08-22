@@ -125,6 +125,7 @@ class task(models.Model):
     main_asset = fields.Many2one('toonproject.asset', compute='_get_main_asset', string='Материалы')
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
+    pay_date = fields.Date()
     
     status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')

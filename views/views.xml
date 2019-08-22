@@ -146,12 +146,13 @@
           <field name="main_asset" string="объект"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>
-          <field name="computed_price" string="стоимость" sum="сумма:"/>
           <field name="status" string="статус"/>          
           <field name="worker_id" string="исполнитель"/>
           <field name="work_start" string="начата"/>
           <field name="real_finish" string="закончена"/>
           <field name="write_date" string="последние изменения"/>
+          <field name="computed_price" string="стоимость" sum="сумма:"/>
+          <field name="pay_date" string="оплачено"/>
         </tree>
       </field>
     </record> 
