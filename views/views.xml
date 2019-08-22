@@ -143,6 +143,7 @@
           <field name="worker_id" string="исполнитель"/>
           <field name="work_start" string="начата"/>
           <field name="real_finish" string="закончена"/>
+          <field name="write_date" string="последние изменения"/>
         </tree>
       </field>
     </record> 
