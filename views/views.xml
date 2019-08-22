@@ -67,7 +67,7 @@
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
-                            <field name="valid_groups" string="Кому можно выдавать"/>
+                            <field name="valid_groups" string="Кому можно выдавать" widget="many2many_tags"/>
                             <field name="worker_id" string="Исполнитель:"/>
                             <field name="work_start" string="принято в работу:" widget="date"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date"/>
@@ -168,7 +168,7 @@
           <field name="value" string="расценка"/>
           <field name="next_tasktype" string="следующий процесс"/>
           <field name="controlers" string="контролер(ы)"/>
-          <field name="valid_groups" string="группы работников" />
+          <field name="valid_groups" string="группы работников" widget="many2many_tags"/>
         </tree>
       </field>
     </record> 	
