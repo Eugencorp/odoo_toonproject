@@ -126,12 +126,13 @@ class task(models.Model):
     computed_price = fields.Float(compute='_compute_price')
     
     status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending', track_visibility='onchange')
-    
-    # by default store = False this means the value of this field
-    # is always computed.
-    isControler = fields.Boolean(compute='_is_controler')
-    isWorker = fields.Boolean(compute='_is_worker')
-    isValidWorker = fields.Boolean(compute='_is_valid_worker')
+    dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
+    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
+
+
+    isControler = fields.Boolean(compute='_is_controler', store=False)
+    isWorker = fields.Boolean(compute='_is_worker', store=False)
+    isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
 
     @api.depends('controler_id')
     def _is_controler(self):
