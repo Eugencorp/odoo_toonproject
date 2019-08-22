@@ -152,7 +152,7 @@ class task(models.Model):
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
-            sum = 0
+            sm = 0
             for asset in record.asset_ids:
                 assettype = asset.assettype_id
                 is_valid = False
@@ -170,10 +170,10 @@ class task(models.Model):
                             foundprice = price.value
                             break
                     project = project.parent_id     
-                sum = sum + foundprice * record.factor * asset.size
+                sm = sm + foundprice * record.factor * asset.size
                 if record.compute_price_method == 'first':
                     break                
-            record.computed_price = sum
+            record.computed_price = sm
     
     @api.multi
     def button_start(self):
@@ -194,7 +194,8 @@ class task(models.Model):
     @api.multi
     def button_accept(self):
         for rec in self:
-            rec.status = 'finished'            
+            rec.status = 'finished'
+            rec.real_finish = fields.Date.today()
 
 class CreateTasksWizard(models.TransientModel):
     _name = 'toonproject.createtasks_wizard'
