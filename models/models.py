@@ -130,27 +130,19 @@ class task(models.Model):
     
     # by default store = False this means the value of this field
     # is always computed.
-    current_user = fields.Many2one('res.users', compute='_get_current_user')
     isControler = fields.Boolean(compute='_is_controler')
-
-    def test_is_controler(self):
-        for rec in self:
-            result = (self.env.user.id == rec.controler_id.id)
-        return result
+    isWorker = fields.Boolean(compute='_is_worker')
 
     @api.depends('controler_id')
     def _is_controler(self):
         for rec in self:
             rec.isControler = (self.env.user.id == rec.controler_id.id)
 
-
-    @api.depends()
-    def _get_current_user(self):
+    @api.depends('worker_id')
+    def _is_worker(self):
         for rec in self:
-            rec.current_user = self.env.user
-        # i think this work too so you don't have to loop
-        self.update({'current_user' : self.env.user})
-    
+            rec.isWorker = (self.env.user.id == rec.worker_id.id)
+
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
