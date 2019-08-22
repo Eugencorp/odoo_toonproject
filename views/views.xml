@@ -63,7 +63,7 @@
                             <field name="description" string="Описание задачи:"/>
 						    <field name="factor" string="Сложность:"/>
 						    <field name="compute_price_method" string="Способ рассчета стоимости:"/>                 
-                            <field name="computed_price" string="Cтоимость: "/>
+                            <field name="computed_price" string="Cтоимость:"/>
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
@@ -76,10 +76,10 @@
                             <field name="isWorker" invisible="1"/>
                             <field name="isValidWorker" invisible="1"/>
                         </group>
-                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', 'ready'),('isValidWorker','!=',True)]}"/>
-                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', 'progress'),('isWorker','!=',True)]}"/>
-                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}"/>
-                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', 'ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
+                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', 'progress'),('isWorker','!=',True)]}" class="btn-danger"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-danger"/>
+                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
                     <label for="asset_ids"/>
                     <field name="asset_ids"/>
