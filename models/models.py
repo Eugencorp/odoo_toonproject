@@ -111,7 +111,6 @@ class task(models.Model):
     _inherit = 'mail.thread'
     
     name = fields.Char()
-    #type = fields.Selection([('anim','мультипиликат'),('lo','лэй-аут'),('compose','композ'),('rig','риг'),('draw','графика'),('paint','живопись')],'Тип работ', default='anim')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
     factor = fields.Float(default=1)    
     description = fields.Text()
@@ -126,12 +125,13 @@ class task(models.Model):
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending')
+    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending', track_visibility='onchange')
     
     # by default store = False this means the value of this field
     # is always computed.
     isControler = fields.Boolean(compute='_is_controler')
     isWorker = fields.Boolean(compute='_is_worker')
+    isValidWorker = fields.Boolean(compute='_is_valid_worker')
 
     @api.depends('controler_id')
     def _is_controler(self):
@@ -142,6 +142,12 @@ class task(models.Model):
     def _is_worker(self):
         for rec in self:
             rec.isWorker = (self.env.user.id == rec.worker_id.id)
+
+    @api.depends('worker_id')
+    def _is_valid_worker(self):
+        for rec in self:
+            #some group conditions must be added later
+            rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
