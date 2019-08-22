@@ -144,7 +144,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name" string="задача"/>
-          <field name="asset_ids" string="объект"/>
+          <field name="asset_ids" string="объект"  widget="many2many_tags"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>
           <field name="status" string="статус"/>          
@@ -167,7 +167,7 @@
           <field name="tasktype_id" string="вид работ"/>
           <field name="value" string="расценка"/>
           <field name="next_tasktype" string="следующий процесс"/>
-          <field name="controlers" string="контролер(ы)"/>
+          <field name="controlers" string="контролер(ы)" widget="many2many_tags"/>
           <field name="valid_groups" string="группы работников" widget="many2many_tags"/>
         </tree>
       </field>
