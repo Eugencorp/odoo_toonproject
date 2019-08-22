@@ -111,7 +111,6 @@ class task(models.Model):
     _inherit = 'mail.thread'
     
     name = fields.Char()
-    #type = fields.Selection([('anim','мультипиликат'),('lo','лэй-аут'),('compose','композ'),('rig','риг'),('draw','графика'),('paint','живопись')],'Тип работ', default='anim')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
     factor = fields.Float(default=1)    
     description = fields.Text()
@@ -126,31 +125,30 @@ class task(models.Model):
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending')
+    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending', track_visibility='onchange')
     
     # by default store = False this means the value of this field
     # is always computed.
-    current_user = fields.Many2one('res.users', compute='_get_current_user')
     isControler = fields.Boolean(compute='_is_controler')
-
-    def test_is_controler(self):
-        for rec in self:
-            result = (self.env.user.id == rec.controler_id.id)
-        return result
+    isWorker = fields.Boolean(compute='_is_worker')
+    isValidWorker = fields.Boolean(compute='_is_valid_worker')
 
     @api.depends('controler_id')
     def _is_controler(self):
         for rec in self:
             rec.isControler = (self.env.user.id == rec.controler_id.id)
 
-
-    @api.depends()
-    def _get_current_user(self):
+    @api.depends('worker_id')
+    def _is_worker(self):
         for rec in self:
-            rec.current_user = self.env.user
-        # i think this work too so you don't have to loop
-        self.update({'current_user' : self.env.user})
-    
+            rec.isWorker = (self.env.user.id == rec.worker_id.id)
+
+    @api.depends('worker_id')
+    def _is_valid_worker(self):
+        for rec in self:
+            #some group conditions must be added later
+            rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
+
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
