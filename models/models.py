@@ -122,6 +122,7 @@ class task(models.Model):
     real_finish = fields.Date()
     
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
+    main_asset = fields.Many2one('toonproject.asset', compute='_get_main_asset', string='Материалы')
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     
@@ -149,6 +150,17 @@ class task(models.Model):
         for rec in self:
             #some group conditions must be added later
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
+
+    @api.depends('asset_ids')
+    def _get_main_asset(self):
+            for record in self:
+                for asset in record.asset_ids:
+                    res = asset.id
+                    return self.env['toonproject.asset'].search([('id','=',res)])
+                    break
+                return None
+
+
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):

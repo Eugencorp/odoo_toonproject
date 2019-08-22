@@ -132,6 +132,7 @@
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
+          <field name="size" string="размер" sum="общий размер"/>
         </tree>
       </field>
     </record>
@@ -142,8 +143,10 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name" string="задача"/>
+          <field name="main_asset" string="объект"/>
           <field name="tasktype_id" string="вид работ"/>
-          <field name="factor" string="сложность"/>   
+          <field name="factor" string="сложность"/>
+          <field name="computed_price" string="стоимость" sum="сумма:"/>
           <field name="status" string="статус"/>          
           <field name="worker_id" string="исполнитель"/>
           <field name="work_start" string="начата"/>
