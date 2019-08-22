@@ -68,9 +68,9 @@
                         </group>
                         <group>
                             <field name="worker_id" string="Исполнитель:"/>
-                            <field name="work_start" string="принято в работу:"/>
-                            <field name="plan_finish" string="планируемое окончание:"/>
-                            <field name="real_finish" string="фактическое окончание:"/>
+                            <field name="work_start" string="принято в работу:" widget="date"/>
+                            <field name="plan_finish" string="планируемое окончание:" widget="date"/>
+                            <field name="real_finish" string="фактическое окончание:" widget="date"/>
                             <field name="status" string="Статус:"/>
                             <field name="isControler" invisible="1"/>
                             <field name="isWorker" invisible="1"/>

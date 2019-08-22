@@ -179,6 +179,7 @@ class task(models.Model):
     def button_start(self):
         for rec in self:
             rec.status = 'progress'
+            rec.work_start = fields.Date.today()
             
     @api.multi
     def button_control(self):
