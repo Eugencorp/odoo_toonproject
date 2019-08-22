@@ -125,7 +125,7 @@ class task(models.Model):
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending', track_visibility='onchange')
+    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
 
@@ -197,6 +197,20 @@ class task(models.Model):
         for rec in self:
             rec.status = 'finished'
             rec.real_finish = fields.Date.today()
+
+    @api.multi
+    def write(self, values):
+        if values.get('status')=='finished':
+            for dependent_task in self.dependent_tasks:
+                if dependent_task.status == 'pending':
+                    to_begin = True
+                    for affecting_task in dependent_task.affecting_tasks:
+                        if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
+                            to_begin = False
+                            break
+                    if to_begin:
+                        dependent_task.status = "ready"
+        return super(task, self).write(values)
 
 class CreateTasksWizard(models.TransientModel):
     _name = 'toonproject.createtasks_wizard'
