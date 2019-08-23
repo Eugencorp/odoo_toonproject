@@ -122,7 +122,6 @@ class task(models.Model):
     
     controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
     precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
-    current_control = fields.Many2one('res.users', ondelete='set null', index=True, default='_default_control')
     worker_id = fields.Many2one('res.users', ondelete='set null', index=True)
     work_start = fields.Date()
     plan_finish = fields.Date()
@@ -151,11 +150,14 @@ class task(models.Model):
             else:
                 rec.current_control = rec.controler_id
 
+    current_control = fields.Many2one('res.users', string="должен проверить", default=_default_control, track_visibility='onchange')
+
     @api.depends('current_control')
     def _is_controler(self):
         for rec in self:
+            if not rec.current_control:
+                rec._default_control()
             rec.isControler = (self.env.user.id == rec.current_control.id)
-
     @api.depends('worker_id')
     def _is_worker(self):
         for rec in self:
@@ -260,16 +262,20 @@ class task(models.Model):
 
     @api.multi
     def write(self, values):
-        if values.get('status')=='finished':
-            for dependent_task in self.dependent_tasks:
-                if dependent_task.status == 'pending':
-                    to_begin = True
-                    for affecting_task in dependent_task.affecting_tasks:
-                        if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
-                            to_begin = False
-                            break
-                    if to_begin:
-                        dependent_task.status = "ready"
+        if values.get('status') == 'finished':
+            for rec in self:
+                for dependent_task in rec.dependent_tasks:
+                    if dependent_task.status == 'pending':
+                        to_begin = True
+                        for affecting_task in dependent_task.affecting_tasks:
+                            if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
+                                to_begin = False
+                                break
+                        if to_begin:
+                            dependent_task.status = "ready"
+        if values.get('controler_id') or values.get('precontroler_id'):
+            for rec in self:
+                rec.current_control = values.get('precontroler_id') or values.get('controler_id')
         return super(task, self).write(values)
 
 
