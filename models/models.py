@@ -161,7 +161,25 @@ class task(models.Model):
                         return
                 rec.isValidWorker = False
 
+    def getMainAsset(self):
+        #find first asset have legal tasktype
+        for asset in self.asset_ids:
+            for valid_tasktype in asset.assettype_id.valid_tasktypes:
+                if valid_tasktype == self.tasktype_id:
+                    return asset
+        return None
+
+    def getProject(self):
+        gotMainAsset = self.getMainAsset()
+        if gotMainAsset:
+            return gotMainAsset.project_id
+        return None
+
     def getPriceRecord(taskRec, assetRec):
+        if not assetRec:
+            assetRec = taskRec.getMainAsset()
+        if not assetRec:
+            return None
         type = taskRec.tasktype_id
         project = assetRec.project_id
         while project:
@@ -212,14 +230,28 @@ class task(models.Model):
     @api.multi
     def button_reject(self):
         for rec in self:
-            rec.status = 'progress'  
+            gotPrice = self.getPriceRecord()
+            if gotPrice and len(gotPrice.controlers)>1:
+                if rec.controler_id in gotPrice.controlers:
+                    rec.controler_id = gotPrice.controlers[0]
+            rec.status = 'progress'
+
+    def finishMe(self):
+        self.status = 'finished'
+        self.real_finish = fields.Date.today()
 
     @api.multi
     def button_accept(self):
         for rec in self:
-            rec.status = 'finished'
-            rec.real_finish = fields.Date.today()
-
+            gotPrice = self.getPriceRecord()
+            if (not gotPrice) or len(gotPrice.controlers)<2:
+                return rec.finishMe
+            for i in range(len(gotPrice.controlers)):
+                if gotPrice.controlers[i]==rec.controler_id:
+                    if i >= len(gotPrice.controlers)-1:
+                        return rec.finishMe
+                    rec.controler_id = gotPrice.controlers[i+1]
+                    return
     @api.multi
     def write(self, values):
         if values.get('status')=='finished':
