@@ -275,5 +275,14 @@ class CreateTasksWizard(models.TransientModel):
                         if next_task.tasktype_id == next_type:
                             task.dependent_tasks |= next_task
                             break
+                    task.valid_groups = priceRec.valid_groups
+                    if len(priceRec.controlers)>0:
+                        task.controler_id = priceRec.controlers[0]
 
-        return {}    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tasks',
+            'res_model': 'toonproject.task',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+        }
