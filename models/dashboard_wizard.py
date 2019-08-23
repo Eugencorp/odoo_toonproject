@@ -27,11 +27,3 @@ class DashboardForm(models.Model):
     valid_tasks = fields.Many2many('toonproject.task',
                                  string="Можно взять в работу", required=True, compute='_valid_tasks')
 
-class DashboardWizard(models.TransientModel):
-    _name = 'toonproject.dashboard_wizard'
-
-    def _my_tasks(self):
-        return self.env['toonproject.task'].search([])
-
-    my_tasks = fields.Many2many('toonproject.task',
-                                 string="В работе", required=True, default=_my_tasks)

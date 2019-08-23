@@ -26,35 +26,6 @@
         <field name="res_id">1</field>
     </record>
 
-    <record model="ir.ui.view" id="dashboard_wizard_form_view">
-      <field name="name">dashboard_wizard.form</field>
-      <field name="model">toonproject.dashboard_wizard</field>
-      <field name="arch" type="xml">
-        <form string="Мои задачи">
-          <group>
-            <field name="my_tasks"/>
-          </group>
-        </form>
-      </field>
-    </record>
-<!--
-    <act_window id="dashboard_wizard_action"
-				name="Мои задачи"
-				src_model="toonproject.task"
-				res_model="toonproject.dashboard_wizard"
-				view_mode="form"
-				target="new"
-				key2="client_action_multi"/>
--->
-
-    <record model="ir.actions.act_window" id="dashboard_wizard_action">
-        <field name="name">Tasks</field>
-        <field name="res_model">toonproject.dashboard_wizard</field>
-        <!--<field name="view_type">form</field>-->
-        <field name="view_mode">form</field>
-    </record>
-
-
     <menuitem id="dashboard_menu" name="Мои задачи" parent="main_toonproject_menu"
               sequence="1"
               action="dashboard_form_action"/>
