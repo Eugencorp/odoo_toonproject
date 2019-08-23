@@ -26,7 +26,7 @@ class price(models.Model):
     controler_id = fields.Many2one('res.users', string='контроль')
     precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
     next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
-    valid_groups = fields.Many2many('res.groups', string='группы работников')
+    valid_group = fields.Many2one('res.groups', string='группа работников')
     
 
 class cartoon(models.Model):
@@ -140,7 +140,7 @@ class task(models.Model):
     isControler = fields.Boolean(compute='_is_controler', store=False)
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
-    valid_groups = fields.Many2many('res.groups', string='группы работников')
+    valid_group = fields.Many2one('res.groups', string='группа работников')
 
     @api.multi
     def _default_control(self):
@@ -163,16 +163,12 @@ class task(models.Model):
         for rec in self:
             rec.isWorker = (self.env.user.id == rec.worker_id.id)
 
-    @api.depends('worker_id','valid_groups')
+    @api.depends('worker_id','valid_group')
     def _is_valid_worker(self):
         for rec in self:
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
             if not rec.worker_id.id:
-                for valid_group in rec.valid_groups:
-                    if self.env.user.id in valid_group.users.ids:
-                        rec.isValidWorker = True
-                        return
-                rec.isValidWorker = False
+                rec.isValidWorker = (not rec.valid_group) or (self.env.user.id in rec.valid_group.users.ids)
 
     def getMainAsset(self):
         #find first asset have legal tasktype
@@ -319,7 +315,7 @@ class CreateTasksWizard(models.TransientModel):
                         if next_task.tasktype_id == next_type:
                             task.dependent_tasks |= next_task
                             break
-                    task.valid_groups = priceRec.valid_groups
+                    task.valid_group = priceRec.valid_group
                     task.controler_id = priceRec.controler_id
                     task.precontroler_id = priceRec.precontroler_id
 
@@ -330,3 +326,6 @@ class CreateTasksWizard(models.TransientModel):
             'view_type': 'form',
             'view_mode': 'tree,form',
         }
+
+
+

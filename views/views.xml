@@ -30,7 +30,7 @@
                         <field name="next_tasktype" string="Следующий процесс"/>
                         <field name="precontroler_id" string="предварительный контроль" attrs="{'invisible':[('controler_id','=',None)]}"/>
                         <field name="controler_id" string="контроль" />
-                        <field name="valid_groups" string="Группы исполнителей" widget="many2many_tags"/>
+                        <field name="valid_group" string="Группа исполнителей"/>
                     </group>
                 </sheet>
             </form>
@@ -88,7 +88,7 @@
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
-                            <field name="valid_groups" string="Кому можно выдавать" widget="many2many_tags"/>
+                            <field name="valid_group" string="Кому можно выдавать" />
                             <field name="worker_id" string="Исполнитель:"/>
                             <field name="work_start" string="принято в работу:" widget="date"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date"/>
@@ -191,7 +191,7 @@
           <field name="next_tasktype" string="следующий процесс"/>
           <field name="precontroler_id" string="предварительный контроль"/>
           <field name="controler_id" string="контроль"/>
-          <field name="valid_groups" string="группы работников" widget="many2many_tags"/>
+          <field name="valid_group" string="группа работников"/>
         </tree>
       </field>
     </record> 	

@@ -5,3 +5,4 @@ cartoon_manager,cartoon manager,model_toonproject_cartoon,group_manager,1,1,1,1
 price_manager,price manager,model_toonproject_price,group_manager,1,1,1,1
 tasktype_manager,tasktype manager,model_toonproject_tasktype,group_manager,1,1,1,1
 assettype_manager,assettype manager,model_toonproject_assettype,group_manager,1,1,1,1
+dashboard_manager,dashboard manager,model_toonproject_dashboard,group_manager,1,0,0,0
