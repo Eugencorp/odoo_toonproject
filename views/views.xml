@@ -67,6 +67,7 @@
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
+                            <field name="valid_groups" string="Кому можно выдавать" widget="many2many_tags"/>
                             <field name="worker_id" string="Исполнитель:"/>
                             <field name="work_start" string="принято в работу:" widget="date"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date"/>
@@ -76,13 +77,18 @@
                             <field name="isWorker" invisible="1"/>
                             <field name="isValidWorker" invisible="1"/>
                         </group>
+                        <label for="asset_ids"/>
+                        <field name="asset_ids"/>
+                        <label for="affecting_tasks"/>
+                        <field name="affecting_tasks"/>
+                        <label for="dependent_tasks" />
+                        <field name="dependent_tasks" />
                         <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', 'ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
                         <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', 'progress'),('isWorker','!=',True)]}" class="btn-danger"/>
                         <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-danger"/>
                         <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
-                    <label for="asset_ids"/>
-                    <field name="asset_ids"/>
+
                 
                     <div class = "oe_chatter">
                          <field name="message_follower_ids" widget="mail_followers"/>
@@ -127,6 +133,7 @@
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
+          <field name="size" string="размер" sum="общий размер"/>
         </tree>
       </field>
     </record>
@@ -137,13 +144,16 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name" string="задача"/>
+          <field name="asset_ids" string="объект"  widget="many2many_tags"/>
           <field name="tasktype_id" string="вид работ"/>
-          <field name="factor" string="сложность"/>   
+          <field name="factor" string="сложность"/>
           <field name="status" string="статус"/>          
           <field name="worker_id" string="исполнитель"/>
           <field name="work_start" string="начата"/>
           <field name="real_finish" string="закончена"/>
           <field name="write_date" string="последние изменения"/>
+          <field name="computed_price" string="стоимость" sum="сумма:"/>
+          <field name="pay_date" string="оплачено"/>
         </tree>
       </field>
     </record> 
@@ -156,6 +166,9 @@
           <field name="project_id" string="проект"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="value" string="расценка"/>
+          <field name="next_tasktype" string="следующий процесс"/>
+          <field name="controlers" string="контролер(ы)" widget="many2many_tags"/>
+          <field name="valid_groups" string="группы работников" widget="many2many_tags"/>
         </tree>
       </field>
     </record> 	
@@ -212,7 +225,7 @@
                   action="assets_list_action"/>    
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
                   action="tasks_list_action"/> 
-    <menuitem id="prices_menu" name="Расценки" parent="lists_menu"
+    <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
                   action="prices_list_action"/>	
 
 	<record model="ir.ui.view" id="createtasks_wizard_form_view">

@@ -22,6 +22,10 @@ class price(models.Model):
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
+
+    controlers = fields.Many2many('res.users', string='контролер(ы)')
+    next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
+    valid_groups = fields.Many2many('res.groups', string='группы работников')
     
 
 class cartoon(models.Model):
@@ -124,14 +128,17 @@ class task(models.Model):
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
+    pay_date = fields.Date()
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово')], string='Статус', default='pending', track_visibility='onchange')
-    
-    # by default store = False this means the value of this field
-    # is always computed.
-    isControler = fields.Boolean(compute='_is_controler')
-    isWorker = fields.Boolean(compute='_is_worker')
-    isValidWorker = fields.Boolean(compute='_is_valid_worker')
+    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
+    dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
+    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
+
+
+    isControler = fields.Boolean(compute='_is_controler', store=False)
+    isWorker = fields.Boolean(compute='_is_worker', store=False)
+    isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
+    valid_groups = fields.Many2many('res.groups', string='группы работников')
 
     @api.depends('controler_id')
     def _is_controler(self):
@@ -143,11 +150,26 @@ class task(models.Model):
         for rec in self:
             rec.isWorker = (self.env.user.id == rec.worker_id.id)
 
-    @api.depends('worker_id')
+    @api.depends('worker_id','valid_groups')
     def _is_valid_worker(self):
         for rec in self:
-            #some group conditions must be added later
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
+            if not rec.worker_id.id:
+                for valid_group in rec.valid_groups:
+                    if self.env.user.id in valid_group.users.ids:
+                        rec.isValidWorker = True
+                        return
+                rec.isValidWorker = False
+
+    def getPriceRecord(taskRec, assetRec):
+        type = taskRec.tasktype_id
+        project = assetRec.project_id
+        while project:
+            for price in project.price_ids:
+                if price.tasktype_id == type:
+                    return price
+            project = project.parent_id
+
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
@@ -180,7 +202,8 @@ class task(models.Model):
         for rec in self:
             rec.status = 'progress'
             rec.work_start = fields.Date.today()
-            
+            if not rec.worker_id:
+                rec.worker_id = self.env.user.id
     @api.multi
     def button_control(self):
         for rec in self:
@@ -197,6 +220,23 @@ class task(models.Model):
             rec.status = 'finished'
             rec.real_finish = fields.Date.today()
 
+    @api.multi
+    def write(self, values):
+        if values.get('status')=='finished':
+            for dependent_task in self.dependent_tasks:
+                if dependent_task.status == 'pending':
+                    to_begin = True
+                    for affecting_task in dependent_task.affecting_tasks:
+                        if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
+                            to_begin = False
+                            break
+                    if to_begin:
+                        dependent_task.status = "ready"
+        return super(task, self).write(values)
+
+
+
+
 class CreateTasksWizard(models.TransientModel):
     _name = 'toonproject.createtasks_wizard'
     _description = "Wizard: Create tasks for selected assets"
@@ -211,6 +251,7 @@ class CreateTasksWizard(models.TransientModel):
     @api.multi
     def create_tasks(self):
         for asset in self.asset_ids:
+            created = self.env['toonproject.task']
             for tasktype in self.tasktype_ids:
                 tasktype_is_valid = False
                 for valid_assettype in tasktype.valid_assettypes:
@@ -219,11 +260,29 @@ class CreateTasksWizard(models.TransientModel):
                         break
                 if tasktype_is_valid:
                     name = tasktype.name + " " + asset.name 
-                    self.env['toonproject.task'].create(
+                    created = created|self.env['toonproject.task'].create(
                         {
                             'name': name,
                             'tasktype_id': tasktype.id,
                             'asset_ids': [(4,asset.id)]
                         }
                     )
-        return {}    
+            for task in created:
+                priceRec = task.getPriceRecord(asset)
+                if priceRec:
+                    next_type = priceRec.next_tasktype
+                    for next_task in created:
+                        if next_task.tasktype_id == next_type:
+                            task.dependent_tasks |= next_task
+                            break
+                    task.valid_groups = priceRec.valid_groups
+                    if len(priceRec.controlers)>0:
+                        task.controler_id = priceRec.controlers[0]
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tasks',
+            'res_model': 'toonproject.task',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+        }
