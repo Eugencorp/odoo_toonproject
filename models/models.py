@@ -161,6 +161,16 @@ class task(models.Model):
                         return
                 rec.isValidWorker = False
 
+    def getPriceRecord(taskRec, assetRec):
+        type = taskRec.tasktype_id
+        project = assetRec.project_id
+        while project:
+            for price in project.price_ids:
+                if price.tasktype_id == type:
+                    return price
+            project = project.parent_id
+
+
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
         for record in self:
@@ -241,6 +251,7 @@ class CreateTasksWizard(models.TransientModel):
     @api.multi
     def create_tasks(self):
         for asset in self.asset_ids:
+            created = self.env['toonproject.task']
             for tasktype in self.tasktype_ids:
                 tasktype_is_valid = False
                 for valid_assettype in tasktype.valid_assettypes:
@@ -249,11 +260,20 @@ class CreateTasksWizard(models.TransientModel):
                         break
                 if tasktype_is_valid:
                     name = tasktype.name + " " + asset.name 
-                    self.env['toonproject.task'].create(
+                    created = created|self.env['toonproject.task'].create(
                         {
                             'name': name,
                             'tasktype_id': tasktype.id,
                             'asset_ids': [(4,asset.id)]
                         }
                     )
+            for task in created:
+                priceRec = task.getPriceRecord(asset)
+                if priceRec:
+                    next_type = priceRec.next_tasktype
+                    for next_task in created:
+                        if next_task.tasktype_id == next_type:
+                            task.dependent_tasks |= next_task
+                            break
+
         return {}    
