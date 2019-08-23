@@ -23,7 +23,8 @@ class price(models.Model):
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
 
-    controlers = fields.Many2many('res.users', string='контролер(ы)')
+    controler_id = fields.Many2one('res.users', string='контроль')
+    precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
     next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_groups = fields.Many2many('res.groups', string='группы работников')
     
@@ -120,6 +121,8 @@ class task(models.Model):
     description = fields.Text()
     
     controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
+    precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
+    current_control = fields.Many2one('res.users', ondelete='set null', index=True, default='_default_control')
     worker_id = fields.Many2one('res.users', ondelete='set null', index=True)
     work_start = fields.Date()
     plan_finish = fields.Date()
@@ -140,10 +143,18 @@ class task(models.Model):
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
     valid_groups = fields.Many2many('res.groups', string='группы работников')
 
-    @api.depends('controler_id')
+    @api.multi
+    def _default_control(self):
+        for rec in self:
+            if rec.precontroler_id:
+                rec.current_control = rec.precontroler_id
+            else:
+                rec.current_control = rec.controler_id
+
+    @api.depends('current_control')
     def _is_controler(self):
         for rec in self:
-            rec.isControler = (self.env.user.id == rec.controler_id.id)
+            rec.isControler = (self.env.user.id == rec.current_control.id)
 
     @api.depends('worker_id')
     def _is_worker(self):
@@ -230,10 +241,8 @@ class task(models.Model):
     @api.multi
     def button_reject(self):
         for rec in self:
-            gotPrice = self.getPriceRecord()
-            if gotPrice and len(gotPrice.controlers)>1:
-                if rec.controler_id in gotPrice.controlers:
-                    rec.controler_id = gotPrice.controlers[0]
+            if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
+                rec.current_control = rec.precontroler_id
             rec.status = 'progress'
 
     def finishMe(self):
@@ -243,15 +252,12 @@ class task(models.Model):
     @api.multi
     def button_accept(self):
         for rec in self:
-            gotPrice = self.getPriceRecord()
-            if (not gotPrice) or len(gotPrice.controlers)<2:
-                return rec.finishMe
-            for i in range(len(gotPrice.controlers)):
-                if gotPrice.controlers[i]==rec.controler_id:
-                    if i >= len(gotPrice.controlers)-1:
-                        return rec.finishMe
-                    rec.controler_id = gotPrice.controlers[i+1]
-                    return
+            if rec.current_control.id == rec.controler_id.id:
+                self.status = 'finished'
+                self.real_finish = fields.Date.today()
+            else:
+                rec.current_control = rec.controler_id
+
     @api.multi
     def write(self, values):
         if values.get('status')=='finished':
@@ -308,8 +314,8 @@ class CreateTasksWizard(models.TransientModel):
                             task.dependent_tasks |= next_task
                             break
                     task.valid_groups = priceRec.valid_groups
-                    if len(priceRec.controlers)>0:
-                        task.controler_id = priceRec.controlers[0]
+                    task.controler_id = priceRec.controler_id
+                    task.precontroler_id = priceRec.precontroler_id
 
         return {
             'type': 'ir.actions.act_window',
