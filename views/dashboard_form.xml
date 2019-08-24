@@ -11,13 +11,52 @@
         <field name="arch" type="xml">
           <form string="Мои задачи">
             <label for="my_control"/>
-            <field name="my_control"/>
+            <field name="my_control">
+              <tree>
+                <field name="name" string="задача"/>
+                <field name="short_description" string="содержание"/>
+                <field name="asset_ids" string="объект"  widget="many2many_tags"/>
+                <field name="tasktype_id" string="вид работ"/>
+                <field name="factor" string="сложность"/>
+                <field name="worker_id" string="исполнитель"/>
+                <field name="work_start" string="начата"/>
+                <field name="write_date" string="последние изменения"/>
+              </tree>
+            </field>
             <label for="my_tasks"/>
-            <field name="my_tasks"/>
+            <field name="my_tasks">
+              <tree>
+                <field name="name" string="задача"/>
+                <field name="short_description" string="содержание"/>
+                <field name="asset_ids" string="объект"  widget="many2many_tags"/>
+                <field name="tasktype_id" string="вид работ"/>
+                <field name="factor" string="сложность"/>
+                <field name="status" string="статус"/>
+                <field name="work_start" string="начата"/>
+                <field name="write_date" string="последние изменения"/>
+                <field name="computed_price" string="стоимость" sum="сумма:"/>
+              </tree>
+            </field>
             <label for="for_pay"/>
-            <field name="for_pay"/>
+            <field name="for_pay">
+                      <tree>
+                        <field name="name" string="задача"/>
+                        <field name="tasktype_id" string="вид работ"/>
+                        <field name="factor" string="сложность"/>
+                        <field name="computed_price" string="стоимость" sum="сумма:"/>
+                      </tree>
+            </field>
             <label for="valid_tasks"/>
-            <field name="valid_tasks"/>
+            <field name="valid_tasks">
+              <tree>
+                <field name="name" string="задача"/>
+                <field name="short_description" string="содержание"/>
+                <field name="asset_ids" string="объект"  widget="many2many_tags"/>
+                <field name="tasktype_id" string="вид работ"/>
+                <field name="factor" string="сложность"/>
+                <field name="computed_price" string="стоимость" sum="сумма:"/>
+                </tree>
+            </field>
           </form>
         </field>
     </record>

@@ -117,7 +117,8 @@ class task(models.Model):
     
     name = fields.Char()
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
-    factor = fields.Float(default=1)    
+    factor = fields.Float(default=1)
+    short_description = fields.Char()
     description = fields.Text()
     
     controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
@@ -304,7 +305,8 @@ class CreateTasksWizard(models.TransientModel):
                         {
                             'name': name,
                             'tasktype_id': tasktype.id,
-                            'asset_ids': [(4,asset.id)]
+                            'asset_ids': [(4,asset.id)],
+                            'short_description': asset.short_description,
                         }
                     )
             for task in created:
