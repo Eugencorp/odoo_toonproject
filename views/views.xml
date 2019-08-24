@@ -30,7 +30,7 @@
                         <field name="next_tasktype" string="Следующий процесс"/>
                         <field name="precontroler_id" string="предварительный контроль" attrs="{'invisible':[('controler_id','=',None)]}"/>
                         <field name="controler_id" string="контроль" />
-                        <field name="valid_groups" string="Группы исполнителей" widget="many2many_tags"/>
+                        <field name="valid_group" string="Группа исполнителей"/>
                     </group>
                 </sheet>
             </form>
@@ -88,7 +88,7 @@
                             <field name="controler_id" string="Контролер:"/>
                         </group>
                         <group>
-                            <field name="valid_groups" string="Кому можно выдавать" widget="many2many_tags"/>
+                            <field name="valid_group" string="Кому можно выдавать" />
                             <field name="worker_id" string="Исполнитель:"/>
                             <field name="work_start" string="принято в работу:" widget="date"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date"/>
@@ -111,11 +111,10 @@
                         <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
-                
-                    <div class = "oe_chatter">
+                    <div class = "oe_chatter"></div>
                          <field name="message_follower_ids" widget="mail_followers"/>
                          <field name="message_ids" widget="mail_thread"/>                    
-                    </div>
+
                 </sheet>
             </form>
         </field>
@@ -191,7 +190,7 @@
           <field name="next_tasktype" string="следующий процесс"/>
           <field name="precontroler_id" string="предварительный контроль"/>
           <field name="controler_id" string="контроль"/>
-          <field name="valid_groups" string="группы работников" widget="many2many_tags"/>
+          <field name="valid_group" string="группа работников"/>
         </tree>
       </field>
     </record> 	
@@ -240,7 +239,7 @@
         </field>
     </record>   
     
-    <menuitem id="main_toonproject_menu" name="Toon Project"/>
+    <menuitem id="main_toonproject_menu" name="The Toon Project" sequence="0"/>
     <menuitem id="lists_menu" name="Списки" parent="main_toonproject_menu"/>
     <menuitem id="projects_menu" name="Проекты" parent="lists_menu"
                   action="cartoons_list_action"/>        
@@ -279,61 +278,6 @@
 				key2="client_action_multi"/>
                   
 
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="toonproject.list">
-      <field name="name">toonproject list</field>
-      <field name="model">toonproject.toonproject</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
 
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="toonproject.action_window">
-      <field name="name">toonproject window</field>
-      <field name="res_model">toonproject.toonproject</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
-
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="toonproject.action_server">
-      <field name="name">toonproject server</field>
-      <field name="model_id" ref="model_toonproject_toonproject"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
-
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="toonproject" id="toonproject.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="toonproject.menu_1" parent="toonproject.menu_root"/>
-    <menuitem name="Menu 2" id="toonproject.menu_2" parent="toonproject.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="toonproject.menu_1_list" parent="toonproject.menu_1"
-              action="toonproject.action_window"/>
-    <menuitem name="Server to list" id="toonproject" parent="toonproject.menu_2"
-              action="toonproject.action_server"/>
-    -->
   </data>
 </odoo>
