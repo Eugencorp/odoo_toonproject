@@ -64,7 +64,18 @@
                         </group>
                     </group>
                     <label for="task_ids"/>
-                    <field name="task_ids"/>
+                    <field name="task_ids">
+                      <tree class="no_open">
+                        <button name="open_task_view_py" string="смотреть" type="object"/>
+                        <field name="name" string="задача"/>
+                        <field name="tasktype_id" string="вид работ"/>
+                        <field name="worker_id" string="исполнитель"/>
+                        <field name="status" string="статус"/>
+                      </tree>
+                    </field>
+                  <script>
+                      jQuery('.no_open .o_data_row td').click(function(evt) { evt.stopPropagation(); });
+                  </script>
                 </sheet>
             </form>
         </field>
@@ -111,9 +122,10 @@
                         <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
-                    <div class = "oe_chatter"></div>
+                    <div class = "oe_chatter" style="display:block;">
                          <field name="message_follower_ids" widget="mail_followers"/>
-                         <field name="message_ids" widget="mail_thread"/>                    
+                         <field name="message_ids" widget="mail_thread"/>
+                    </div>
 
                 </sheet>
             </form>
@@ -196,7 +208,7 @@
     </record> 	
 
     <record model="ir.actions.act_window" id="cartoons_list_action">
-        <field name="name">Projects</field>
+        <field name="name">Проекты</field>
         <field name="res_model">toonproject.cartoon</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
@@ -207,7 +219,7 @@
     </record>    
 
     <record model="ir.actions.act_window" id="assets_list_action">
-        <field name="name">Assets</field>
+        <field name="name">Материалы</field>
         <field name="res_model">toonproject.asset</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
@@ -218,7 +230,7 @@
     </record>
     
     <record model="ir.actions.act_window" id="tasks_list_action">
-        <field name="name">Tasks</field>
+        <field name="name">Задачи</field>
         <field name="res_model">toonproject.task</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
@@ -229,7 +241,7 @@
     </record>
 
     <record model="ir.actions.act_window" id="prices_list_action">
-        <field name="name">Prices</field>
+        <field name="name">Расценки и пайплайн</field>
         <field name="res_model">toonproject.price</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
@@ -276,8 +288,12 @@
 				view_mode="form"
 				target="new"
 				key2="client_action_multi"/>
-                  
 
+    <template id="assets_end" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script src="/toonproject/static/src/js/widgets.js" type="text/javascript" />
+        </xpath>
+    </template>
 
   </data>
 </odoo>
