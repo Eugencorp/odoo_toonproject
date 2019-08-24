@@ -286,5 +286,11 @@
 				target="new"
 				key2="client_action_multi"/>
 
+    <template id="assets_end" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script src="/toonproject/static/src/js/widgets.js" type="text/javascript" />
+        </xpath>
+    </template>
+
   </data>
 </odoo>
