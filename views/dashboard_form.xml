@@ -13,6 +13,7 @@
             <label for="my_control"/>
             <field name="my_control">
               <tree>
+                <button name="open_task_view_py" string="смотреть" type="object"/>
                 <field name="name" string="задача"/>
                 <field name="short_description" string="содержание"/>
                 <field name="asset_ids" string="объект"  widget="many2many_tags"/>
@@ -26,6 +27,8 @@
             <label for="my_tasks"/>
             <field name="my_tasks">
               <tree>
+                <field name="id" invisible="1"/>
+                <button name="open_task_view_py" string="смотреть" type="object"/>
                 <field name="name" string="задача"/>
                 <field name="short_description" string="содержание"/>
                 <field name="asset_ids" string="объект"  widget="many2many_tags"/>
@@ -49,6 +52,7 @@
             <label for="valid_tasks"/>
             <field name="valid_tasks">
               <tree>
+                <button name="open_task_view_py" string="смотреть" type="object"/>
                 <field name="name" string="задача"/>
                 <field name="short_description" string="содержание"/>
                 <field name="asset_ids" string="объект"  widget="many2many_tags"/>

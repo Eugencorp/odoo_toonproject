@@ -64,7 +64,15 @@
                         </group>
                     </group>
                     <label for="task_ids"/>
-                    <field name="task_ids"/>
+                    <field name="task_ids">
+                      <tree>
+                        <button name="open_task_view_py" string="смотреть" type="object"/>
+                        <field name="name" string="задача"/>
+                        <field name="tasktype_id" string="вид работ"/>
+                        <field name="worker_id" string="исполнитель"/>
+                        <field name="status" string="статус"/>
+                      </tree>
+                    </field>
                 </sheet>
             </form>
         </field>
@@ -111,9 +119,10 @@
                         <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
-                    <div class = "oe_chatter"></div>
+                    <div class = "oe_chatter" style="display:block;">
                          <field name="message_follower_ids" widget="mail_followers"/>
-                         <field name="message_ids" widget="mail_thread"/>                    
+                         <field name="message_ids" widget="mail_thread"/>
+                    </div>
 
                 </sheet>
             </form>
@@ -276,8 +285,6 @@
 				view_mode="form"
 				target="new"
 				key2="client_action_multi"/>
-                  
-
 
   </data>
 </odoo>

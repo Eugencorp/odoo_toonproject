@@ -275,7 +275,17 @@ class task(models.Model):
                 rec.current_control = values.get('precontroler_id') or values.get('controler_id')
         return super(task, self).write(values)
 
-
+    def open_task_view_py(self):
+        #import pdb
+        #pdb.set_trace()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'toonproject.task',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'current',
+        }
 
 
 class CreateTasksWizard(models.TransientModel):
