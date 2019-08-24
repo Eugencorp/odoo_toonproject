@@ -5,7 +5,6 @@ from odoo import models, fields, api
 class DashboardForm(models.Model):
     _name='toonproject.dashboard'
     name = fields.Char()
-    dummy_int = fields.Integer()
 
     @api.multi
     def _my_tasks(self):
