@@ -2,7 +2,7 @@
   <data>
 
     <record id="single" model="toonproject.dashboard">
-            <field name="name">single</field>
+            <field name="name">Актуальное</field>
     </record>
 
     <record model="ir.ui.view" id="dashboard_form_view">
@@ -14,6 +14,8 @@
             <field name="my_control"/>
             <label for="my_tasks"/>
             <field name="my_tasks"/>
+            <label for="for_pay"/>
+            <field name="for_pay"/>
             <label for="valid_tasks"/>
             <field name="valid_tasks"/>
           </form>

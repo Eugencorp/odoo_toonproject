@@ -9,7 +9,12 @@ class DashboardForm(models.Model):
     @api.multi
     def _my_tasks(self):
         for rec in self:
-            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid)])
+            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','!=','finished'),('status','!=','pause'),('status','!=','canceled')])
+
+    @api.multi
+    def _for_pay(self):
+        for rec in self:
+            rec.for_pay =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','=','finished'),('pay_date','=',None)])
 
     @api.multi
     def _valid_tasks(self):
@@ -39,4 +44,7 @@ class DashboardForm(models.Model):
 
     my_control = fields.Many2many('toonproject.task',
                                  string="Мне в проверку", required=True, compute='_my_control')
+
+    for_pay = fields.Many2many('toonproject.task',
+                                 string="В оплату", required=True, compute='_for_pay')
 
