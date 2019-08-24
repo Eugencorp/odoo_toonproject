@@ -1,9 +1,36 @@
-var oldList = require('web.ListView.List');
-var newList = oldList.extend({
-        row_clicked: function (e, view) {
-			if( this.view.is_action_enabled('open') )
-				this._super.apply(this, arguments);
-		},
-    });
+/**/
+odoo.define('my_field_widget', function (require) {
+"use strict";
+
+var AbstractField = require('web.AbstractField');
 var fieldRegistry = require('web.field_registry');
-fieldRegistry.add('toonproject.newList', newList);
+
+var colorField = AbstractField.extend({
+    className: 'o_int_colorpicker',
+    tagName: 'span',
+    supportedFieldTypes: ['integer'],
+
+    init: function () {
+        this._super.apply(this, arguments);
+    },
+    _renderEdit: function () {
+        this.$el.empty();
+        this.evalTwick();
+
+    },
+    _renderReadonly: function () {
+        this.evalTwick();
+    },
+    evalTwick: function(){
+        //alert('Alert!');
+        $('.no_open .o_data_row td').click(function(evt){evt.stopPropagation();});
+    },
+
+});
+
+fieldRegistry.add('int_color', colorField);
+
+return {
+    colorField: colorField,
+};
+});

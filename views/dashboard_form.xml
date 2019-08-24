@@ -12,7 +12,7 @@
           <form string="Мои задачи">
             <label for="my_control"/>
             <field name="my_control">
-              <tree open="false"  widget="toonproject.newList" >
+              <tree open="false">
                 <button name="open_task_view_py" string="смотреть" type="object"/>
                 <field name="name" string="задача"/>
                 <field name="short_description" string="содержание"/>
@@ -25,8 +25,8 @@
               </tree>
             </field>
             <label for="my_tasks"/>
-            <field name="my_tasks" widget="toonproject.newList" open="false">
-              <tree  open="false"   >
+            <field name="my_tasks" open="false">
+              <tree  open="false" class="no_open"  >
                 <field name="id" invisible="1"/>
                 <button name="open_task_view_py" string="смотреть" type="object"/>
                 <field name="name" string="задача"/>
@@ -41,7 +41,7 @@
               </tree>
             </field>
             <label for="for_pay"/>
-            <field name="for_pay" readonly="1">
+            <field name="for_pay">
                       <tree>
                         <field name="name" string="задача"/>
                         <field name="tasktype_id" string="вид работ"/>
@@ -61,6 +61,7 @@
                 <field name="computed_price" string="стоимость" sum="сумма:"/>
                 </tree>
             </field>
+            <field name="dummy_int" widget="int_color"/>
           </form>
         </field>
     </record>
