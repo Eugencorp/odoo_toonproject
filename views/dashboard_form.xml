@@ -9,7 +9,9 @@
         <field name="name">task.dashboard_form</field>
         <field name="model">toonproject.dashboard</field>
         <field name="arch" type="xml">
-          <form string="Task dashboard">
+          <form string="Мои задачи">
+            <label for="my_control"/>
+            <field name="my_control"/>
             <label for="my_tasks"/>
             <field name="my_tasks"/>
             <label for="valid_tasks"/>

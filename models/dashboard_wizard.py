@@ -21,9 +21,22 @@ class DashboardForm(models.Model):
                     tasks |= task
             rec.valid_tasks = tasks
 
+    @api.multi
+    def _my_control(self):
+        for rec in self:
+            control_tasks =  self.env['toonproject.task'].search([('status','=','control')])
+            tasks = self.env['toonproject.task']
+            for task in control_tasks:
+                if task.isControler:
+                    tasks |= task
+            rec.my_control = tasks
+
     my_tasks = fields.Many2many('toonproject.task',
                                  string="В работе", required=True, compute='_my_tasks')
 
     valid_tasks = fields.Many2many('toonproject.task',
                                  string="Можно взять в работу", required=True, compute='_valid_tasks')
+
+    my_control = fields.Many2many('toonproject.task',
+                                 string="Мне в проверку", required=True, compute='_my_control')
 
