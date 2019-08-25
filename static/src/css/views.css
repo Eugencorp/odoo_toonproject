@@ -1,0 +1,6 @@
+table.o_list_view tbody tr:not(.o_data_row) {
+    display: none;
+}
+.table.o_list_view {
+    width: auto;
+}
