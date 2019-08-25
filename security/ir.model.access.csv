@@ -9,7 +9,7 @@ tasktype_manager,tasktype manager,model_toonproject_tasktype,group_toonproject_m
 assettype_manager,assettype manager,model_toonproject_assettype,group_toonproject_manager,1,1,1,1
 dashboard_manager,dashboard manager,model_toonproject_dashboard,group_toonproject_manager,1,0,0,0
 asset_user,asset user,model_toonproject_asset,group_toonproject_user,1,0,0,0
-task_user,task user,model_toonproject_task,group_toonproject_user,1,0,0,0
+task_user,task user,model_toonproject_task,group_toonproject_user,1,1,0,0
 cartoon_user,cartoon user,model_toonproject_cartoon,group_toonproject_user,1,0,0,0
 price_user,price user,model_toonproject_price,group_toonproject_user,1,0,0,0
 tasktype_user,tasktype user,model_toonproject_tasktype,group_toonproject_user,1,0,0,0

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
@@ -257,8 +258,21 @@ class task(models.Model):
             else:
                 rec.current_control = rec.controler_id
 
+
     @api.multi
     def write(self, values):
+        if not self.user_has_groups('toonproject.group_toonproject_manager'):
+            readonly_fields = ['name', 'description', 'short_description',
+                               'factor','compute_price_method',
+                               'asset_ids', 'affecting_tasks','dependent_tasks',
+                               'controler_id', 'precontroler_id', 'valid_group',
+                               'worker_id','work_start','real_finish',
+                               'status']
+            for ro_field in readonly_fields:
+                if values.get(ro_field):
+                    raise UserError(
+                        'У вас нет прав на это действие'
+                    )
         if values.get('status') == 'finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
