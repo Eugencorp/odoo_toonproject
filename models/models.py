@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from odoo import SUPERUSER_ID
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
@@ -236,32 +237,32 @@ class task(models.Model):
     @api.multi
     def button_control(self):
         for rec in self:
-            rec.status = 'control'
+            rec.sudo().write({'status': 'control'})
 
     @api.multi
     def button_reject(self):
+        #import pdb
+        #pdb.set_trace()
         for rec in self:
             if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
-                rec.current_control = rec.precontroler_id
-            rec.status = 'progress'
-
-    def finishMe(self):
-        self.status = 'finished'
-        self.real_finish = fields.Date.today()
+                rec.sudo().write({'current_control': rec.precontroler_id.id})
+            rec.sudo().write({'status': 'progress'})
 
     @api.multi
     def button_accept(self):
         for rec in self:
             if rec.current_control.id == rec.controler_id.id:
-                self.status = 'finished'
-                self.real_finish = fields.Date.today()
+                rec.sudo().write({
+                    'status': 'finished',
+                    'real_finish': fields.Date.today()
+                })
             else:
-                rec.current_control = rec.controler_id
+                rec.sudo().write({'current_control':rec.controler_id.id})
 
 
     @api.multi
     def write(self, values):
-        if not self.user_has_groups('toonproject.group_toonproject_manager'):
+        if self.env.user.id != SUPERUSER_ID and not self.env.user.has_group('toonproject.group_toonproject_manager'):
             readonly_fields = ['name', 'description', 'short_description',
                                'factor','compute_price_method',
                                'asset_ids', 'affecting_tasks','dependent_tasks',
