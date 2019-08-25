@@ -138,12 +138,20 @@ class task(models.Model):
     status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
-
+    valid_group = fields.Many2one('res.groups', string='группа работников')
 
     isControler = fields.Boolean(compute='_is_controler', store=False)
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
-    valid_group = fields.Many2one('res.groups', string='группа работников')
+    isManager = fields.Boolean(compute='_is_manager', store=False)
+
+    def _is_manager(self):
+        for rec in self:
+            if self.env.user.has_group('toonproject.group_toonproject_manager') or self.env.user.id == SUPERUSER_ID:
+                rec.isManager = True
+            else:
+                rec.isManager = False
+
 
     @api.multi
     def _default_control(self):
@@ -230,10 +238,11 @@ class task(models.Model):
     @api.multi
     def button_start(self):
         for rec in self:
-            rec.status = 'progress'
-            rec.work_start = fields.Date.today()
-            if not rec.worker_id:
-                rec.worker_id = self.env.user.id
+            rec.sudo().write({
+                'status': 'progress',
+                'work_start': fields.Date.today(),
+                'worker_id': rec.worker_id.id|self.env.user.id
+            })
     @api.multi
     def button_control(self):
         for rec in self:
