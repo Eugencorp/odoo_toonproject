@@ -63,6 +63,13 @@
             </field>
             <script>
               jQuery('.no_open .o_data_row td').click(function(evt) { evt.stopPropagation(); });
+              jQuery('.o_form_label').each(function(i,el){
+                if(jQuery(el).next('.o_field_many2many').length > 0)
+                  if(jQuery(el).next().find('.o_data_row').length == 0){
+                    jQuery(el).hide();
+                    jQuery(el).next().hide();
+                  }
+              });
             </script>
           </form>
         </field>
