@@ -114,7 +114,7 @@ class asset(models.Model, StoresImages):
 class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
-    
+
     name = fields.Char()
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
     factor = fields.Float(default=1)
