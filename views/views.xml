@@ -260,7 +260,8 @@
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
                   action="tasks_list_action"/> 
     <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
-                  action="prices_list_action"/>	
+                  action="prices_list_action"
+                  groups="group_toonproject_manager"/>
 
 	<record model="ir.ui.view" id="createtasks_wizard_form_view">
 		<field name="name">createtasks_wizard.form</field>
