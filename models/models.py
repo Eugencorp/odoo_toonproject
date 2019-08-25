@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+from odoo import SUPERUSER_ID
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
@@ -114,7 +116,7 @@ class asset(models.Model, StoresImages):
 class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
-    
+
     name = fields.Char()
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
     factor = fields.Float(default=1)
@@ -136,12 +138,20 @@ class task(models.Model):
     status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
-
+    valid_group = fields.Many2one('res.groups', string='группа работников')
 
     isControler = fields.Boolean(compute='_is_controler', store=False)
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
-    valid_group = fields.Many2one('res.groups', string='группа работников')
+    isManager = fields.Boolean(compute='_is_manager', store=False)
+
+    def _is_manager(self):
+        for rec in self:
+            if self.env.user.has_group('toonproject.group_toonproject_manager') or self.env.user.id == SUPERUSER_ID:
+                rec.isManager = True
+            else:
+                rec.isManager = False
+
 
     @api.multi
     def _default_control(self):
@@ -228,37 +238,51 @@ class task(models.Model):
     @api.multi
     def button_start(self):
         for rec in self:
-            rec.status = 'progress'
-            rec.work_start = fields.Date.today()
-            if not rec.worker_id:
-                rec.worker_id = self.env.user.id
+            rec.sudo().write({
+                'status': 'progress',
+                'work_start': fields.Date.today(),
+                'worker_id': rec.worker_id.id|self.env.user.id
+            })
     @api.multi
     def button_control(self):
         for rec in self:
-            rec.status = 'control'
+            rec.sudo().write({'status': 'control'})
 
     @api.multi
     def button_reject(self):
+        #import pdb
+        #pdb.set_trace()
         for rec in self:
             if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
-                rec.current_control = rec.precontroler_id
-            rec.status = 'progress'
-
-    def finishMe(self):
-        self.status = 'finished'
-        self.real_finish = fields.Date.today()
+                rec.sudo().write({'current_control': rec.precontroler_id.id})
+            rec.sudo().write({'status': 'progress'})
 
     @api.multi
     def button_accept(self):
         for rec in self:
             if rec.current_control.id == rec.controler_id.id:
-                self.status = 'finished'
-                self.real_finish = fields.Date.today()
+                rec.sudo().write({
+                    'status': 'finished',
+                    'real_finish': fields.Date.today()
+                })
             else:
-                rec.current_control = rec.controler_id
+                rec.sudo().write({'current_control':rec.controler_id.id})
+
 
     @api.multi
     def write(self, values):
+        if self.env.user.id != SUPERUSER_ID and not self.env.user.has_group('toonproject.group_toonproject_manager'):
+            readonly_fields = ['name', 'description', 'short_description',
+                               'factor','compute_price_method',
+                               'asset_ids', 'affecting_tasks','dependent_tasks',
+                               'controler_id', 'precontroler_id', 'valid_group',
+                               'worker_id','work_start','real_finish',
+                               'status']
+            for ro_field in readonly_fields:
+                if values.get(ro_field):
+                    raise UserError(
+                        'У вас нет прав на это действие'
+                    )
         if values.get('status') == 'finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
