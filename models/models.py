@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
+from odoo import tools
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
@@ -64,6 +65,7 @@ class StoresImages():
             # data = requests.get(url.strip()).content.encode('base64').replace('\n', '')
 
             # Python 3
+
             data = base64.b64encode(requests.get(url.strip()).content).replace(b'\n', b'')
         except Exception as e:
             _logger.warn('There was a problem requesting the image from URL %s' % url)
@@ -111,7 +113,12 @@ class asset(models.Model, StoresImages):
             if record.icon_video_url:
                 image = self.fetch_image_from_url(record.icon_video_url)
             record.update({'icon_video': image, })
-    
+
+    @api.multi
+    def write(self, values):
+        if values.get('icon_image'):
+            tools.image_resize_images(values, big_name='icon_image', sizes={'icon_image': (256, 144)})
+        return super().write(values)
 
 class task(models.Model):
     _name = 'toonproject.task'
