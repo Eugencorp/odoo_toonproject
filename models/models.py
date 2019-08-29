@@ -124,12 +124,11 @@ class asset(models.Model, StoresImages):
         return super().write(values)
 
     def name_get(self,context=None):
-        #import pdb
-        #pdb.set_trace()
-        ret = super(asset, self).name_get()
-        #if context and context.get('show_type'):
-        ret = self.assettype_id.name + ' ' + ret[0][1]
-        return [(self.id,ret)]
+        res = []
+        for record in self:
+            complex_name = record.assettype_id.name + ' ' + record.name
+            res.append((record.id, complex_name))
+        return res
 
 class task(models.Model):
     _name = 'toonproject.task'
@@ -163,6 +162,8 @@ class task(models.Model):
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
     isManager = fields.Boolean(compute='_is_manager', store=False)
+
+    color = fields.Integer()
 
     def _is_manager(self):
         for rec in self:
