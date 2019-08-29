@@ -142,7 +142,7 @@
                     <group col="3">
                       <div>
                         <label for="asset_ids"/>
-                        <field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>
+                        <field name="asset_ids" widget="clickable_tags" options="{'help_title':'Hello,world!'}" attrs="{'readonly':[('isManager','=',False)]}"/>
                         <!--<field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
                           <tree>
                             <field name="assettype_id"/>

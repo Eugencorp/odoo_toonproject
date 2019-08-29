@@ -30,6 +30,9 @@
         'views/templates.xml',
         'views/preset_data.xml',
     ],
+    'qweb': [
+        "static/src/xml/templates.xml",
+    ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
