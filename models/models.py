@@ -123,6 +123,14 @@ class asset(models.Model, StoresImages):
             tools.image_resize_images(values, big_name='icon_image', sizes={'icon_image': (256, 144)})
         return super().write(values)
 
+    def name_get(self,context=None):
+        #import pdb
+        #pdb.set_trace()
+        ret = super(asset, self).name_get()
+        #if context and context.get('show_type'):
+        ret = self.assettype_id.name + ' ' + ret[0][1]
+        return [(self.id,ret)]
+
 class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
