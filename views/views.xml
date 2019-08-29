@@ -44,18 +44,18 @@
             <form string="Asset Form">
                 <sheet>
                     <group>
-                        <group colspan = "2">
+                        <group>
                             <field name="project_id" string="Проект: "/>
                             <field name="name" string="Название"/>
-                        </group>
-                        <group>
                             <field name="assettype_id" string="Тип:"/>
                             <field name="short_description" string="Краткое описание:"/>
                             <field name="size" string="Размер:"/>
                         </group>
                         <group>
+                          <group colspan="2">
                             <field name="description" string="Длинное описание:"/>
                             <field name="factor" string="Ориентировочная сложность"/>
+                          </group>
                             <group>
                                 <field name="icon_image" widget="image"/>
                             </group>
@@ -87,39 +87,57 @@
         <field name="name">task.form</field>
         <field name="model">toonproject.task</field>
         <field name="arch" type="xml">
-            <form string="Asset Form">
+            <form string="Task Form">
                 <sheet>
-                    <group col="3">
-                        <field name="name" attrs="{'readonly':[('isManager','=',False)]}"/>
-                        <field name="project_id" attrs="{'readonly':[('isManager','=',False)]}" string="по проекту"/>
-                        <group>
+                    <notebook>
+                        <page string="Задание">
+                          <group>
+                            <field name="name" string="Задание" attrs="{'readonly':[('isManager','=',False)]}" />
+                            <field name="project_id" string="по проекту" attrs="{'readonly':[('isManager','=',False)]}" />
                             <field name="tasktype_id" string="Тип работ:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="worker_id" string="Исполнитель:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="status" string="Статус:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                          </group>
+                        </page>
+                        <page string="Описание">
+                          <group>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
 						                <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
-						                <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
                             <field name="computed_price" string="Cтоимость:"/>
-                        </group>
-                        <group>
-                            <field name="status" string="Статус:" attrs="{'readonly':[('isManager','=',False)]}"/>
+						                <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                          </group>
+                        </page>
+                        <page string="Контроль">
+                          <group>
                             <field name="precontroler_id" string="Предварительный контроль:" attrs="{'invisible':['|',('controler_id','=',None), '&amp;', ('isManager','=',False), ('precontroler_id','=',None)],'readonly':[('isManager','=',False)]}"/>
                             <field name="controler_id" string="Контролер:" attrs="{'readonly':[('isManager','=',False)]}"/>
-                        </group>
-                        <group>
+                          </group>
+                        </page>
+                        <page string="Сроки">
+                          <group>
                             <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
-                            <field name="worker_id" string="Исполнитель:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
                             <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','finished'),('isManager','=',False)]}" />
-
+                          </group>
+                        </page>
+                        <page string="Результат">
+                          <group>
+                          </group>
+                        </page>
+                        <page string="Служебное">
+                          <group>
                             <field name="isManager" string="Manager" invisible="1"/>
                             <field name="isControler" invisible="1"/>
                             <field name="isWorker" invisible="1"/>
                             <field name="isValidWorker" invisible="1"/>
                             <field name="current_control" string="current_control" invisible="1"/>
-                        </group>
-                    </group>
+                          </group>
+                        </page>
+                    </notebook>
                     <script>
                       jQuery('td.o_td_label+td').each(function(i,el){el.style.width = null;});
+                      jQuery('table.o_group').each(function(i,el){el.style.width = 'auto';});
                     </script>
                     <group col="3">
                       <div>
