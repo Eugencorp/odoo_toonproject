@@ -46,7 +46,7 @@
                     <group>
                         <group colspan = "2">
                             <field name="project_id" string="Проект: "/>
-                            <field name="name"/>
+                            <field name="name" string="Название"/>
                         </group>
                         <group>
                             <field name="assettype_id" string="Тип:"/>
@@ -54,6 +54,8 @@
                             <field name="size" string="Размер:"/>
                         </group>
                         <group>
+                            <field name="description" string="Длинное описание:"/>
+                            <field name="factor" string="Ориентировочная сложность"/>
                             <group>
                                 <field name="icon_image" widget="image"/>
                             </group>
@@ -88,7 +90,8 @@
             <form string="Asset Form">
                 <sheet>
                     <group col="3">
-                        <!--<field name="name" attrs="{'readonly':[('isManager','=',False)]}"/>-->
+                        <field name="name" attrs="{'readonly':[('isManager','=',False)]}"/>
+                        <field name="project_id" attrs="{'readonly':[('isManager','=',False)]}" string="по проекту"/>
                         <group>
                             <field name="tasktype_id" string="Тип работ:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
@@ -212,6 +215,7 @@
       <field name="model">toonproject.task</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="project_id" string="проект"/>
           <field name="name" string="задача"/>
           <field name="asset_ids" string="объект"  widget="many2many_tags"/>
           <field name="tasktype_id" string="вид работ"/>

@@ -79,6 +79,9 @@ class asset(models.Model, StoresImages):
 
     name = fields.Char()
     short_description = fields.Char()
+    description = fields.Text()
+    factor = fields.Float(default=1)
+
     size = fields.Float(default=1)
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=0)
@@ -129,6 +132,7 @@ class task(models.Model):
     factor = fields.Float(default=1)
     short_description = fields.Char()
     description = fields.Text()
+    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null', required=True)
     
     controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
     precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
@@ -197,18 +201,25 @@ class task(models.Model):
         return None
 
     def getProject(self):
+        if self.project_id:
+            return self.project_id
         gotMainAsset = self.getMainAsset()
         if gotMainAsset:
             return gotMainAsset.project_id
         return None
 
     def getPriceRecord(taskRec, assetRec):
+        '''
         if not assetRec:
             assetRec = taskRec.getMainAsset()
         if not assetRec:
             return None
-        type = taskRec.tasktype_id
         project = assetRec.project_id
+        '''
+
+        project = taskRec.project_id
+        type = taskRec.tasktype_id
+
         while project:
             for price in project.price_ids:
                 if price.tasktype_id == type:
@@ -348,6 +359,9 @@ class CreateTasksWizard(models.TransientModel):
                             'tasktype_id': tasktype.id,
                             'asset_ids': [(4,asset.id)],
                             'short_description': asset.short_description,
+                            'description': asset.description,
+                            'factor': asset.factor,
+                            'project_id': asset.project_id
                         }
                     )
             for task in created:
