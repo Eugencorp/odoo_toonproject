@@ -163,7 +163,7 @@ class task(models.Model):
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
     isManager = fields.Boolean(compute='_is_manager', store=False)
 
-    color = fields.Integer()
+    color = fields.Integer(compute='_raw_tasktype', store=True)
 
     def _is_manager(self):
         for rec in self:
@@ -182,6 +182,14 @@ class task(models.Model):
                 rec.current_control = rec.controler_id
 
     current_control = fields.Many2one('res.users', string="должен проверить", default=_default_control, track_visibility='onchange')
+
+    @api.depends('tasktype_id')
+    def _raw_tasktype(self):
+        for rec in self:
+            if rec.tasktype_id:
+                rec.color = rec.tasktype_id.id
+            else:
+                rec.color = 0
 
     @api.depends('current_control')
     def _is_controler(self):
