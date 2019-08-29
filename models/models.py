@@ -126,10 +126,12 @@ class asset(models.Model, StoresImages):
     def name_get(self,context=None):
         #import pdb
         #pdb.set_trace()
-        ret = super(asset, self).name_get()
+        res = []
+        for record in self:
+            complex_name = record.assettype_id.name + ' ' + record.name
+            res.append((record.id, complex_name))
         #if context and context.get('show_type'):
-        ret = self.assettype_id.name + ' ' + ret[0][1]
-        return [(self.id,ret)]
+        return res
 
 class task(models.Model):
     _name = 'toonproject.task'

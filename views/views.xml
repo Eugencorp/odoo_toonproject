@@ -142,18 +142,20 @@
                     <group col="3">
                       <div>
                         <label for="asset_ids"/>
-                        <!--<field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>-->
-                        <field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
+                        <field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>
+                        <!--<field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
                           <tree>
                             <field name="assettype_id"/>
                             <field name="name"/>
                             <field name="short_description"/>
                             <field name="size"/>
                           </tree>
-                        </field>
+                        </field>-->
                       </div>
                       <div>
                         <label for="affecting_tasks"/>
+                          <field name="affecting_tasks" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>
+                          <!--
                           <field name="affecting_tasks" attrs="{'readonly':[('isManager','=',False)]}">
                                 <tree>
                                   <field name="name"/>
@@ -162,6 +164,7 @@
                                   <field name="worker_id"/>
                                 </tree>
                           </field>
+                          -->
                       </div>
                       <div>
                         <label for="dependent_tasks"/>
