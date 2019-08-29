@@ -118,7 +118,7 @@
                             <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
                             <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
-                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','finished'),('isManager','=',False)]}" />
+                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
                           </group>
                         </page>
                         <page string="Результат">
@@ -174,10 +174,10 @@
                       </div>
                     </group>
                     <group>
-                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', 'ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
-                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', 'progress'),('isWorker','!=',True)]}" class="btn-danger"/>
-                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-danger"/>
-                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', '2ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
+                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', '3progress'),('isWorker','!=',True)]}" class="btn-danger"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-danger"/>
+                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
                     <div class = "oe_chatter" style="display:block;">

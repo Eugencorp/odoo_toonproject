@@ -9,17 +9,17 @@ class DashboardForm(models.Model):
     @api.multi
     def _my_tasks(self):
         for rec in self:
-            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','!=','finished'),('status','!=','pause'),('status','!=','canceled'),('status','!=','control')])
+            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','!=','5finished'),('status','!=','1pending'),('status','!=','6canceled'),('status','!=','4control')])
 
     @api.multi
     def _for_pay(self):
         for rec in self:
-            rec.for_pay =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','=','finished'),('pay_date','=',None)])
+            rec.for_pay =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','=','5finished'),('pay_date','=',None)])
 
     @api.multi
     def _valid_tasks(self):
         for rec in self:
-            ready_tasks =  self.env['toonproject.task'].search([('status','=','ready')])
+            ready_tasks =  self.env['toonproject.task'].search([('status','=','2ready')])
             tasks = self.env['toonproject.task']
             for task in ready_tasks:
                 if (not task.valid_group) or self.env.user.id in task.valid_group.users.ids:
@@ -29,7 +29,7 @@ class DashboardForm(models.Model):
     @api.multi
     def _my_control(self):
         for rec in self:
-            control_tasks =  self.env['toonproject.task'].search([('status','=','control')])
+            control_tasks =  self.env['toonproject.task'].search([('status','=','4control')])
             tasks = self.env['toonproject.task']
             for task in control_tasks:
                 if task.isControler:

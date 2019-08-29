@@ -153,7 +153,7 @@ class task(models.Model):
     computed_price = fields.Float(compute='_compute_price')
     pay_date = fields.Date()
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
+    status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
     valid_group = fields.Many2one('res.groups', string='группа работников')
@@ -266,14 +266,14 @@ class task(models.Model):
     def button_start(self):
         for rec in self:
             rec.sudo().write({
-                'status': 'progress',
+                'status': '3progress',
                 'work_start': fields.Date.today(),
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
     def button_control(self):
         for rec in self:
-            rec.sudo().write({'status': 'control'})
+            rec.sudo().write({'status': '4control'})
 
     @api.multi
     def button_reject(self):
@@ -282,14 +282,14 @@ class task(models.Model):
         for rec in self:
             if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
                 rec.sudo().write({'current_control': rec.precontroler_id.id})
-            rec.sudo().write({'status': 'progress'})
+            rec.sudo().write({'status': '3progress'})
 
     @api.multi
     def button_accept(self):
         for rec in self:
             if rec.current_control.id == rec.controler_id.id:
                 rec.sudo().write({
-                    'status': 'finished',
+                    'status': '5finished',
                     'real_finish': fields.Date.today()
                 })
             else:
@@ -310,17 +310,17 @@ class task(models.Model):
                     raise UserError(
                         'У вас нет прав на это действие'
                     )
-        if values.get('status') == 'finished':
+        if values.get('status') == '5finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
-                    if dependent_task.status == 'pending':
+                    if dependent_task.status == '1pending':
                         to_begin = True
                         for affecting_task in dependent_task.affecting_tasks:
-                            if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
+                            if affecting_task!=self and affecting_task.status != '5finished' and affecting_task!='6canceled':
                                 to_begin = False
                                 break
                         if to_begin:
-                            dependent_task.status = "ready"
+                            dependent_task.status = "2ready"
         if values.get('controler_id') or values.get('precontroler_id'):
             for rec in self:
                 rec.current_control = values.get('precontroler_id') or values.get('controler_id')
