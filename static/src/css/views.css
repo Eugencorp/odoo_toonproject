@@ -1,4 +1,9 @@
+/*
 table.o_list_view tbody tr:not(.o_data_row) {
+    display: none;
+}
+*/
+table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add) {
     display: none;
 }
 .table.o_list_view {
