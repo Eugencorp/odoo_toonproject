@@ -266,9 +266,9 @@ class task(models.Model):
                 rec.current_control = controlers[0].id
 
 
-    price_record = fields.Many2one('toonproject.price', compute='_get_price_record',store=True)
+    price_record = fields.Many2one('toonproject.price', compute='_get_price_record',store=False)
     current_control = fields.Many2one('toonproject.controler', string="должен проверить", default=_default_control, track_visibility='onchange')
-    controler_names = fields.Char(compute='_get_controler_names', store=True, string="контролеры")
+    controler_names = fields.Char(compute='_get_controler_names', store=False, string="контролеры")
 
     @api.depends('price_record','tasktype_id','project_id')
     def _get_controler_names(self):
@@ -318,16 +318,19 @@ class task(models.Model):
                     return asset
         return None
 
-    @api.depends('project_id')
+    def findPriceInProject(self):
+        project = self.project_id
+        while len(project)>0:
+            for price in project.price_ids:
+                if price.tasktype_id == self.tasktype_id:
+                    return price
+            project = project.parent_id
+
+
+    @api.depends('project_id','tasktype_id')
     def _get_price_record(self):
         for rec in self:
-            project = rec.project_id
-            while project:
-                for price in project.price_ids:
-                    if price.tasktype_id == rec.tasktype_id:
-                        rec.price_record = price
-                        return
-                project = project.parent_id
+            rec.price_record = rec.findPriceInProject()
 
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')

@@ -136,6 +136,7 @@
                             <field name="isControler" invisible="1"/>
                             <field name="isWorker" invisible="1"/>
                             <field name="isValidWorker" invisible="1"/>
+                            <field name="price_record" groups="toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
                     </notebook>
