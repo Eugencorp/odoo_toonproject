@@ -397,21 +397,9 @@
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="projects_list_action">
-        <field name="name">Projects</field>
-        <field name="res_model">toonproject.project</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Create a project
-            </p>
-        </field>
-    </record>
-    
+
     <menuitem id="main_toonproject_menu" name="The Toon Project" sequence="0"/>
     <menuitem id="lists_menu" name="Списки" parent="main_toonproject_menu"/>
-    <menuitem id="new_projects_menu" name="Projects" parent="lists_menu"
-                  action="projects_list_action"/>
     <menuitem id="projects_menu" name="Проекты" parent="lists_menu"
                   action="cartoons_list_action"/>        
     <menuitem id="assets_menu" name="Материалы" parent="lists_menu"

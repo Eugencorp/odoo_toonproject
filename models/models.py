@@ -8,21 +8,21 @@ from odoo.exceptions import ValidationError
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
-    
+
     name = fields.Char(string="Тип")
     description = fields.Text()
     valid_tasktypes = fields.Many2many('toonproject.tasktype', string = "Возможные виды работ:")
 
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
-    
+
     name = fields.Char(string="Вид работ")
     description = fields.Text()
-    valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")    
-    
+    valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
+
 class price(models.Model):
     _name = 'toonproject.price'
-    
+
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
@@ -31,7 +31,7 @@ class price(models.Model):
     precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
     next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
-    
+
 
 class project(models.Model):
     _name = 'toonproject.project'
@@ -41,10 +41,10 @@ class project(models.Model):
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
-    
+
     name = fields.Char()
     description = fields.Text()
-    
+
     parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='restrict', index=True)
     child_ids = fields.One2many('toonproject.cartoon', 'parent_id', string='Дочерние проекты')
     _parent_store = True
