@@ -7,8 +7,9 @@ from odoo import tools
 from odoo.exceptions import ValidationError
 
 class controler(models.Model):
-    _name='toonproject.controler'
-    _order='sequence'
+    _name = 'toonproject.controler'
+    _order = 'sequence'
+    _description = 'Simple model for ordering multiple controlers bent to some project task type'
 
     user = fields.Many2one('res.users', required=True, ondelete='restrict')
     sequence = fields.Integer(default=10)
@@ -23,6 +24,7 @@ class controler(models.Model):
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
+    _description = 'asset category, sets wish task types can be created for an asset'
 
     name = fields.Char(string="Тип")
     description = fields.Text()
@@ -30,6 +32,7 @@ class assettype(models.Model):
 
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
+    _description = 'task type for wich prices and pipeline are set'
 
     name = fields.Char(string="Вид работ")
     description = fields.Text()
@@ -37,6 +40,7 @@ class tasktype(models.Model):
 
 class price(models.Model):
     _name = 'toonproject.price'
+    _description = 'some info, such as price, controlers, pipeline and valid worker groups bent to a project and a task type'
 
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
@@ -60,6 +64,7 @@ class price(models.Model):
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
+    _description = 'a project, hierarchial structure'
 
     name = fields.Char()
     description = fields.Text()
@@ -126,6 +131,7 @@ class StoresImages():
 
 class asset(models.Model, StoresImages):
     _name = 'toonproject.asset'
+    _desdription = 'some meaning part of a production: a scene, a background or a rig'
 
     name = fields.Char()
     short_description = fields.Char()
@@ -212,6 +218,7 @@ class asset(models.Model, StoresImages):
 class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
+    _description = 'main model for work'
 
     name = fields.Char()
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True)
@@ -254,13 +261,26 @@ class task(models.Model):
     @api.multi
     def _default_control(self):
         for rec in self:
-            controlers = self.env['toonproject.controler'].search([('price', '=', rec.price_record.id)], order='sequence,asc', limit=1)
+            controlers = self.env['toonproject.controler'].search([('price', '=', rec.price_record.id)], order='sequence asc', limit=1)
             if len(controlers) > 0:
-                rec.current_control = controlers[0]
+                rec.current_control = controlers[0].id
 
 
-    price_record = fields.Many2one('toonproject.price', compute='_get_price_record')
-    current_control = fields.Many2one('toonproject.control', string="должен проверить", default=_default_control, track_visibility='onchange')
+    price_record = fields.Many2one('toonproject.price', compute='_get_price_record',store=True)
+    current_control = fields.Many2one('toonproject.controler', string="должен проверить", default=_default_control, track_visibility='onchange')
+    controler_names = fields.Char(compute='_get_controler_names', store=True, string="контролеры")
+
+    @api.depends('price_record','tasktype_id','project_id')
+    def _get_controler_names(self):
+        for rec in self:
+            if rec.price_record and rec.price_record.controlers:
+                controlers = self.env['toonproject.controler'].search([('price', '=', rec.price_record.id)],order='sequence asc')
+                res = ''
+                for controler in controlers:
+                    res = res + controler.name + ', '
+                if len(controlers):
+                    res = res[:-2]
+                rec.controler_names = res
 
     @api.depends('tasktype_id')
     def _raw_tasktype(self):
@@ -362,7 +382,7 @@ class task(models.Model):
             controlers = self.env['toonproject.controler'].search([
                 ('price', '=', rec.price_record.id),
                 ('sequence', '>', rec.current_control.sequence)],
-                order='sequence,asc')
+                order='sequence asc')
             if len(controlers)<1:
                 rec.sudo().write({
                     'status': '5finished',
@@ -415,6 +435,7 @@ class task(models.Model):
 class CreateTasksWizard(models.TransientModel):
     _name = 'toonproject.createtasks_wizard'
     _description = "Wizard: Create tasks for selected assets"
+
 
     def _default_assets(self):
         return self.env['toonproject.asset'].browse(self._context.get('active_ids'))

@@ -29,7 +29,7 @@
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
                         <field name="next_tasktype" string="Следующий процесс"/>
-                        <field name="controlers" string="контроль">
+                        <field name="controlers" string="контроль" context="{'default_price':id}">
                           <tree>
                             <field name="sequence" widget="handle"/>
                             <field name="name"/>
@@ -114,6 +114,7 @@
                         </page>
                         <page string="Контроль">
                           <group>
+                            <field name="controler_names" string="Контролеры:"/>
                             <field name="current_control" string="Должен проверить:"/>
                           </group>
                         </page>
