@@ -215,8 +215,7 @@
       <field name="field_parent">children_ids</field>
       <field name="arch" type="xml">
         <tree>
-          <!--<field icon="icon" name="code"/>-->
-          <field name="name" />
+          <field name="display_name" />
           <field name="parent_id" invisible="1"/>
         </tree>
       </field>
@@ -345,10 +344,10 @@
     <record model="ir.actions.act_window" id="cartoons_list_action">
         <field name="name">Проекты</field>
         <field name="res_model">toonproject.cartoon</field>
-        <field name="domain">[('parent_id','=',False)]</field>
-        <field name="view_type">tree</field>
-        <field name="view_id" ref="cartoon_list"/>
-    </record>    
+        <field name="domain">[]</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
 
     <record model="ir.actions.act_window" id="assets_list_action">
         <field name="name">Материалы</field>
