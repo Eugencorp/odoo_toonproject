@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
 from odoo import tools
+from odoo.exceptions import ValidationError
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
@@ -38,9 +39,20 @@ class cartoon(models.Model):
     name = fields.Char()
     description = fields.Text()
     
-    parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='set null')
+    parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='restrict', index=True)
+    child_ids = fields.One2many('toonproject.cartoon', 'parent_id', string='Дочерние проекты')
+    parent_store = True
+    parent_name = "parent_id"
+    parent_path = fields.Char(index=True)
+
     price_ids = fields.One2many('toonproject.price', 'project_id')
-    
+
+
+    @api.constrains('parent_id')
+    def _check_hierarchy(self):
+        if not self._check_recursion():
+            raise models.ValidationError('Error! You cannot create recursive projects.')
+
 
 import requests, logging, base64
 _logger = logging.getLogger(__name__)

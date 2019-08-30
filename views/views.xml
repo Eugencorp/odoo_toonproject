@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <odoo>
   <data>
 
@@ -207,11 +208,13 @@
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
       <field name="model">toonproject.cartoon</field>
+      <field name="type">tree</field>
+      <field name="field_parent">children_ids</field>
       <field name="arch" type="xml">
         <tree>
           <field name="name" string="проект"/>
           <field name="description" string="описание"/>
-          <field name="parent_id" string="родительский проект"/>
+          <field name="parent_id" invisible="1"/>
         </tree>
       </field>
     </record>  
@@ -299,10 +302,10 @@
     </record>
 
     <record model="ir.ui.view" id="asset_list_kanban">
-      <field name="name">asset.list.kanban</field>
+      <field name="name">asset.kanban</field>
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
-        <kanban default_group_by="current_tasktype" quick_create="0" group_delete="0" group_create="0" group_edit="0" >
+        <kanban default_group_by="current_tasktype" quick_create="0" group_delete="0" group_create="0" group_edit="0">
           <field name="color"/>
           <field name="current_tasktype"/>
           <field name="icon_image"/>
@@ -313,23 +316,6 @@
                   t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
                                 oe_kanban_global_click oe_semantic_html_override
                                 oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
-                <!--
-                                <div class="oe_dropdown_kanban">
-                                  <div class="oe_dropdown_toggle">
-                                      <i class="fa fa-bars fa-lg" title="Manage" aria-label="Manage"/>
-                                      <ul class="oe_dropdown_menu">
-                                          <li>
-                                              <a type="delete">Delete</a>
-                                          </li>
-                                          <li>
-                                              <ul class="oe_kanban_colorpicker"
-                                                  data-field="color"/>
-                                          </li>
-                                      </ul>
-                                  </div>
-                                  <div class="oe_clear"></div>
-                                </div>
-              -->
                                 <div t-attf-class="oe_kanban_content">
                                     <div class="row">
                                       <div class="col-md-8">
@@ -345,7 +331,7 @@
                                             <img t-att-src="kanban_image('toonproject.asset','icon_image',record.id.raw_value)"/>
                                           </div>
                                       </div>
-                                  </div>
+                                    </div>
                                 </div>
               </div>
             </t>
@@ -373,12 +359,9 @@
     <record model="ir.actions.act_window" id="cartoons_list_action">
         <field name="name">Проекты</field>
         <field name="res_model">toonproject.cartoon</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Создайте первый проект
-            </p>
-        </field>
+        <field name="domain">[('parent_id','=',False)]</field>
+        <field name="view_type">tree</field>
+        <field name="view_id" ref="cartoon_list"/>
     </record>    
 
     <record model="ir.actions.act_window" id="assets_list_action">
