@@ -9,7 +9,7 @@
             <form string="Project Form">
                 <sheet>
                     <group>
-                        <field name="name" string="Проект"/>                    
+                        <field name="name" string="Проект"/>
                         <field name="parent_id" string="Родительский проект"/>
                         <field colspan="2" name="description" string="Описание"/>
                     </group>

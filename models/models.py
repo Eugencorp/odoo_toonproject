@@ -61,6 +61,19 @@ class cartoon(models.Model):
         if not self._check_recursion():
             raise models.ValidationError('Error! You cannot create recursive projects.')
 
+    @api.multi
+    def name_get(self):
+        def get_names(cat):
+            res = []
+            while cat:
+                res.append(cat.name)
+                cat = cat.parent_id
+            return res
+        res = []
+        for record in self:
+            res.append((record.id, " / ".join(reversed(get_names(record)))))
+        return res
+
 
 import requests, logging, base64
 _logger = logging.getLogger(__name__)
