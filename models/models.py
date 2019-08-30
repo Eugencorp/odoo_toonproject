@@ -87,6 +87,10 @@ class asset(models.Model, StoresImages):
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=0)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
+
+    color = fields.Integer(compute='_get_type_color', store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
+    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
     
@@ -94,13 +98,38 @@ class asset(models.Model, StoresImages):
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
     
-    '''
-    def create_multiple_tasks(self, cursor, uid, ids, tasktype_ids, context):
-        n = 0 #temporal placeholder
-        for id in ids:
-            n = n + 1 #temporal placeholder
-        return True
-    '''
+    @api.depends('assettype_id')
+    def _get_type_color(self):
+        for rec in self:
+            if rec.assettype_id:
+                rec.color = rec.assettype_id.id
+            else:
+                rec.color = 0
+
+    @api.depends('task_ids')
+    def _get_current_statuses(self):
+        for rec in self:
+            task_states = []
+            for task in rec.task_ids:
+                for valid_tasktype in rec.assettype_id.valid_tasktypes:
+                    if valid_tasktype == task.tasktype_id:
+                        task_states.append(task.status)
+                        break
+            task_states.sort()
+
+
+    @api.depends('task_ids')
+    def _get_current_tasktype(self):
+        for rec in self:
+            task_types = []
+            for task in rec.task_ids:
+                for valid_tasktype in rec.assettype_id.valid_tasktypes:
+                    if valid_tasktype == task.tasktype_id and task.status > '1pending':
+                        task_types.append(task)
+                        break
+            task_types.sort(key=lambda task: task.status)
+            rec.current_tasktype = task_types[0].tasktype_id
+            rec.current_status = task_types[0].status
 
     @api.multi
     @api.depends('icon_video_url')

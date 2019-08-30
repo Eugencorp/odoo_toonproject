@@ -225,6 +225,8 @@
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
           <field name="size" string="размер" sum="общий размер"/>
+          <field name="current_tasktype" string="текущая задача"/>
+          <field name="current_status" string="текущий статус"/>
         </tree>
       </field>
     </record>
@@ -254,13 +256,13 @@
       <field name="name">task.list.kanban</field>
       <field name="model">toonproject.task</field>
       <field name="arch" type="xml">
-        <kanban default_group_by="status" quick_create="0">
+        <kanban default_group_by="status" quick_create="0" group_delete="0" group_create="0" group_edit="0">
           <field name="color"/>
           <templates>
             <t t-name="kanban-box">
               <div
                   t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
-                                oe_kanban_global_click_edit oe_semantic_html_override
+                                oe_kanban_global_click oe_semantic_html_override
                                 oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
                 <!--
                                 <div class="oe_dropdown_kanban">
@@ -288,6 +290,52 @@
                                     <br/>
                                     Исполнитель:
                                     <field name="worker_id"/>
+                                </div>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="asset_list_kanban">
+      <field name="name">asset.list.kanban</field>
+      <field name="model">toonproject.asset</field>
+      <field name="arch" type="xml">
+        <kanban default_group_by="current_tasktype" quick_create="0" group_delete="0" group_create="0" group_edit="0" >
+          <field name="color"/>
+          <field name="current_tasktype"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div
+                  t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
+                                oe_kanban_global_click oe_semantic_html_override
+                                oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
+                <!--
+                                <div class="oe_dropdown_kanban">
+                                  <div class="oe_dropdown_toggle">
+                                      <i class="fa fa-bars fa-lg" title="Manage" aria-label="Manage"/>
+                                      <ul class="oe_dropdown_menu">
+                                          <li>
+                                              <a type="delete">Delete</a>
+                                          </li>
+                                          <li>
+                                              <ul class="oe_kanban_colorpicker"
+                                                  data-field="color"/>
+                                          </li>
+                                      </ul>
+                                  </div>
+                                  <div class="oe_clear"></div>
+                                </div>
+              -->
+                                <div t-attf-class="oe_kanban_content">
+                                    <!-- title -->
+                                    <field name="assettype_id"/>
+                                    <br/>
+                                    <field name="name"/>
+                                    <br/>
+                                    <field name="size"/>
+                                    <field name="short_description"/>
                                 </div>
               </div>
             </t>
@@ -327,7 +375,7 @@
         <field name="name">Материалы</field>
         <field name="res_model">toonproject.asset</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Создайте первую сцену, фон или риг
             </p>
