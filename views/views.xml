@@ -305,6 +305,8 @@
         <kanban default_group_by="current_tasktype" quick_create="0" group_delete="0" group_create="0" group_edit="0" >
           <field name="color"/>
           <field name="current_tasktype"/>
+          <field name="icon_image"/>
+          <field name="id"/>
           <templates>
             <t t-name="kanban-box">
               <div
@@ -329,13 +331,21 @@
                                 </div>
               -->
                                 <div t-attf-class="oe_kanban_content">
-                                    <!-- title -->
-                                    <field name="assettype_id"/>
-                                    <br/>
-                                    <field name="name"/>
-                                    <br/>
-                                    <field name="size"/>
-                                    <field name="short_description"/>
+                                    <div class="row">
+                                      <div class="col-md-8">
+                                          <field name="assettype_id"/>
+                                          <field name="name"/>
+                                          <br/>
+                                          <field name="size"/>
+                                          <br/>
+                                          <field name="short_description"/>
+                                      </div>
+                                      <div class="col-md-3">
+                                          <div class="o_kanban_image">
+                                            <img t-att-src="kanban_image('toonproject.asset','icon_image',record.id.raw_value)"/>
+                                          </div>
+                                      </div>
+                                  </div>
                                 </div>
               </div>
             </t>
