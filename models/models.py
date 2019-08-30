@@ -13,7 +13,7 @@ class controler(models.Model):
     user = fields.Many2one('res.users', required=True, ondelete='restrict')
     sequence = fields.Integer(default=10)
     price = fields.Many2one('toonproject.price', required=True, ondelete='cascade')
-    name = fields.Char(computed='_get_name', store=False)
+    name = fields.Char(compute='_get_name', store=True)
 
     @api.depends('user')
     def _get_name(self):
@@ -48,6 +48,14 @@ class price(models.Model):
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for rec in self:
+            res.append((rec.id, rec.tasktype_id.name + ' по проекту ' + rec.project_id.name))
+        return res
+
 
 
 class cartoon(models.Model):

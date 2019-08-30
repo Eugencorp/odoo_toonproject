@@ -29,13 +29,12 @@
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
                         <field name="next_tasktype" string="Следующий процесс"/>
-                        <field name="controlers"/>
-                        <!--<field name="controlers" string="контроль">
+                        <field name="controlers" string="контроль">
                           <tree>
                             <field name="sequence" widget="handle"/>
-                            <field nmae="name"/>
+                            <field name="name"/>
                           </tree>
-                        </field>-->
+                        </field>
                         <field name="valid_group" string="Группа исполнителей"/>
                     </group>
                 </sheet>
