@@ -33,6 +33,12 @@ class price(models.Model):
     valid_group = fields.Many2one('res.groups', string='группа работников')
     
 
+class project(models.Model):
+    _name = 'toonproject.project'
+    name = fields.Char()
+    description = fields.Text()
+    parent_id = fields.Many2one('toonproject.project', string="Родительский прокт", ondelete='restrict', index=True)
+
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
     
@@ -41,9 +47,11 @@ class cartoon(models.Model):
     
     parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='restrict', index=True)
     child_ids = fields.One2many('toonproject.cartoon', 'parent_id', string='Дочерние проекты')
-    parent_store = True
-    parent_name = "parent_id"
+    _parent_store = True
+    _parent_name = "parent_id"
     parent_path = fields.Char(index=True)
+
+    #code = fields.Char('Code', required=True)
 
     price_ids = fields.One2many('toonproject.price', 'project_id')
 
