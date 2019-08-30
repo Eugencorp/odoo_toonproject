@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <odoo>
   <data>
 
@@ -8,7 +9,7 @@
             <form string="Project Form">
                 <sheet>
                     <group>
-                        <field name="name" string="Проект"/>                    
+                        <field name="name" string="Проект"/>
                         <field name="parent_id" string="Родительский проект"/>
                         <field colspan="2" name="description" string="Описание"/>
                     </group>
@@ -118,7 +119,7 @@
                             <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
                             <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
-                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','finished'),('isManager','=',False)]}" />
+                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
                           </group>
                         </page>
                         <page string="Результат">
@@ -177,10 +178,10 @@
                       </div>
                     </group>
                     <group>
-                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', 'ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
-                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', 'progress'),('isWorker','!=',True)]}" class="btn-danger"/>
-                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-danger"/>
-                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', 'control'),('isControler','!=',True)]}" class="btn-success"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', '2ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
+                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', '3progress'),('isWorker','!=',True)]}" class="btn-danger"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-danger"/>
+                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
                     <div class = "oe_chatter" style="display:block;">
@@ -210,11 +211,13 @@
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
       <field name="model">toonproject.cartoon</field>
+      <field name="type">tree</field>
+      <field name="field_parent">children_ids</field>
       <field name="arch" type="xml">
         <tree>
-          <field name="name" string="проект"/>
-          <field name="description" string="описание"/>
-          <field name="parent_id" string="родительский проект"/>
+          <!--<field icon="icon" name="code"/>-->
+          <field name="name" />
+          <field name="parent_id" invisible="1"/>
         </tree>
       </field>
     </record>  
@@ -228,6 +231,8 @@
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
           <field name="size" string="размер" sum="общий размер"/>
+          <field name="current_tasktype" string="текущая задача"/>
+          <field name="current_status" string="текущий статус"/>
         </tree>
       </field>
     </record>
@@ -251,7 +256,75 @@
           <field name="pay_date" string="оплачено"/>
         </tree>
       </field>
-    </record> 
+    </record>
+
+    <record model="ir.ui.view" id="task_list_kanban">
+      <field name="name">task.list.kanban</field>
+      <field name="model">toonproject.task</field>
+      <field name="arch" type="xml">
+        <kanban default_group_by="status" quick_create="0" group_delete="0" group_create="0" group_edit="0">
+          <field name="color"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div
+                  t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
+                                oe_kanban_global_click oe_semantic_html_override
+                                oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
+                                <div t-attf-class="oe_kanban_content">
+                                    <!-- title -->
+                                    <field name="name"/>
+                                    <br/>
+                                    Вид работ:
+                                    <field name="tasktype_id"/>
+                                    <br/>
+                                    Исполнитель:
+                                    <field name="worker_id"/>
+                                </div>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="asset_list_kanban">
+      <field name="name">asset.kanban</field>
+      <field name="model">toonproject.asset</field>
+      <field name="arch" type="xml">
+        <kanban default_group_by="current_tasktype" quick_create="0" group_delete="0" group_create="0" group_edit="0">
+          <field name="color"/>
+          <field name="current_tasktype"/>
+          <field name="icon_image"/>
+          <field name="id"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div
+                  t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
+                                oe_kanban_global_click oe_semantic_html_override
+                                oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
+                                <div t-attf-class="oe_kanban_content">
+                                    <div class="row">
+                                      <div class="col-md-8">
+                                          <field name="assettype_id"/>
+                                          <field name="name"/>
+                                          <br/>
+                                          <field name="size"/>
+                                          <br/>
+                                          <field name="short_description"/>
+                                      </div>
+                                      <div class="col-md-3">
+                                          <div class="o_kanban_image">
+                                            <img t-att-src="kanban_image('toonproject.asset', 'icon_image', record.id.raw_value)"/>
+                                          </div>
+                                      </div>
+                                    </div>
+                                </div>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
 
     <record model="ir.ui.view" id="price_list">
       <field name="name">price.list</field>
@@ -272,19 +345,16 @@
     <record model="ir.actions.act_window" id="cartoons_list_action">
         <field name="name">Проекты</field>
         <field name="res_model">toonproject.cartoon</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Создайте первый проект
-            </p>
-        </field>
+        <field name="domain">[('parent_id','=',False)]</field>
+        <field name="view_type">tree</field>
+        <field name="view_id" ref="cartoon_list"/>
     </record>    
 
     <record model="ir.actions.act_window" id="assets_list_action">
         <field name="name">Материалы</field>
         <field name="res_model">toonproject.asset</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Создайте первую сцену, фон или риг
             </p>
@@ -295,7 +365,7 @@
         <field name="name">Задачи</field>
         <field name="res_model">toonproject.task</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Создайте первую задачу
             </p>
@@ -311,8 +381,9 @@
             <p class="o_view_nocontent_smiling_face">Добавьте расценку на какой-нибудь вид работ
             </p>
         </field>
-    </record>   
-    
+    </record>
+
+
     <menuitem id="main_toonproject_menu" name="The Toon Project" sequence="0"/>
     <menuitem id="lists_menu" name="Списки" parent="main_toonproject_menu"/>
     <menuitem id="projects_menu" name="Проекты" parent="lists_menu"

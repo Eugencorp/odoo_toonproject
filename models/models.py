@@ -4,24 +4,25 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
 from odoo import tools
+from odoo.exceptions import ValidationError
 
 class assettype(models.Model):
     _name = 'toonproject.assettype'
-    
+
     name = fields.Char(string="Тип")
     description = fields.Text()
     valid_tasktypes = fields.Many2many('toonproject.tasktype', string = "Возможные виды работ:")
 
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
-    
+
     name = fields.Char(string="Вид работ")
     description = fields.Text()
-    valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")    
-    
+    valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
+
 class price(models.Model):
     _name = 'toonproject.price'
-    
+
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
@@ -30,17 +31,49 @@ class price(models.Model):
     precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
     next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
-    
+
+
+class project(models.Model):
+    _name = 'toonproject.project'
+    name = fields.Char()
+    description = fields.Text()
+    parent_id = fields.Many2one('toonproject.project', string="Родительский прокт", ondelete='restrict', index=True)
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
-    
+
     name = fields.Char()
     description = fields.Text()
-    
-    parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='set null')
+
+    parent_id = fields.Many2one('toonproject.cartoon', string="Родительский проект", ondelete='restrict', index=True)
+    child_ids = fields.One2many('toonproject.cartoon', 'parent_id', string='Дочерние проекты')
+    _parent_store = True
+    _parent_name = "parent_id"
+    parent_path = fields.Char(index=True)
+
+    #code = fields.Char('Code', required=True)
+
     price_ids = fields.One2many('toonproject.price', 'project_id')
-    
+
+
+    @api.constrains('parent_id')
+    def _check_hierarchy(self):
+        if not self._check_recursion():
+            raise models.ValidationError('Error! You cannot create recursive projects.')
+
+    @api.multi
+    def name_get(self):
+        def get_names(cat):
+            res = []
+            while cat:
+                res.append(cat.name)
+                cat = cat.parent_id
+            return res
+        res = []
+        for record in self:
+            res.append((record.id, " / ".join(reversed(get_names(record)))))
+        return res
+
 
 import requests, logging, base64
 _logger = logging.getLogger(__name__)
@@ -87,6 +120,10 @@ class asset(models.Model, StoresImages):
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=0)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
+
+    color = fields.Integer(compute='_get_type_color', store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
+    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
     
@@ -94,13 +131,38 @@ class asset(models.Model, StoresImages):
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
     
-    '''
-    def create_multiple_tasks(self, cursor, uid, ids, tasktype_ids, context):
-        n = 0 #temporal placeholder
-        for id in ids:
-            n = n + 1 #temporal placeholder
-        return True
-    '''
+    @api.depends('assettype_id')
+    def _get_type_color(self):
+        for rec in self:
+            if rec.assettype_id:
+                rec.color = rec.assettype_id.id
+            else:
+                rec.color = 0
+
+    @api.depends('task_ids')
+    def _get_current_statuses(self):
+        for rec in self:
+            task_states = []
+            for task in rec.task_ids:
+                for valid_tasktype in rec.assettype_id.valid_tasktypes:
+                    if valid_tasktype == task.tasktype_id:
+                        task_states.append(task.status)
+                        break
+            task_states.sort()
+
+
+    @api.depends('task_ids')
+    def _get_current_tasktype(self):
+        for rec in self:
+            task_types = []
+            for task in rec.task_ids:
+                for valid_tasktype in rec.assettype_id.valid_tasktypes:
+                    if valid_tasktype == task.tasktype_id and task.status > '1pending':
+                        task_types.append(task)
+                        break
+            task_types.sort(key=lambda task: task.status)
+            rec.current_tasktype = task_types[0].tasktype_id
+            rec.current_status = task_types[0].status
 
     @api.multi
     @api.depends('icon_video_url')
@@ -124,13 +186,10 @@ class asset(models.Model, StoresImages):
         return super().write(values)
 
     def name_get(self,context=None):
-        #import pdb
-        #pdb.set_trace()
         res = []
         for record in self:
             complex_name = record.assettype_id.name + ' ' + record.name
             res.append((record.id, complex_name))
-        #if context and context.get('show_type'):
         return res
 
 class task(models.Model):
@@ -156,7 +215,7 @@ class task(models.Model):
     computed_price = fields.Float(compute='_compute_price')
     pay_date = fields.Date()
     
-    status = fields.Selection([('pending', 'пауза'),('ready','в работу'),('progress','в процессе'),('control','в проверку'),('finished','готово'),('canceled', 'отменено')], string='Статус', default='pending', track_visibility='onchange')
+    status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
     valid_group = fields.Many2one('res.groups', string='группа работников')
@@ -165,6 +224,8 @@ class task(models.Model):
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
     isManager = fields.Boolean(compute='_is_manager', store=False)
+
+    color = fields.Integer(compute='_raw_tasktype', store=True)
 
     def _is_manager(self):
         for rec in self:
@@ -183,6 +244,14 @@ class task(models.Model):
                 rec.current_control = rec.controler_id
 
     current_control = fields.Many2one('res.users', string="должен проверить", default=_default_control, track_visibility='onchange')
+
+    @api.depends('tasktype_id')
+    def _raw_tasktype(self):
+        for rec in self:
+            if rec.tasktype_id:
+                rec.color = rec.tasktype_id.id
+            else:
+                rec.color = 0
 
     @api.depends('current_control')
     def _is_controler(self):
@@ -267,14 +336,14 @@ class task(models.Model):
     def button_start(self):
         for rec in self:
             rec.sudo().write({
-                'status': 'progress',
+                'status': '3progress',
                 'work_start': fields.Date.today(),
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
     def button_control(self):
         for rec in self:
-            rec.sudo().write({'status': 'control'})
+            rec.sudo().write({'status': '4control'})
 
     @api.multi
     def button_reject(self):
@@ -283,14 +352,14 @@ class task(models.Model):
         for rec in self:
             if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
                 rec.sudo().write({'current_control': rec.precontroler_id.id})
-            rec.sudo().write({'status': 'progress'})
+            rec.sudo().write({'status': '3progress'})
 
     @api.multi
     def button_accept(self):
         for rec in self:
             if rec.current_control.id == rec.controler_id.id:
                 rec.sudo().write({
-                    'status': 'finished',
+                    'status': '5finished',
                     'real_finish': fields.Date.today()
                 })
             else:
@@ -311,17 +380,17 @@ class task(models.Model):
                     raise UserError(
                         'У вас нет прав на это действие'
                     )
-        if values.get('status') == 'finished':
+        if values.get('status') == '5finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
-                    if dependent_task.status == 'pending':
+                    if dependent_task.status == '1pending':
                         to_begin = True
                         for affecting_task in dependent_task.affecting_tasks:
-                            if affecting_task!=self and affecting_task.status != 'finished' and affecting_task!='canceled':
+                            if affecting_task!=self and affecting_task.status != '5finished' and affecting_task!='6canceled':
                                 to_begin = False
                                 break
                         if to_begin:
-                            dependent_task.status = "ready"
+                            dependent_task.status = "2ready"
         if values.get('controler_id') or values.get('precontroler_id'):
             for rec in self:
                 rec.current_control = values.get('precontroler_id') or values.get('controler_id')
