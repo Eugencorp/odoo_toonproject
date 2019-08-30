@@ -6,6 +6,21 @@ from odoo import SUPERUSER_ID
 from odoo import tools
 from odoo.exceptions import ValidationError
 
+class controler(models.Model):
+    _name='toonproject.controler'
+    _order='sequence'
+
+    user = fields.Many2one('res.users', required=True, ondelete='restrict')
+    sequence = fields.Integer(default=10)
+    price = fields.Many2one('toonproject.price', required=True, ondelete='cascade')
+    name = fields.Char(computed='_get_name', store=False)
+
+    @api.depends('user')
+    def _get_name(self):
+        for rec in self:
+            rec.name = rec.user.display_name
+
+
 class assettype(models.Model):
     _name = 'toonproject.assettype'
 
@@ -27,10 +42,12 @@ class price(models.Model):
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
 
-    controler_id = fields.Many2one('res.users', string='контроль')
-    precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
+    # controler_id = fields.Many2one('res.users', string='контроль')
+    # precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
     next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
+
+    controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
 
 
 class cartoon(models.Model):
@@ -189,14 +206,14 @@ class task(models.Model):
     _inherit = 'mail.thread'
 
     name = fields.Char()
-    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='set null', index=True)
+    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True)
     factor = fields.Float(default=1)
     short_description = fields.Char()
     description = fields.Text()
-    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null', required=True)
+    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
     
-    controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
-    precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
+    # controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
+    # precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
     worker_id = fields.Many2one('res.users', ondelete='set null', index=True)
     work_start = fields.Date()
     plan_finish = fields.Date()
@@ -226,16 +243,16 @@ class task(models.Model):
             else:
                 rec.isManager = False
 
-
     @api.multi
     def _default_control(self):
         for rec in self:
-            if rec.precontroler_id:
-                rec.current_control = rec.precontroler_id
-            else:
-                rec.current_control = rec.controler_id
+            controlers = self.env['toonproject.controler'].search([('price', '=', rec.price_record.id)], order='sequence,asc', limit=1)
+            if len(controlers) > 0:
+                rec.current_control = controlers[0]
 
-    current_control = fields.Many2one('res.users', string="должен проверить", default=_default_control, track_visibility='onchange')
+
+    price_record = fields.Many2one('toonproject.price', compute='_get_price_record')
+    current_control = fields.Many2one('toonproject.control', string="должен проверить", default=_default_control, track_visibility='onchange')
 
     @api.depends('tasktype_id')
     def _raw_tasktype(self):
@@ -249,8 +266,10 @@ class task(models.Model):
     def _is_controler(self):
         for rec in self:
             if not rec.current_control:
-                rec._default_control()
-            rec.isControler = (self.env.user.id == rec.current_control.id)
+                rec.isControler = False
+            else:
+                rec.isControler = (self.env.user.id == rec.current_control.user.id)
+
     @api.depends('worker_id')
     def _is_worker(self):
         for rec in self:
@@ -271,31 +290,16 @@ class task(models.Model):
                     return asset
         return None
 
-    def getProject(self):
-        if self.project_id:
-            return self.project_id
-        gotMainAsset = self.getMainAsset()
-        if gotMainAsset:
-            return gotMainAsset.project_id
-        return None
-
-    def getPriceRecord(taskRec, assetRec):
-        '''
-        if not assetRec:
-            assetRec = taskRec.getMainAsset()
-        if not assetRec:
-            return None
-        project = assetRec.project_id
-        '''
-
-        project = taskRec.project_id
-        type = taskRec.tasktype_id
-
-        while project:
-            for price in project.price_ids:
-                if price.tasktype_id == type:
-                    return price
-            project = project.parent_id
+    @api.depends('project_id')
+    def _get_price_record(self):
+        for rec in self:
+            project = rec.project_id
+            while project:
+                for price in project.price_ids:
+                    if price.tasktype_id == rec.tasktype_id:
+                        rec.price_record = price
+                        return
+                project = project.parent_id
 
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
@@ -342,20 +346,22 @@ class task(models.Model):
         #import pdb
         #pdb.set_trace()
         for rec in self:
-            if rec.precontroler_id and rec.current_control.id == rec.controler_id.id:
-                rec.sudo().write({'current_control': rec.precontroler_id.id})
             rec.sudo().write({'status': '3progress'})
 
     @api.multi
     def button_accept(self):
         for rec in self:
-            if rec.current_control.id == rec.controler_id.id:
+            controlers = self.env['toonproject.controler'].search([
+                ('price', '=', rec.price_record.id),
+                ('sequence', '>', rec.current_control.sequence)],
+                order='sequence,asc')
+            if len(controlers)<1:
                 rec.sudo().write({
                     'status': '5finished',
                     'real_finish': fields.Date.today()
                 })
             else:
-                rec.sudo().write({'current_control':rec.controler_id.id})
+                rec.sudo().write({'current_control':controlers[0].id})
 
 
     @api.multi
@@ -364,7 +370,7 @@ class task(models.Model):
             readonly_fields = ['name', 'description', 'short_description',
                                'factor','compute_price_method',
                                'asset_ids', 'affecting_tasks','dependent_tasks',
-                               'controler_id', 'precontroler_id', 'valid_group',
+                               'valid_group',
                                'worker_id','work_start','real_finish',
                                'status']
             for ro_field in readonly_fields:
@@ -383,9 +389,6 @@ class task(models.Model):
                                 break
                         if to_begin:
                             dependent_task.status = "2ready"
-        if values.get('controler_id') or values.get('precontroler_id'):
-            for rec in self:
-                rec.current_control = values.get('precontroler_id') or values.get('controler_id')
         return super(task, self).write(values)
 
     def open_task_view_py(self):
@@ -423,7 +426,7 @@ class CreateTasksWizard(models.TransientModel):
                         tasktype_is_valid = True
                         break
                 if tasktype_is_valid:
-                    name = tasktype.name + " " + asset.name 
+                    name = tasktype.name + " " + asset.name
                     created = created|self.env['toonproject.task'].create(
                         {
                             'name': name,
@@ -436,7 +439,7 @@ class CreateTasksWizard(models.TransientModel):
                         }
                     )
             for task in created:
-                priceRec = task.getPriceRecord(asset)
+                priceRec = task.price_record
                 if priceRec:
                     next_type = priceRec.next_tasktype
                     for next_task in created:
