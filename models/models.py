@@ -555,6 +555,8 @@ class CombineTasksWizard(models.TransientModel):
             return "Отстуствуют задания для объединения"
         common_tasktype = target_recs[0].tasktype_id
         common_project = target_recs[0].project_id
+        common_short_description = ''
+        common_description=''
         for rec in target_recs:
             if rec.worker_id and rec.status > '2ready':
                 return "Нельзя объединить задания, уже отданные в работу"
@@ -562,8 +564,16 @@ class CombineTasksWizard(models.TransientModel):
                 return "Нельзя объединить задания разного типа"
             if rec.project_id!=common_project:
                 return "Нельзя объединить задания из разных проектов"
+            if rec.short_description:
+                common_short_description += (rec.short_description + '\n')
+            if rec.description:
+                common_description += (rec.description + '\n')
+        import pdb
+        pdb.set_trace()
         self.tasktype_id = common_tasktype
         self.project_id = common_project
+        self.description = common_description
+        self.short_description = common_short_description
         return False
 
     @api.depends('invalid_message')
