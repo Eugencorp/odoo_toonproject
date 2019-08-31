@@ -5,6 +5,7 @@ from odoo import models, fields, api
 class DashboardForm(models.Model):
     _name='toonproject.dashboard'
     name = fields.Char()
+    _description = 'Singleton model for display user tasks dashboard as a record form with some m2m fields'
 
     @api.multi
     def _my_tasks(self):

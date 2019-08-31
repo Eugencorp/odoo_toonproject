@@ -8,7 +8,7 @@ from odoo.exceptions import ValidationError
 
 class controler(models.Model):
     _name = 'toonproject.controler'
-    _order = 'sequence'
+    _order = 'sequence,name'
     _description = 'Simple model for ordering multiple controlers bent to some project task type'
 
     user = fields.Many2one('res.users', required=True, ondelete='restrict')
@@ -131,18 +131,18 @@ class StoresImages():
 
 class asset(models.Model, StoresImages):
     _name = 'toonproject.asset'
-    _desdription = 'some meaning part of a production: a scene, a background or a rig'
+    _description = 'some meaning part of a production: a scene, a background or a rig'
 
-    name = fields.Char()
+    name = fields.Char(required=True)
     short_description = fields.Char()
     description = fields.Text()
     factor = fields.Float(default=1)
 
     size = fields.Float(default=1)
     
-    assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=0)
+    assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
-    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
+    project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_type_color', store=True)
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
@@ -183,9 +183,12 @@ class asset(models.Model, StoresImages):
                     if valid_tasktype == task.tasktype_id and task.status > '1pending':
                         task_types.append(task)
                         break
-            task_types.sort(key=lambda task: task.status)
-            rec.current_tasktype = task_types[0].tasktype_id
-            rec.current_status = task_types[0].status
+            if len(task_types):
+                task_types.sort(key=lambda task: task.status)
+                rec.current_tasktype = task_types[0].tasktype_id
+                rec.current_status = task_types[0].status
+            else:
+                rec.current_status = '1pending'
 
     @api.multi
     @api.depends('icon_video_url')
@@ -221,7 +224,7 @@ class task(models.Model):
     _description = 'main model for work'
 
     name = fields.Char()
-    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True)
+    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True)
     factor = fields.Float(default=1)
     short_description = fields.Char()
     description = fields.Text()
@@ -247,13 +250,13 @@ class task(models.Model):
     isControler = fields.Boolean(compute='_is_controler', store=False)
     isWorker = fields.Boolean(compute='_is_worker', store=False)
     isValidWorker = fields.Boolean(compute='_is_valid_worker', store=False)
-    isManager = fields.Boolean(compute='_is_manager', store=False)
+    isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
 
     def _is_manager(self):
         for rec in self:
-            if self.env.user.has_group('toonproject.group_toonproject_manager') or self.env.user.id == SUPERUSER_ID:
+            if self.id == 0 or self.env.user.has_group('toonproject.group_toonproject_manager') or self.env.user.has_group('toonproject.group_toonproject_admin') or self.env.user.id == SUPERUSER_ID:
                 rec.isManager = True
             else:
                 rec.isManager = False
@@ -265,6 +268,12 @@ class task(models.Model):
             if len(controlers) > 0:
                 rec.current_control = controlers[0].id
 
+    @api.onchange('price_record')
+    def update_current_control(self):
+        controlers = self.env['toonproject.controler'].search([('price', '=', self.price_record.id)],
+                                                              order='sequence asc', limit=1)
+        if len(controlers) > 0:
+            self.current_control = controlers[0].id
 
     price_record = fields.Many2one('toonproject.price', compute='_get_price_record',store=False)
     current_control = fields.Many2one('toonproject.controler', string="должен проверить", default=_default_control, track_visibility='onchange')
@@ -467,7 +476,7 @@ class CreateTasksWizard(models.TransientModel):
                             'short_description': asset.short_description,
                             'description': asset.description,
                             'factor': asset.factor,
-                            'project_id': asset.project_id
+                            'project_id': asset.project_id.id
                         }
                     )
             for task in created:
@@ -479,8 +488,8 @@ class CreateTasksWizard(models.TransientModel):
                             task.dependent_tasks |= next_task
                             break
                     task.valid_group = priceRec.valid_group
-                    task.controler_id = priceRec.controler_id
-                    task.precontroler_id = priceRec.precontroler_id
+                    task._default_control()
+
 
         return {
             'type': 'ir.actions.act_window',

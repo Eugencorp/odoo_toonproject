@@ -16,3 +16,4 @@ price_user,price user,model_toonproject_price,group_toonproject_user,1,0,0,0
 tasktype_user,tasktype user,model_toonproject_tasktype,group_toonproject_user,1,0,0,0
 assettype_user,assettype user,model_toonproject_assettype,group_toonproject_user,1,0,0,0
 dashboard_user,dashboard user,model_toonproject_dashboard,group_toonproject_user,1,0,0,0
+controler_user,controler user,model_toonproject_controler,group_toonproject_user,1,0,0,0

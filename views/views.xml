@@ -29,7 +29,7 @@
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
                         <field name="next_tasktype" string="Следующий процесс"/>
-                        <field name="controlers" string="контроль" context="{'default_price':id}">
+                        <field name="controlers" string="контроль" context="{'default_price':id}" >
                           <tree>
                             <field name="sequence" widget="handle"/>
                             <field name="name"/>
@@ -109,13 +109,12 @@
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
 						                <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:"/>
-						                <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
                         <page string="Контроль">
                           <group>
                             <field name="controler_names" string="Контролеры:"/>
-                            <field name="current_control" string="Должен проверить:"/>
+                            <field name="current_control" string="Должен проверить:" domain="[('price','=',price_record)]" attrs="{'readonly':[('isManager','=',False)]}"/>
                           </group>
                         </page>
                         <page string="Сроки">
@@ -130,13 +129,25 @@
                           <group>
                           </group>
                         </page>
-                        <page string="Служебное">
+                        <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
-                            <field name="isManager" string="Manager" invisible="1"/>
-                            <field name="isControler" invisible="1"/>
-                            <field name="isWorker" invisible="1"/>
-                            <field name="isValidWorker" invisible="1"/>
-                            <field name="price_record" groups="toonproject.group_toonproject_admin"/>
+                            <group>
+                              <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                              <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                            </group>
+                            <group>
+                              <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                              <field name="computed_price" string="Cтоимость:"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Служебное" groups="toonproject.group_toonproject_admin">
+                          <group>
+                            <field name="isManager"  invisible="0"/>
+                            <field name="isControler" invisible="0"/>
+                            <field name="isWorker" invisible="0"/>
+                            <field name="isValidWorker" invisible="0"/>
+                            <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
                     </notebook>
@@ -317,7 +328,7 @@
                                       </div>
                                       <div class="col-md-3">
                                           <div class="o_kanban_image">
-                                            <img t-att-src="kanban_image('toonproject.asset', 'icon_image', record.id.raw_value)"/>
+                                            <img t-att-src="kanban_image('toonproject.asset', 'icon_image', record.id.raw_value)" alt="icon"/>
                                           </div>
                                       </div>
                                     </div>
