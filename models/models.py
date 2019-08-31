@@ -38,14 +38,17 @@ class assettype(models.Model):
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
     _description = 'task type for wich prices and pipeline are set'
+    _order = "sequence,id"
 
     name = fields.Char(string="Вид работ")
+    sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
 
 class price(models.Model):
     _name = 'toonproject.price'
     _description = 'some info, such as price, controlers, pipeline and valid worker groups bent to a project and a task type'
+    _order = 'sequence,id'
 
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
@@ -57,6 +60,7 @@ class price(models.Model):
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
+    sequence = fields.Integer(default=10)
 
     @api.multi
     def name_get(self):
@@ -186,12 +190,15 @@ class asset(models.Model, StoresImages):
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
                     if valid_tasktype == task.tasktype_id and task.status > '1pending':
-                        task_types.append(task)
+                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
+                        if self.env.context.get('task') and self.env.context.get('task')==task.id:
+                            pseudo_task.update({'status':self.env.context.get('status')})
+                        task_types.append(pseudo_task)
                         break
             if len(task_types):
-                task_types.sort(key=lambda task: task.status)
-                rec.current_tasktype = task_types[0].tasktype_id
-                rec.current_status = task_types[0].status
+                task_types.sort(key=lambda task: task['status'])
+                rec.current_tasktype = task_types[0]['tasktype_id']
+                rec.current_status = task_types[0]['status']
             else:
                 rec.current_status = '1pending'
 
@@ -426,6 +433,11 @@ class task(models.Model):
                     raise UserError(
                         'У вас нет прав на это действие'
                     )
+        if values.get('status'):
+            for rec in self:
+                for asset in rec.asset_ids:
+                    ctx = {'task':rec.id, 'status': values.get('status')}
+                    asset.with_context(ctx)._get_current_tasktype()
         if values.get('status') == '5finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:

@@ -19,21 +19,27 @@
 
 		<record model="toonproject.tasktype" id="anim">
             <field name="name">мультипликат</field>
+            <field name="sequence">11</field>
         </record>
         <record model="toonproject.tasktype" id="lo">
             <field name="name">lay-out</field>
+            <field name="sequence">10</field>
         </record>
         <record model="toonproject.tasktype" id="composing">
             <field name="name">композ</field>
+            <field name="sequence">12</field>
         </record>
         <record model="toonproject.tasktype" id="riging">
             <field name="name">риг</field>
+            <field name="sequence">7</field>
         </record>
         <record model="toonproject.tasktype" id="drawing">
             <field name="name">графика</field>
+            <field name="sequence">3</field>
         </record>	
         <record model="toonproject.tasktype" id="painting">
             <field name="name">живопись</field>
+            <field name="sequence">4</field>
         </record>
 
 		<record model="toonproject.assettype" id="scene">
