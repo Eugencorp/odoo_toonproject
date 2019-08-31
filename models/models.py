@@ -235,8 +235,6 @@ class task(models.Model):
     description = fields.Text()
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
     
-    # controler_id = fields.Many2one('res.users', ondelete='set null', index=True)
-    # precontroler_id = fields.Many2one('res.users', ondelete='set null', index=True)
     worker_id = fields.Many2one('res.users', ondelete='set null', index=True)
     work_start = fields.Date()
     plan_finish = fields.Date()
@@ -509,5 +507,41 @@ class CreateTasksWizard(models.TransientModel):
             'view_mode': 'tree,form',
         }
 
+class EditTasksWizard(models.TransientModel):
+    _name = 'toonproject.edittasks_wizard'
+    _description = "Wizard: Edit multiple tasks at once"
 
+    def _default_valid_group(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        for rec in target_recs:
+            if rec.valid_group:
+                return rec.valid_group
 
+    valid_group = fields.Many2one('res.groups', string="Группа исполнителей", default=_default_valid_group)
+    worker_id = fields.Many2one('res.user', string="Исполнитель")
+    factor = fields.Float(default=1, string="Cложность")
+    status = fields.Selection(
+        [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4control', 'в проверку'),
+         ('5finished', 'готово'), ('6canceled', 'отменено')], string='Статус', default='1pending',
+        )
+
+    valid_group_chk = fields.Boolean(default=False)
+    worker_id_chk = fields.Boolean(default=False)
+    factor_chk = fields.Boolean(default=False)
+    status_chk = fields.Boolean(default=False)
+
+    @api.multi
+    def apply_tasks(self):
+        values = {}
+        if self.valid_group_chk:
+            values.update({'valid_group': self.valid_group.id})
+        if self.worker_id_chk:
+            values.update({'worker_id': self.worker_id.id})
+        if self.factor_chk:
+            values.update({'factor': self.factor})
+        if self.status_chk:
+            values.update({'status': self.status})
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        for rec in target_recs:
+            rec.write(values)
+        return {}

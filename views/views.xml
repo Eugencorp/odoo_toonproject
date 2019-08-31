@@ -474,12 +474,53 @@
 		</field>
 	</record>
 
+	<record model="ir.ui.view" id="edittasks_wizard_form_view">
+		<field name="name">edittasks_wizard.form</field>
+		<field name="model">toonproject.edittasks_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Изменить свойства выбранных задач">
+        <div class="row">
+          <div class="col-md-6">
+            <field name="valid_group_chk"/> Группа исполнителей:
+            <field name="valid_group" attrs="{'readonly':[('valid_group_chk','=',False)]}" domain="[('category_id','=', %(module_category_toonproject)d)]" />
+            <br/>
+            <field name="worker_id_chk"/> Исполнитель:
+            <field name="worker_id"  attrs="{'readonly':[('worker_id_chk','=',False)]}"/>
+            <br/>
+            <field name="factor_chk"/> Сложность:
+            <field name="factor"  attrs="{'readonly':[('factor_chk','=',False)]}" style="{width:20%}"/>
+            <br/>
+            <field name="status_chk"/> Статус:
+            <field name="status"  attrs="{'readonly':[('status_chk','=',False)]}" style="{width:20%}"/>
+            <br/>
+          </div>
+        </div>
+				<footer>
+					<button name="apply_tasks" type="object"
+							string="Изменить" class="oe_highlight"/>
+					or
+					<button special="cancel" string="Отмена"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
 	<act_window id="launch_createtasks_wizard"
 				name="Создать задачи..."
 				src_model="toonproject.asset"
 				res_model="toonproject.createtasks_wizard"
 				view_mode="form"
 				target="new"
+        groups="toonproject.group_toonproject_manager"
+				key2="client_action_multi"/>
+
+	<act_window id="launch_edittasks_wizard"
+				name="Редактировать выбранное..."
+				src_model="toonproject.task"
+				res_model="toonproject.edittasks_wizard"
+				view_mode="form"
+				target="new"
+        groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
 
     <template id="assets_end" inherit_id="web.assets_backend">
