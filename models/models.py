@@ -257,6 +257,14 @@ class task(models.Model):
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
 
+    valid_users = fields.Many2many('res.users', compute='_get_valid_group_users', store=True)
+
+    @api.depends('valid_group')
+    def _get_valid_group_users(self):
+        for rec in self:
+            if rec.valid_group:
+                rec.valid_users = rec.valid_group.users
+
     def _is_manager(self):
         for rec in self:
             if self.id == 0 or self.env.user.has_group('toonproject.group_toonproject_manager') or self.env.user.has_group('toonproject.group_toonproject_admin') or self.env.user.id == SUPERUSER_ID:

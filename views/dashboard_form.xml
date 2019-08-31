@@ -83,9 +83,20 @@
         <field name="res_id">1</field>
     </record>
 
+    <record model="ir.actions.act_window" id="dashboard_kanban_action">
+        <field name="name">Tasks</field>
+        <field name="res_model">toonproject.task</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[(uid, 'child_of', 'valid_users')]</field>
+    </record>
+
     <menuitem id="dashboard_menu" name="Мои задачи" parent="main_toonproject_menu"
               sequence="1"
               action="dashboard_form_action"/>
 
+    <menuitem id="dashboard_kanban_menu" name="Мои задачи" parent="main_toonproject_menu"
+              sequence="2"
+              action="dashboard_kanban_action"/>
   </data>
 </odoo>

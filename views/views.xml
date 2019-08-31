@@ -12,7 +12,8 @@
                     <group>
                         <field name="category_id" readonly="1"/>
                         <field name="name" string="Группа"/>
-                        <field name="comment" stirng="Описание"/>
+                        <field name="comment" string="Описание"/>
+                        <field name="users" string="Участники группы"/>
                     </group>
                 </sheet>
             </form>
@@ -165,6 +166,7 @@
                             <field name="isControler" invisible="0"/>
                             <field name="isWorker" invisible="0"/>
                             <field name="isValidWorker" invisible="0"/>
+                            <field name="valid_users" string="члены разрешенной группы"/>
                             <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
