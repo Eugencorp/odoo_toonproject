@@ -38,8 +38,10 @@ class assettype(models.Model):
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
     _description = 'task type for wich prices and pipeline are set'
+    _order = "sequence,id"
 
     name = fields.Char(string="Вид работ")
+    sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
 
@@ -152,8 +154,8 @@ class asset(models.Model, StoresImages):
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_type_color', store=True)
-    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
-    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=False)
+    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=False)
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
     

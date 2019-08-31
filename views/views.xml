@@ -255,6 +255,20 @@
       </field>
     </record>
 
+    <record model="ir.ui.view" id="tasktype_list">
+      <field name="name">tasktype.list</field>
+      <field name="model">toonproject.tasktype</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="sequence" widget="handle"/>
+          <field name="name"/>
+          <field name="description"/>
+          <field name="valid_assettypes" widget="many2many_tags"/>
+        </tree>
+      </field>
+    </record>
+
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
       <field name="model">toonproject.cartoon</field>
@@ -407,6 +421,13 @@
             </p>
         </field>
     </record>
+
+    <record model="ir.actions.act_window" id="tasktypes_list_action">
+        <field name="name">Виды работ</field>
+        <field name="res_model">toonproject.tasktype</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
     
     <record model="ir.actions.act_window" id="tasks_list_action">
         <field name="name">Задачи</field>
@@ -451,7 +472,10 @@
     <menuitem id="assets_menu" name="Материалы" parent="lists_menu"
                   action="assets_list_action"/>    
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
-                  action="tasks_list_action"/> 
+                  action="tasks_list_action"/>
+    <menuitem id="tasktypes_menu" name="Виды работ" parent="lists_menu"
+                  action="tasktypes_list_action"
+                  groups="toonproject.group_toonproject_admin"/>
     <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
                   action="prices_list_action"
                   groups="toonproject.group_toonproject_admin"/>
