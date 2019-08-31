@@ -29,8 +29,12 @@
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
                         <field name="next_tasktype" string="Следующий процесс"/>
-                        <field name="precontroler_id" string="предварительный контроль" attrs="{'invisible':[('controler_id','=',None)]}"/>
-                        <field name="controler_id" string="контроль" />
+                        <field name="controlers" string="контроль" context="{'default_price':id}" >
+                          <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                          </tree>
+                        </field>
                         <field name="valid_group" string="Группа исполнителей"/>
                     </group>
                 </sheet>
@@ -105,13 +109,12 @@
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
 						                <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:"/>
-						                <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
                         <page string="Контроль">
                           <group>
-                            <field name="precontroler_id" string="Предварительный контроль:" attrs="{'invisible':['|',('controler_id','=',None), '&amp;', ('isManager','=',False), ('precontroler_id','=',None)],'readonly':[('isManager','=',False)]}"/>
-                            <field name="controler_id" string="Контролер:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="controler_names" string="Контролеры:"/>
+                            <field name="current_control" string="Должен проверить:" domain="[('price','=',price_record)]" attrs="{'readonly':[('isManager','=',False)]}"/>
                           </group>
                         </page>
                         <page string="Сроки">
@@ -126,13 +129,25 @@
                           <group>
                           </group>
                         </page>
-                        <page string="Служебное">
+                        <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
-                            <field name="isManager" string="Manager" invisible="1"/>
-                            <field name="isControler" invisible="1"/>
-                            <field name="isWorker" invisible="1"/>
-                            <field name="isValidWorker" invisible="1"/>
-                            <field name="current_control" string="current_control" invisible="1"/>
+                            <group>
+                              <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                              <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                            </group>
+                            <group>
+                              <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                              <field name="computed_price" string="Cтоимость:"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Служебное" groups="toonproject.group_toonproject_admin">
+                          <group>
+                            <field name="isManager"  invisible="0"/>
+                            <field name="isControler" invisible="0"/>
+                            <field name="isWorker" invisible="0"/>
+                            <field name="isValidWorker" invisible="0"/>
+                            <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
                           </group>
                         </page>
                     </notebook>
@@ -143,20 +158,20 @@
                     <group col="3">
                       <div>
                         <label for="asset_ids"/>
-                        <field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>
-                        <!--<field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
+                        <!--<field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>-->
+                        <field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
                           <tree>
                             <field name="assettype_id"/>
                             <field name="name"/>
                             <field name="short_description"/>
                             <field name="size"/>
                           </tree>
-                        </field>-->
+                        </field>
                       </div>
                       <div>
                         <label for="affecting_tasks"/>
-                          <field name="affecting_tasks" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>
-                          <!--
+                          <!--<field name="affecting_tasks" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>-->
+
                           <field name="affecting_tasks" attrs="{'readonly':[('isManager','=',False)]}">
                                 <tree>
                                   <field name="name"/>
@@ -165,7 +180,7 @@
                                   <field name="worker_id"/>
                                 </tree>
                           </field>
-                          -->
+
                       </div>
                       <div>
                         <label for="dependent_tasks"/>
@@ -313,7 +328,7 @@
                                       </div>
                                       <div class="col-md-3">
                                           <div class="o_kanban_image">
-                                            <img t-att-src="kanban_image('toonproject.asset', 'icon_image', record.id.raw_value)"/>
+                                            <img t-att-src="kanban_image('toonproject.asset', 'icon_image', record.id.raw_value)" alt="icon"/>
                                           </div>
                                       </div>
                                     </div>
@@ -334,8 +349,7 @@
           <field name="tasktype_id" string="вид работ"/>
           <field name="value" string="расценка"/>
           <field name="next_tasktype" string="следующий процесс"/>
-          <field name="precontroler_id" string="предварительный контроль"/>
-          <field name="controler_id" string="контроль"/>
+          <field name="controlers" string="контроль" widget="many2many_tags"/>
           <field name="valid_group" string="группа работников"/>
         </tree>
       </field>
