@@ -12,7 +12,8 @@
                     <group>
                         <field name="category_id" readonly="1"/>
                         <field name="name" string="Группа"/>
-                        <field name="comment" stirng="Описание"/>
+                        <field name="comment" string="Описание"/>
+                        <field name="users" string="Участники группы"/>
                     </group>
                 </sheet>
             </form>
