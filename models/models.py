@@ -6,6 +6,11 @@ from odoo import SUPERUSER_ID
 from odoo import tools
 from odoo.exceptions import ValidationError
 
+class group(models.Model):
+    _name = 'res.groups'
+    _inherit = 'res.groups'
+    max_tasks = fields.Integer(string="Количество одновременных заданий")
+
 class controler(models.Model):
     _name = 'toonproject.controler'
     _order = 'sequence,name'

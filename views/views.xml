@@ -2,6 +2,23 @@
 <odoo>
   <data>
 
+    <record model="ir.ui.view" id="toonproject_group_form_view">
+        <field name="name">group.form</field>
+        <field name="model">res.groups</field>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <form string="Группа">
+                <sheet>
+                    <group>
+                        <field name="category_id" readonly="1"/>
+                        <field name="name" string="Группа"/>
+                        <field name="comment" stirng="Описание"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record model="ir.ui.view" id="cartoon_form_view">
         <field name="name">cartoon.form</field>
         <field name="model">toonproject.cartoon</field>
@@ -35,7 +52,8 @@
                             <field name="name"/>
                           </tree>
                         </field>
-                        <field name="valid_group" string="Группа исполнителей"/>
+                        <field name="valid_group" string="Группа исполнителей"
+                          domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                     </group>
                 </sheet>
             </form>
@@ -132,7 +150,7 @@
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
                             <group>
-                              <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                              <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                               <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
                             </group>
                             <group>
@@ -222,6 +240,18 @@
 			</form>
 		</field>
 	</record>
+
+    <record model="ir.ui.view" id="toonproject_group_list">
+      <field name="name">group.list</field>
+      <field name="model">res.groups</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="display_name" />
+          <field name="comment" />
+        </tree>
+      </field>
+    </record>
 
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
@@ -396,6 +426,19 @@
         </field>
     </record>
 
+    <record model="ir.actions.act_window" id="groups_list_action">
+        <field name="name">Группы</field>
+        <field name="res_model">res.groups</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="toonproject_group_list"/>
+        <field name="domain" eval="[('category_id','=',ref('toonproject.module_category_toonproject'))]"/>
+        <field name="context" eval="{'form_view_ref':'toonproject.toonproject_group_form_view', 'default_category_id':ref('toonproject.module_category_toonproject')}"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Создайте первую группу
+            </p>
+        </field>
+    </record>
 
     <menuitem id="main_toonproject_menu" name="The Toon Project" sequence="0"/>
     <menuitem id="lists_menu" name="Списки" parent="main_toonproject_menu"/>
@@ -408,6 +451,9 @@
     <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
                   action="prices_list_action"
                   groups="toonproject.group_toonproject_admin"/>
+    <menuitem id="groups_menu" name="Группы пользователей" parent="lists_menu"
+                  action="groups_list_action"
+                  groups="toonproject.group_toonproject_manager"/>
 
 	<record model="ir.ui.view" id="createtasks_wizard_form_view">
 		<field name="name">createtasks_wizard.form</field>
