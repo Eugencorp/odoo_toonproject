@@ -46,6 +46,7 @@ class tasktype(models.Model):
 class price(models.Model):
     _name = 'toonproject.price'
     _description = 'some info, such as price, controlers, pipeline and valid worker groups bent to a project and a task type'
+    _order = 'sequence,id'
 
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
@@ -57,6 +58,7 @@ class price(models.Model):
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
+    sequence = fields.Integer(default=10)
 
     @api.multi
     def name_get(self):
