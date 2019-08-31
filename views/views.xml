@@ -505,6 +505,8 @@
 		</field>
 	</record>
 
+
+
 	<act_window id="launch_createtasks_wizard"
 				name="Создать задачи..."
 				src_model="toonproject.asset"
@@ -518,6 +520,15 @@
 				name="Редактировать выбранное..."
 				src_model="toonproject.task"
 				res_model="toonproject.edittasks_wizard"
+				view_mode="form"
+				target="new"
+        groups="toonproject.group_toonproject_manager"
+				key2="client_action_multi"/>
+
+	<act_window id="launch_combinetasks_wizard"
+				name="Объдинить выбранные задачи..."
+				src_model="toonproject.task"
+				res_model="toonproject.combinetasks_wizard"
 				view_mode="form"
 				target="new"
         groups="toonproject.group_toonproject_manager"

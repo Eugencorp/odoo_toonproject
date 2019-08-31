@@ -440,8 +440,6 @@ class task(models.Model):
         return super(task, self).write(values)
 
     def open_task_view_py(self):
-        #import pdb
-        #pdb.set_trace()
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'toonproject.task',
@@ -545,3 +543,19 @@ class EditTasksWizard(models.TransientModel):
         for rec in target_recs:
             rec.write(values)
         return {}
+
+class CombineTasksWizard(models.TransientModel):
+    _name = 'toonproject.combinetasks_wizard'
+    _description = "Wizard: Combine multiple tasks"
+    _inherit = 'toonproject.task'
+
+    def _is_valid_operation(self):
+
+        return True
+
+    valid_operation = fields.Boolean(default=_is_valid_operation)
+    delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')])
+
+    @api.multi
+    def combine_tasks(self):
+        return{}
