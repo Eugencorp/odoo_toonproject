@@ -71,7 +71,7 @@
                         </group>
                     </group>
                     <label for="task_ids"/>
-                    <field name="task_ids">
+                    <field name="task_ids" context="{'default_asset_ids':[id]}">
                       <tree class="no_open">
                         <button name="open_task_view_py" string="смотреть" type="object"/>
                         <field name="name" string="задача"/>
