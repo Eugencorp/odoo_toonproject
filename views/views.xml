@@ -125,6 +125,7 @@
                         </page>
                         <page string="Описание">
                           <group>
+                            <field name="short_description" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
 						                <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:"/>
@@ -289,6 +290,7 @@
         <tree>
           <field name="project_id" string="проект"/>
           <field name="name" string="задача"/>
+          <field name="short_description" string="содержание"/>
           <field name="asset_ids" string="объект"  widget="many2many_tags"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>
