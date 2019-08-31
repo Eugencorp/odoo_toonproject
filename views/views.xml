@@ -505,7 +505,126 @@
 		</field>
 	</record>
 
+  <record model="ir.ui.view" id="combinetasks_wizard_form_view">
+		<field name="name">combinetasks_wizard.form</field>
+		<field name="model">toonproject.combinetasks_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Объединить задачи">
+        <sheet>
+          <header style="{color:red;font-weight:bold;align:center}">
+            <field name="valid_operation" invisible="1"/>
+            <field name="invalid_message" readonly="1"/>
+          </header>
+              <notebook>
+                  <page string="Задание">
+                    <group>
+                      <field name="name" string="Задание" attrs="{'readonly':[('isManager','=',False)]}" />
+                      <field name="project_id" string="по проекту" readonly="1" />
+                      <field name="tasktype_id" string="Тип работ:" readony="1"/>
+                      <field name="worker_id" string="Исполнитель:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <field name="status" string="Статус:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                    </group>
+                  </page>
+                  <page string="Описание">
+                    <group>
+                      <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <field name="computed_price" string="Cтоимость:"/>
+                    </group>
+                  </page>
+                  <page string="Контроль">
+                    <group>
+                      <field name="controler_names" string="Контролеры:"/>
+                      <field name="current_control" string="Должен проверить:" domain="[('price','=',price_record)]" attrs="{'readonly':[('isManager','=',False)]}"/>
+                    </group>
+                  </page>
+                  <page string="Сроки">
+                    <group>
+                      <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
+                      <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
+                      <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
+                    </group>
+                  </page>
+                  <page string="Результат">
+                    <group>
+                    </group>
+                  </page>
+                  <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
+                    <group>
+                      <group>
+                        <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
+                        <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                      </group>
+                      <group>
+                        <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                        <field name="computed_price" string="Cтоимость:"/>
+                      </group>
+                    </group>
+                  </page>
+                  <page string="Служебное" groups="toonproject.group_toonproject_admin">
+                    <group>
+                      <field name="isManager"  invisible="0"/>
+                      <field name="isControler" invisible="0"/>
+                      <field name="isWorker" invisible="0"/>
+                      <field name="isValidWorker" invisible="0"/>
+                      <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
+                    </group>
+                  </page>
+              </notebook>
+              <script>
+                jQuery('td.o_td_label+td').each(function(i,el){el.style.width = null;});
+                jQuery('table.o_group').each(function(i,el){el.style.width = 'auto';});
+              </script>
+              <group col="3">
+                <div>
+                  <label for="asset_ids"/>
+                  <!--<field name="asset_ids" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>-->
+                  <field name="asset_ids" attrs="{'readonly':[('isManager','=',False)]}">
+                    <tree>
+                      <field name="assettype_id"/>
+                      <field name="name"/>
+                      <field name="short_description"/>
+                      <field name="size"/>
+                    </tree>
+                  </field>
+                </div>
+                <div>
+                  <label for="affecting_tasks"/>
+                    <!--<field name="affecting_tasks" widget="many2many_tags" attrs="{'readonly':[('isManager','=',False)]}"/>-->
 
+                    <field name="affecting_tasks" attrs="{'readonly':[('isManager','=',False)]}">
+                          <tree>
+                            <field name="name"/>
+                            <field name="tasktype_id"/>
+                            <field name="status"/>
+                            <field name="worker_id"/>
+                          </tree>
+                    </field>
+
+                </div>
+                <div>
+                  <label for="dependent_tasks"/>
+                  <field name="dependent_tasks" attrs="{'readonly':[('isManager','=',False)]}">
+                        <tree>
+                          <field name="name"/>
+                          <field name="tasktype_id"/>
+                        </tree>
+                  </field>
+                </div>
+              </group>
+         </sheet>
+				<footer>
+					<button name="apply_tasks" type="object"
+							string="Объединить" class="oe_highlight"
+                  attrs="{'invisible':[('valid_operation','=',False)]}"/>
+
+					or
+					<button special="cancel" string="Отмена"/>
+				</footer>
+			</form>
+		</field>
+	</record>
 
 	<act_window id="launch_createtasks_wizard"
 				name="Создать задачи..."
@@ -526,7 +645,7 @@
 				key2="client_action_multi"/>
 
 	<act_window id="launch_combinetasks_wizard"
-				name="Объдинить выбранные задачи..."
+				name="Объединить выбранные задачи..."
 				src_model="toonproject.task"
 				res_model="toonproject.combinetasks_wizard"
 				view_mode="form"

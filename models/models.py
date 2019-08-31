@@ -550,11 +550,31 @@ class CombineTasksWizard(models.TransientModel):
     _inherit = 'toonproject.task'
 
     def _is_valid_operation(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        if len(target_recs)<0:
+            return "Отстуствуют задания для объединения"
+        common_tasktype = target_recs[0].tasktype_id
+        common_project = target_recs[0].project_id
+        for rec in target_recs:
+            if rec.worker_id and rec.status > '2ready':
+                return "Нельзя объединить задания, уже отданные в работу"
+            if rec.tasktype_id!=common_tasktype:
+                return "Нельзя объединить задания разного типа"
+            if rec.project_id!=common_project:
+                return "Нельзя объединить задания из разных проектов"
+        self.tasktype_id = common_tasktype
+        self.project_id = common_project
+        return False
 
-        return True
+    @api.depends('invalid_message')
+    def _set_invalid_operation(self):
+        for rec in self:
+            rec.valid_operation = not rec.invalid_message
 
-    valid_operation = fields.Boolean(default=_is_valid_operation)
-    delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')])
+    invalid_message = fields.Char(default=_is_valid_operation)
+    valid_operation = fields.Boolean(compute="_set_is_valid_operation")
+
+    delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')], string='Куда деть старые задачи?')
 
     @api.multi
     def combine_tasks(self):
