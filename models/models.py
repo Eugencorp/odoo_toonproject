@@ -370,47 +370,52 @@ class task(models.Model):
     
     @api.multi
     def button_start(self):
+        ctx = {'btn': True}
         for rec in self:
-            rec.sudo().write({
+            rec.with_context(ctx).write({
                 'status': '3progress',
                 'work_start': fields.Date.today(),
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
     def button_control(self):
+        ctx = {'btn': True}
         for rec in self:
-            rec.sudo().write({'status': '4control'})
+            rec.with_context(ctx).write({'status': '4control'})
 
     @api.multi
     def button_reject(self):
-        #import pdb
-        #pdb.set_trace()
+        ctx = {'btn': True}
         for rec in self:
-            rec.sudo().write({'status': '3progress'})
+            rec.with_context(ctx).write({'status': '3progress'})
 
     @api.multi
     def button_accept(self):
+        ctx = {'btn': True}
         for rec in self:
             controlers = self.env['toonproject.controler'].search([
                 ('price', '=', rec.price_record.id),
                 ('sequence', '>', rec.current_control.sequence)],
                 order='sequence asc')
             if len(controlers)<1:
-                rec.sudo().write({
+                rec.with_context(ctx).write({
                     'status': '5finished',
                     'real_finish': fields.Date.today()
                 })
             else:
-                rec.sudo().write({'current_control':controlers[0].id})
+                rec.with_context(ctx).write({'current_control':controlers[0].id})
 
 
     @api.multi
     def write(self, values):
-        if self.env.user.id != SUPERUSER_ID and not self.env.user.has_group('toonproject.group_toonproject_manager'):
-            readonly_fields = ['name', 'description', 'short_description',
+        if (not self.env.context.get('btn')) and \
+                self.env.user.id != SUPERUSER_ID and \
+                not self.env.user.has_group('toonproject.group_toonproject_manager'):
+            readonly_fields = ['name', 'project_id',
+                               'description', 'short_description',
                                'factor','compute_price_method',
                                'asset_ids', 'affecting_tasks','dependent_tasks',
-                               'valid_group',
+                               'valid_group', 'current_control',
                                'worker_id','work_start','real_finish',
                                'status']
             for ro_field in readonly_fields:
