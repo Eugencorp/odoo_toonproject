@@ -164,8 +164,8 @@ class asset(models.Model, StoresImages):
     @api.depends('assettype_id')
     def _get_type_color(self):
         for rec in self:
-            if rec.assettype_id:
-                rec.color = rec.assettype_id.id
+            if rec.current_status:
+                rec.color = int(rec.current_status[:1])
             else:
                 rec.color = 0
 
@@ -187,12 +187,13 @@ class asset(models.Model, StoresImages):
             task_types = []
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
-                    if valid_tasktype == task.tasktype_id and task.status > '1pending':
+                    if valid_tasktype == task.tasktype_id:
                         pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
-                        task_types.append(pseudo_task)
-                        break
+                        if pseudo_task['status'] > '1pending':
+                            task_types.append(pseudo_task)
+                            break
             if len(task_types):
                 task_types.sort(key=lambda task: task['status'])
                 rec.current_tasktype = task_types[0]['tasktype_id']
