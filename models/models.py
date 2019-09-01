@@ -54,9 +54,7 @@ class price(models.Model):
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
 
-    # controler_id = fields.Many2one('res.users', string='контроль')
-    # precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
-    next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
+    #next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
@@ -166,8 +164,8 @@ class asset(models.Model, StoresImages):
     @api.depends('assettype_id')
     def _get_type_color(self):
         for rec in self:
-            if rec.assettype_id:
-                rec.color = rec.assettype_id.id
+            if rec.current_status:
+                rec.color = int(rec.current_status[:1])
             else:
                 rec.color = 0
 
@@ -189,12 +187,13 @@ class asset(models.Model, StoresImages):
             task_types = []
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
-                    if valid_tasktype == task.tasktype_id and task.status > '1pending':
+                    if valid_tasktype == task.tasktype_id:
                         pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
-                        task_types.append(pseudo_task)
-                        break
+                        if pseudo_task['status'] > '1pending':
+                            task_types.append(pseudo_task)
+                            break
             if len(task_types):
                 task_types.sort(key=lambda task: task['status'])
                 rec.current_tasktype = task_types[0]['tasktype_id']
@@ -502,11 +501,17 @@ class CreateTasksWizard(models.TransientModel):
             for task in created:
                 priceRec = task.price_record
                 if priceRec:
-                    next_type = priceRec.next_tasktype
-                    for next_task in created:
-                        if next_task.tasktype_id == next_type:
-                            task.dependent_tasks |= next_task
+                    next_records = self.env['toonproject.price'].search([('project_id','=',priceRec.project_id.id), ('sequence', '>', priceRec.sequence)], order='sequence asc')
+                    next_record = None
+                    for price in next_records:
+                        if price.tasktype_id in asset.assettype_id.valid_tasktypes:
+                            next_record = price
                             break
+                    if next_record:
+                        for next_task in created:
+                            if next_task.price_record and next_task.price_record == next_record[0]:
+                                task.dependent_tasks |= next_task
+                                break
                     task.valid_group = priceRec.valid_group
                     task._default_control()
 
