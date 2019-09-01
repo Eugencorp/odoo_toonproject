@@ -46,7 +46,7 @@
                         <field name="project_id" string="Проект"/>
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
-                        <field name="next_tasktype" string="Следующий процесс"/>
+                        <!--<field name="next_tasktype" string="Следующий процесс"/>-->
                         <field name="controlers" string="контроль" context="{'default_price':id}" >
                           <tree>
                             <field name="sequence" widget="handle"/>
@@ -396,7 +396,7 @@
           <field name="project_id" string="проект"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="value" string="расценка"/>
-          <field name="next_tasktype" string="следующий процесс"/>
+          <!--<field name="next_tasktype" string="следующий процесс"/>-->
           <field name="controlers" string="контроль" widget="many2many_tags"/>
           <field name="valid_group" string="группа работников"/>
         </tree>

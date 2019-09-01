@@ -54,9 +54,7 @@ class price(models.Model):
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
 
-    # controler_id = fields.Many2one('res.users', string='контроль')
-    # precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
-    next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
+    #next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
@@ -502,11 +500,17 @@ class CreateTasksWizard(models.TransientModel):
             for task in created:
                 priceRec = task.price_record
                 if priceRec:
-                    next_type = priceRec.next_tasktype
-                    for next_task in created:
-                        if next_task.tasktype_id == next_type:
-                            task.dependent_tasks |= next_task
+                    next_records = self.env['toonproject.price'].search([('project_id','=',priceRec.project_id.id), ('sequence', '>', priceRec.sequence)], order='sequence asc')
+                    next_record = None
+                    for price in next_records:
+                        if price.tasktype_id in asset.assettype_id.valid_tasktypes:
+                            next_record = price
                             break
+                    if next_record:
+                        for next_task in created:
+                            if next_task.price_record and next_task.price_record == next_record[0]:
+                                task.dependent_tasks |= next_task
+                                break
                     task.valid_group = priceRec.valid_group
                     task._default_control()
 
