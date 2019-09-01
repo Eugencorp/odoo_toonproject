@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/dashboard_form.xml',
         'views/templates.xml',
+        'views/eternal_data.xml',
         'views/preset_data.xml',
     ],
     # only loaded in demonstration mode

@@ -305,7 +305,7 @@
           <field name="project_id" string="проект"/>
           <field name="name" string="задача"/>
           <field name="short_description" string="содержание"/>
-          <field name="asset_ids" string="объект"  widget="many2many_tags"/>
+          <field name="asset_ids" string="объект"  widget="many2many_tags" options="{'color_field':'assettype_id'}"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>
           <field name="status" string="статус"/>          
