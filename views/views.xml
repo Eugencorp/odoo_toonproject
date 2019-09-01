@@ -412,6 +412,10 @@
         <field name="domain">[]</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Создайте первый проект, чтобы начать работу.
+            </p>
+        </field>
     </record>
 
     <record model="ir.actions.act_window" id="assets_list_action">
