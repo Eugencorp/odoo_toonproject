@@ -262,9 +262,9 @@
       <field name="arch" type="xml">
         <tree>
           <field name="sequence" widget="handle"/>
-          <field name="name"/>
-          <field name="description"/>
-          <field name="valid_assettypes" widget="many2many_tags"/>
+          <field name="name" string="Название"/>
+          <field name="description" string="Описание"/>
+          <field name="valid_assettypes" widget="many2many_tags" string="Над чем производятся работы"/>
         </tree>
       </field>
     </record>
@@ -287,6 +287,7 @@
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
         <tree>
+	  <field name="project_id" string="проект"/>
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
