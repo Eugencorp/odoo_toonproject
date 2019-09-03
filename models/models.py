@@ -40,7 +40,7 @@ class tasktype(models.Model):
     _description = 'task type for wich prices and pipeline are set'
     _order = "sequence,id"
 
-    name = fields.Char(string="Вид работ")
+    name = fields.Char(string="Вид работ")    
     sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
@@ -252,6 +252,7 @@ class task(models.Model):
     real_finish = fields.Date()
     
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
+    asset_names = fields.Char(string="Названия материалов", compute="_get_asset_names", store=True)
     compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price')
     pay_date = fields.Date()
@@ -267,6 +268,13 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    
+    @api.depends('asset_ids')
+    def _get_asset_names(self):
+        for rec in self:
+            names = ", ".join([asset.name for asset in rec.asset_ids])
+            rec.asset_names = names
+        
 
     def _is_manager(self):
         for rec in self:
@@ -540,7 +548,7 @@ class EditTasksWizard(models.TransientModel):
                 return rec.valid_group
 
     valid_group = fields.Many2one('res.groups', string="Группа исполнителей", default=_default_valid_group)
-    worker_id = fields.Many2one('res.user', string="Исполнитель")
+    worker_id = fields.Many2one('res.users', string="Исполнитель")
     factor = fields.Float(default=1, string="Cложность")
     status = fields.Selection(
         [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4control', 'в проверку'),
