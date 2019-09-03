@@ -435,6 +435,13 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
+	  
+    <record model="ir.actions.act_window" id="assettypes_list_action">
+        <field name="name">Виды материалов</field>
+        <field name="res_model">toonproject.assettype</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
     
     <record model="ir.actions.act_window" id="tasks_list_action">
         <field name="name">Задачи</field>
@@ -483,6 +490,9 @@
     <menuitem id="tasktypes_menu" name="Виды работ" parent="lists_menu"
                   action="tasktypes_list_action"
                   groups="toonproject.group_toonproject_admin"/>
+    <menuitem id="assettypes_menu" name="Виды материалов" parent="lists_menu"
+                  action="assettypes_list_action"
+                  groups="toonproject.group_toonproject_admin"/>	  
     <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
                   action="prices_list_action"
                   groups="toonproject.group_toonproject_admin"/>
