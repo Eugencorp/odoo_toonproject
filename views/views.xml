@@ -527,12 +527,16 @@
                     </group>
                   </page>
                   <page string="Описание">
-                    <group>
-                      <field name="short_description" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
-                      <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
-                      <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
-                      <field name="computed_price" string="Cтоимость:"/>
-                    </group>
+					<div style="row">
+					  <label for="short_description" class="md-col-4"/>
+                      <field name="short_description" class="md-col-8" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
+					  <label for="description" class="md-col-4"/>
+                      <field name="description" class="md-col-8"  string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <label for="factor" class="md-col-4"/>
+					  <field name="factor" class="md-col-8"  string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                      <label for="computed_price" class="md-col-4"/>
+					  <field name="computed_price" class="md-col-8"  string="Cтоимость:"/>
+					 </div>
                   </page>
                   <page string="Контроль">
                     <group>

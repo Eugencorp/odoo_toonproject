@@ -228,27 +228,27 @@ class task(models.Model):
     _inherit = 'mail.thread'
     _description = 'main model for work'
 
-    name = fields.Char()
-    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True)
-    factor = fields.Float(default=1)
-    short_description = fields.Char()
-    description = fields.Text()
+    name = fields.Char(string='Название')
+    tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
+    factor = fields.Float(default=1, string='Сложность')
+    short_description = fields.Char(string='Краткое содержание')
+    description = fields.Text(string='Описание задачи')
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
     
-    worker_id = fields.Many2one('res.users', ondelete='set null', index=True)
-    work_start = fields.Date()
-    plan_finish = fields.Date()
-    real_finish = fields.Date()
+    worker_id = fields.Many2one('res.users', ondelete='set null', index=True, string='Исполнитель')
+    work_start = fields.Date(string='Начато')
+    plan_finish = fields.Date(string='Планируется закончить')
+    real_finish = fields.Date(string='Закончено')
     
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
-    compute_price_method = fields.Selection([('first','по первому допустимому'),('sum', 'по сумме допустимых')], default = 'first', string = 'Метод рассчета')
-    computed_price = fields.Float(compute='_compute_price')
-    pay_date = fields.Date()
+    compute_price_method = fields.Selection([('first','по первому из материалов'),('sum', 'по сумме соизмеримых материалов')], default = 'sum', string = 'Метод рассчета')
+    computed_price = fields.Float(compute='_compute_price',string='Стоимость')
+    pay_date = fields.Date(string='Оплачено')
     
     status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
-    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='влияющие задачи')
-    valid_group = fields.Many2one('res.groups', string='группа работников')
+    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='зависит от')
+    valid_group = fields.Many2one('res.groups', string='Кому можно выдавать')
 
     isControler = fields.Boolean(compute='_is_controler', store=False)
     isWorker = fields.Boolean(compute='_is_worker', store=False)
@@ -555,8 +555,6 @@ class CombineTasksWizard(models.TransientModel):
             return "Отстуствуют задания для объединения"
         common_tasktype = target_recs[0].tasktype_id
         common_project = target_recs[0].project_id
-        common_short_description = ''
-        common_description=''
         for rec in target_recs:
             if rec.worker_id and rec.status > '2ready':
                 return "Нельзя объединить задания, уже отданные в работу"
@@ -564,17 +562,66 @@ class CombineTasksWizard(models.TransientModel):
                 return "Нельзя объединить задания разного типа"
             if rec.project_id!=common_project:
                 return "Нельзя объединить задания из разных проектов"
-            if rec.short_description:
-                common_short_description += (rec.short_description + '\n')
-            if rec.description:
-                common_description += (rec.description + '\n')
-        import pdb
-        pdb.set_trace()
-        self.tasktype_id = common_tasktype
-        self.project_id = common_project
-        self.description = common_description
-        self.short_description = common_short_description
         return False
+    
+    def _get_tasktype(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        if len(target_recs)>0:
+            return target_recs[0].tasktype_id
+        else:
+            return False
+            
+    def _get_project(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        if len(target_recs)>0:
+            return target_recs[0].project_id
+        else:
+            return False            
+        
+    def _get_common_short_description(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        common_short_description = "; ".join([task.short_description for task in target_recs if task.short_description])
+        return common_short_description
+        
+    def _get_common_description(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        common_description = "; ".join([task.description for task in target_recs if task.description])
+        return common_description  
+
+    def _get_assets(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))        
+        common_assets = self.env['toonproject.asset']
+        for rec in target_recs:
+            common_assets |= rec.asset_ids
+        return common_assets
+        
+    def _get_factor(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids')) 
+        the_price = 0
+        the_size = 0
+        for rec in target_recs:
+            the_price += rec.computed_price
+            the_size += rec.computed_price/rec.factor
+        return the_price/the_size
+        
+    
+    def _get_dependent_tasks(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        res = self.env['toonproject.task']
+        for rec in target_recs:
+            res |= rec.dependent_tasks
+        res = res - target_recs
+        return res
+        
+    
+    def _get_affecting_tasks(self):
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))        
+        res = self.env['toonproject.task']
+        for rec in target_recs:
+            res |= rec.affecting_tasks
+        res = res - target_recs
+        return res    
+        
 
     @api.depends('invalid_message')
     def _set_invalid_operation(self):
@@ -585,6 +632,17 @@ class CombineTasksWizard(models.TransientModel):
     valid_operation = fields.Boolean(compute="_set_is_valid_operation")
 
     delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')], string='Куда деть старые задачи?')
+    
+    short_description = fields.Char(default = _get_common_short_description)
+    description = fields.Text(default = _get_common_description)
+    asset_ids = fields.Many2many('toonproject.asset', default = _get_assets)
+    tasktype_id = fields.Many2one('toonproject.tasktype', default = _get_tasktype)
+    project_id = fields.Many2one('toonproject.cartoon', default = _get_project)  
+    factor = fields.Float(default = _get_factor, string='Сложность')
+    dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', default=_get_dependent_tasks)    
+    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', default=_get_affecting_tasks)
+    name = fields.Char(required=True)
+
 
     @api.multi
     def combine_tasks(self):
