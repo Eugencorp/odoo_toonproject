@@ -58,7 +58,12 @@ class price(models.Model):
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
-    sequence = fields.Integer(default=10)
+    
+    def _default_sequence(self):
+            prices=self.env['toonproject.price'].search([],order="sequence desc",limit=1)
+            return len(prices)>0 and (prices[0].sequence+1) or 10
+    
+    sequence = fields.Integer(default=_default_sequence)
 
     @api.multi
     def name_get(self):
