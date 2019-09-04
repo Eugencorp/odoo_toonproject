@@ -10,12 +10,12 @@ class DashboardForm(models.Model):
     @api.multi
     def _my_tasks(self):
         for rec in self:
-            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','!=','5finished'),('status','!=','1pending'),('status','!=','6canceled'),('status','!=','4control')])
+            rec.my_tasks =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','!=','7finished'),('status','!=','1pending'),('status','!=','8canceled'),('status','!=','6control')])
 
     @api.multi
     def _for_pay(self):
         for rec in self:
-            rec.for_pay =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','=','5finished'),('pay_date','=',None)])
+            rec.for_pay =  self.env['toonproject.task'].search([('worker_id','=',self.env.uid),('status','=','7finished'),('pay_date','=',None)])
 
     @api.multi
     def _valid_tasks(self):
