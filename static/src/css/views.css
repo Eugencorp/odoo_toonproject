@@ -9,3 +9,14 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 .table.o_list_view {
     width: auto;
 }
+
+.invalid_message_field {
+	margin: auto;
+	font-weight: bold;
+	color: white;
+}
+
+.o_form_statusbar.invalid_message_header {
+	background-color: red;
+	
+}
