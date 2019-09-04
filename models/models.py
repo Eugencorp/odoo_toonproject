@@ -633,7 +633,14 @@ class CombineTasksWizard(models.TransientModel):
         the_size = 0
         for rec in target_recs:
             the_price += rec.computed_price
-            the_size += rec.computed_price/rec.factor
+            if rec.factor:
+                the_size += rec.computed_price/rec.factor
+            else:
+                next_size = 0
+                for asset in rec.asset_ids:
+                    if asset.assettype_id in rec.tasktype_id.valid_assettypes:
+                        next_size += asset.size
+                the_size += next_size*rec.price_record.value
         return the_price/the_size
         
     
@@ -659,7 +666,7 @@ class CombineTasksWizard(models.TransientModel):
     invalid_message = fields.Char(default=_is_valid_operation)
 
 
-    delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')], string='Куда деть старые задачи?')
+    delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')], default='archive', required=True, string='Куда деть старые задачи?')
     
     short_description = fields.Char(default = _get_common_short_description)
     description = fields.Text(default = _get_common_description)
