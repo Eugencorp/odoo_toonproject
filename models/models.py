@@ -697,4 +697,10 @@ class CombineTasksWizard(models.TransientModel):
             'plan_finish': self.plan_finish,
             'valid_group': self.valid_group and self.valid_group.id or False,            
         })
+        target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
+        if self.delete_or_archive == "archive":
+            for task in target_recs:
+                task.status = "6canceled"
+        elif self.delete_or_archive == "delete":
+            target_recs.unlink()
         return{}
