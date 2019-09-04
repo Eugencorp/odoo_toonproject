@@ -157,7 +157,7 @@ class asset(models.Model, StoresImages):
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_type_color', store=True)
-    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
@@ -259,7 +259,7 @@ class task(models.Model):
     asset_names = fields.Char(string="Названия материалов", compute="_get_asset_names", store=True)
 
     
-    status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
+    status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision', 'в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
     affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', string='зависит от')
     valid_group = fields.Many2one('res.groups', string='Кому можно выдавать')
@@ -396,8 +396,11 @@ class task(models.Model):
     def button_start(self):
         ctx = {'btn': True}
         for rec in self:
+            new_state = '3progress'
+            if rec.status == '4torevision':
+                new_state = '5inrevision'
             rec.with_context(ctx).write({
-                'status': '3progress',
+                'status': new_state,
                 'work_start': fields.Date.today(),
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
@@ -405,13 +408,13 @@ class task(models.Model):
     def button_control(self):
         ctx = {'btn': True}
         for rec in self:
-            rec.with_context(ctx).write({'status': '4control'})
+            rec.with_context(ctx).write({'status': '6control'})
 
     @api.multi
     def button_reject(self):
         ctx = {'btn': True}
         for rec in self:
-            rec.with_context(ctx).write({'status': '3progress'})
+            rec.with_context(ctx).write({'status': '4torevision'})
 
     @api.multi
     def button_accept(self):
@@ -423,7 +426,7 @@ class task(models.Model):
                 order='sequence asc')
             if len(controlers)<1:
                 rec.with_context(ctx).write({
-                    'status': '5finished',
+                    'status': '7finished',
                     'real_finish': fields.Date.today()
                 })
             else:
@@ -452,13 +455,13 @@ class task(models.Model):
                 for asset in rec.asset_ids:
                     ctx = {'task':rec.id, 'status': values.get('status')}
                     asset.with_context(ctx)._get_current_tasktype()
-        if values.get('status') == '5finished':
+        if values.get('status') == '7finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
                     if dependent_task.status == '1pending':
                         to_begin = True
                         for affecting_task in dependent_task.affecting_tasks:
-                            if affecting_task!=self and affecting_task.status != '5finished' and affecting_task!='6canceled':
+                            if affecting_task!=self and affecting_task.status != '7finished' and affecting_task!='8canceled':
                                 to_begin = False
                                 break
                         if to_begin:
@@ -551,8 +554,8 @@ class EditTasksWizard(models.TransientModel):
     worker_id = fields.Many2one('res.users', string="Исполнитель")
     factor = fields.Float(default=1, string="Cложность")
     status = fields.Selection(
-        [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4control', 'в проверку'),
-         ('5finished', 'готово'), ('6canceled', 'отменено')], string='Статус', default='1pending',
+        [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4torevision', 'в поправки'),
+        ('5inrevision', 'в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], string='Статус', default='1pending',
         )
 
     valid_group_chk = fields.Boolean(default=False)

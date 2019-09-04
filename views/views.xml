@@ -213,10 +213,10 @@
                       </div>
                     </group>
                     <group>
-                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('status','!=', '2ready'),('isValidWorker','!=',True)]}" class="btn-success"/>
-                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('status','!=', '3progress'),('isWorker','!=',True)]}" class="btn-danger"/>
-                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-danger"/>
-                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', '4control'),('isControler','!=',True)]}" class="btn-success"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('isValidWorker','!=',True),('status','!=', '2ready'),('status','!=', '4torevision')]}" class="btn-success"/>
+                        <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('isWorker','!=',True), ('status','!=', '3progress'),('status','!=','5inrevision')]}" class="btn-danger"/>
+                        <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', '6control'),('isControler','!=',True)]}" class="btn-danger"/>
+                        <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', '6control'),('isControler','!=',True)]}" class="btn-success"/>
                     </group>
 
                     <div class = "oe_chatter" style="display:block;">
