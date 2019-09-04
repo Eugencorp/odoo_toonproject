@@ -667,6 +667,10 @@
          </sheet>
 				<footer>
 				  <span attrs="{'invisible':[('invalid_message','!=',False)]}">
+					<div class="row" style="{'text-align':'right';}" >
+						<label for="delete_or_archive" class="col-md-6" />
+						<field name="delete_or_archive" class="col-md-4" />
+					</div>
 					<button name="combine_tasks" type="object"
 							string="Объединить" class="oe_highlight"/>
 
