@@ -551,8 +551,8 @@ class CombineTasksWizard(models.TransientModel):
 
     def _is_valid_operation(self):
         target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
-        if len(target_recs)<0:
-            return "Отстуствуют задания для объединения"
+        if len(target_recs)<2:
+            return "Не выбраны задания для объединения"
         common_tasktype = target_recs[0].tasktype_id
         common_project = target_recs[0].project_id
         for rec in target_recs:
@@ -635,11 +635,27 @@ class CombineTasksWizard(models.TransientModel):
     tasktype_id = fields.Many2one('toonproject.tasktype', default = _get_tasktype)
     project_id = fields.Many2one('toonproject.cartoon', default = _get_project)  
     factor = fields.Float(default = _get_factor, string='Сложность')
-    dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', default=_get_dependent_tasks)    
-    affecting_tasks = fields.Many2many('toonproject.task', 'task2task', 'target', 'source', default=_get_affecting_tasks)
+    dependent_tasks = fields.Many2many('toonproject.task', 'task2task_temporal', 'source', 'target', default=_get_dependent_tasks)    
+    affecting_tasks = fields.Many2many('toonproject.task', 'task2task_temporal', 'target', 'source', default=_get_affecting_tasks)
     name = fields.Char(required=True)
 
 
     @api.multi
     def combine_tasks(self):
+        self.env['toonproject.task'].create({
+            'name': self.name,
+            'project_id': self.project_id.id,
+            'tasktype_id': self.tasktype_id.id,
+            'short_description': self.short_description,
+            'description': self.description,
+            'factor': self.factor,
+            'asset_ids': [(6, 0, [asset.id for asset in self.asset_ids])],
+            'dependent_tasks': [(6, 0, [task.id for task in self.dependent_tasks])],
+            'affecting_tasks': [(6, 0, [task.id for task in self.affecting_tasks])],
+            'compute_price_method': self.compute_price_method,
+            'worker_id': self.worker_id and self.worker_id.id or False,
+            'current_control': self.current_control and self.current_control.id or False,
+            'plan_finish': self.plan_finish,
+            'valid_group': self.valid_group and self.valid_group.id or False,            
+        })
         return{}

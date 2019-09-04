@@ -621,7 +621,7 @@
          </sheet>
 				<footer>
 				  <span attrs="{'invisible':[('invalid_message','!=',False)]}">
-					<button name="apply_tasks" type="object"
+					<button name="combine_tasks" type="object"
 							string="Объединить" class="oe_highlight"/>
 
 					 или </span>
