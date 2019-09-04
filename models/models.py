@@ -516,7 +516,7 @@ class EditTasksWizard(models.TransientModel):
                 return rec.valid_group
 
     valid_group = fields.Many2one('res.groups', string="Группа исполнителей", default=_default_valid_group)
-    worker_id = fields.Many2one('res.user', string="Исполнитель")
+    worker_id = fields.Many2one('res.users', string="Исполнитель")
     factor = fields.Float(default=1, string="Cложность")
     status = fields.Selection(
         [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4control', 'в проверку'),
@@ -563,7 +563,7 @@ class CombineTasksWizard(models.TransientModel):
             if rec.project_id!=common_project:
                 return "Нельзя объединить задания из разных проектов"
         return False
-    
+           
     def _get_tasktype(self):
         target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
         if len(target_recs)>0:
@@ -623,13 +623,9 @@ class CombineTasksWizard(models.TransientModel):
         return res    
         
 
-    @api.depends('invalid_message')
-    def _set_invalid_operation(self):
-        for rec in self:
-            rec.valid_operation = not rec.invalid_message
 
     invalid_message = fields.Char(default=_is_valid_operation)
-    valid_operation = fields.Boolean(compute="_set_is_valid_operation")
+
 
     delete_or_archive = fields.Selection([('archive', 'архивировать'), ('delete', 'убить')], string='Куда деть старые задачи?')
     

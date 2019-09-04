@@ -512,9 +512,8 @@
 		<field name="arch" type="xml">
 			<form string="Объединить задачи">
         <sheet>
-          <header style="{color:red;font-weight:bold;align:center}">
-            <field name="valid_operation" invisible="1"/>
-            <field name="invalid_message" readonly="1"/>
+          <header class="invalid_message_header">
+            <field name="invalid_message" class="invalid_message_field" readonly="1"/>
           </header>
               <notebook>
                   <page string="Задание">
@@ -621,11 +620,11 @@
               </group>
          </sheet>
 				<footer>
+				  <span attrs="{'invisible':[('invalid_message','!=',False)]}">
 					<button name="apply_tasks" type="object"
-							string="Объединить" class="oe_highlight"
-                  attrs="{'invisible':[('valid_operation','=',False)]}"/>
+							string="Объединить" class="oe_highlight"/>
 
-					or
+					 или </span>
 					<button special="cancel" string="Отмена"/>
 				</footer>
 			</form>
