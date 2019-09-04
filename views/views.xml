@@ -12,7 +12,8 @@
                     <group>
                         <field name="category_id" readonly="1"/>
                         <field name="name" string="Группа"/>
-                        <field name="comment" stirng="Описание"/>
+                        <field name="comment" string="Описание"/>
+                        <field name="users" string="Участники группы"/>
                     </group>
                 </sheet>
             </form>
@@ -45,7 +46,7 @@
                         <field name="project_id" string="Проект"/>
                         <field name="tasktype_id" string="Процесс"/>
                         <field name="value" string="Стоимость"/>
-                        <field name="next_tasktype" string="Следующий процесс"/>
+                        <!--<field name="next_tasktype" string="Следующий процесс"/>-->
                         <field name="controlers" string="контроль" context="{'default_price':id}" >
                           <tree>
                             <field name="sequence" widget="handle"/>
@@ -254,6 +255,20 @@
       </field>
     </record>
 
+    <record model="ir.ui.view" id="tasktype_list">
+      <field name="name">tasktype.list</field>
+      <field name="model">toonproject.tasktype</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="sequence" widget="handle"/>
+          <field name="name" string="Название"/>
+          <field name="description" string="Описание"/>
+          <field name="valid_assettypes" widget="many2many_tags" string="Над чем производятся работы"/>
+        </tree>
+      </field>
+    </record>
+
     <record model="ir.ui.view" id="cartoon_list">
       <field name="name">cartoon.list</field>
       <field name="model">toonproject.cartoon</field>
@@ -272,6 +287,7 @@
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
         <tree>
+	  <field name="project_id" string="проект"/>
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
@@ -289,7 +305,9 @@
         <tree>
           <field name="project_id" string="проект"/>
           <field name="name" string="задача"/>
-          <field name="asset_ids" string="объект"  widget="many2many_tags"/>
+          <field name="short_description" string="содержание"/>
+          <!--<field name="asset_ids" string="объект"  widget="many2many_tags" options="{'color_field':'assettype_id'}"/>-->
+		  <field name="asset_names" string="материалы"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="factor" string="сложность"/>
           <field name="status" string="статус"/>          
@@ -367,6 +385,9 @@
               </div>
             </t>
           </templates>
+          <script>
+            jQuery('.o_column_title').each(function(i,el){if(jQuery(el).text()=='Undefined')jQuery(el).text('');})
+          </script>
         </kanban>
       </field>
     </record>
@@ -376,10 +397,11 @@
       <field name="model">toonproject.price</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="sequence" widget="handle"/>
           <field name="project_id" string="проект"/>
           <field name="tasktype_id" string="вид работ"/>
           <field name="value" string="расценка"/>
-          <field name="next_tasktype" string="следующий процесс"/>
+          <!--<field name="next_tasktype" string="следующий процесс"/>-->
           <field name="controlers" string="контроль" widget="many2many_tags"/>
           <field name="valid_group" string="группа работников"/>
         </tree>
@@ -392,6 +414,10 @@
         <field name="domain">[]</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Создайте первый проект, чтобы начать работу.
+            </p>
+        </field>
     </record>
 
     <record model="ir.actions.act_window" id="assets_list_action">
@@ -403,6 +429,20 @@
             <p class="o_view_nocontent_smiling_face">Создайте первую сцену, фон или риг
             </p>
         </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="tasktypes_list_action">
+        <field name="name">Виды работ</field>
+        <field name="res_model">toonproject.tasktype</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+	  
+    <record model="ir.actions.act_window" id="assettypes_list_action">
+        <field name="name">Виды материалов</field>
+        <field name="res_model">toonproject.assettype</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
     </record>
     
     <record model="ir.actions.act_window" id="tasks_list_action">
@@ -448,7 +488,13 @@
     <menuitem id="assets_menu" name="Материалы" parent="lists_menu"
                   action="assets_list_action"/>    
     <menuitem id="tasks_menu" name="Задачи" parent="lists_menu"
-                  action="tasks_list_action"/> 
+                  action="tasks_list_action"/>
+    <menuitem id="tasktypes_menu" name="Виды работ" parent="lists_menu"
+                  action="tasktypes_list_action"
+                  groups="toonproject.group_toonproject_admin"/>
+    <menuitem id="assettypes_menu" name="Виды материалов" parent="lists_menu"
+                  action="assettypes_list_action"
+                  groups="toonproject.group_toonproject_admin"/>	  
     <menuitem id="prices_menu" name="Расценки и пайплайн" parent="lists_menu"
                   action="prices_list_action"
                   groups="toonproject.group_toonproject_admin"/>

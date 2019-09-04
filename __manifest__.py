@@ -15,8 +15,8 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'Uncategorized',
-    'version': '0.11',
+    'category': 'Toonproject',
+    'version': '0.12',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mail', 'web'],
@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/dashboard_form.xml',
         'views/templates.xml',
+        'views/eternal_data.xml',
         'views/preset_data.xml',
     ],
     # only loaded in demonstration mode

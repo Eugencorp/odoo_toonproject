@@ -38,25 +38,32 @@ class assettype(models.Model):
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
     _description = 'task type for wich prices and pipeline are set'
+    _order = "sequence,id"
 
-    name = fields.Char(string="Вид работ")
+    name = fields.Char(string="Вид работ")    
+    sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
 
 class price(models.Model):
     _name = 'toonproject.price'
     _description = 'some info, such as price, controlers, pipeline and valid worker groups bent to a project and a task type'
+    _order = 'sequence,id'
 
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
     value = fields.Float(string="Расценка за единицу")
 
-    # controler_id = fields.Many2one('res.users', string='контроль')
-    # precontroler_id = fields.Many2one('res.users', string='предварительный контроль')
-    next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
+    #next_tasktype = fields.Many2one('toonproject.tasktype', string='следующий процесс')
     valid_group = fields.Many2one('res.groups', string='группа работников')
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
+    
+    def _default_sequence(self):
+            prices=self.env['toonproject.price'].search([],order="sequence desc",limit=1)
+            return len(prices)>0 and (prices[0].sequence+1) or 10
+    
+    sequence = fields.Integer(default=_default_sequence)
 
     @api.multi
     def name_get(self):
@@ -162,8 +169,8 @@ class asset(models.Model, StoresImages):
     @api.depends('assettype_id')
     def _get_type_color(self):
         for rec in self:
-            if rec.assettype_id:
-                rec.color = rec.assettype_id.id
+            if rec.current_status:
+                rec.color = int(rec.current_status[:1])
             else:
                 rec.color = 0
 
@@ -185,13 +192,17 @@ class asset(models.Model, StoresImages):
             task_types = []
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
-                    if valid_tasktype == task.tasktype_id and task.status > '1pending':
-                        task_types.append(task)
-                        break
+                    if valid_tasktype == task.tasktype_id:
+                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
+                        if self.env.context.get('task') and self.env.context.get('task')==task.id:
+                            pseudo_task.update({'status':self.env.context.get('status')})
+                        if pseudo_task['status'] > '1pending':
+                            task_types.append(pseudo_task)
+                            break
             if len(task_types):
-                task_types.sort(key=lambda task: task.status)
-                rec.current_tasktype = task_types[0].tasktype_id
-                rec.current_status = task_types[0].status
+                task_types.sort(key=lambda task: task['status'])
+                rec.current_tasktype = task_types[0]['tasktype_id']
+                rec.current_status = task_types[0]['status']
             else:
                 rec.current_status = '1pending'
 
@@ -241,9 +252,12 @@ class task(models.Model):
     real_finish = fields.Date(string='Закончено')
     
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
+
     compute_price_method = fields.Selection([('first','по первому из материалов'),('sum', 'по сумме соизмеримых материалов')], default = 'sum', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price',string='Стоимость')
     pay_date = fields.Date(string='Оплачено')
+    asset_names = fields.Char(string="Названия материалов", compute="_get_asset_names", store=True)
+
     
     status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4control','в проверку'),('5finished','готово'),('6canceled', 'отменено')], string='Статус', default='1pending', track_visibility='onchange')
     dependent_tasks = fields.Many2many('toonproject.task', 'task2task', 'source', 'target', string='зависимые задачи')
@@ -256,6 +270,13 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    
+    @api.depends('asset_ids')
+    def _get_asset_names(self):
+        for rec in self:
+            names = ", ".join([asset.name for asset in rec.asset_ids])
+            rec.asset_names = names
+        
 
     def _is_manager(self):
         for rec in self:
@@ -426,6 +447,11 @@ class task(models.Model):
                     raise UserError(
                         'У вас нет прав на это действие'
                     )
+        if values.get('status'):
+            for rec in self:
+                for asset in rec.asset_ids:
+                    ctx = {'task':rec.id, 'status': values.get('status')}
+                    asset.with_context(ctx)._get_current_tasktype()
         if values.get('status') == '5finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
@@ -488,11 +514,17 @@ class CreateTasksWizard(models.TransientModel):
             for task in created:
                 priceRec = task.price_record
                 if priceRec:
-                    next_type = priceRec.next_tasktype
-                    for next_task in created:
-                        if next_task.tasktype_id == next_type:
-                            task.dependent_tasks |= next_task
+                    next_records = self.env['toonproject.price'].search([('project_id','=',priceRec.project_id.id), ('sequence', '>', priceRec.sequence)], order='sequence asc')
+                    next_record = None
+                    for price in next_records:
+                        if price.tasktype_id in asset.assettype_id.valid_tasktypes:
+                            next_record = price
                             break
+                    if next_record:
+                        for next_task in created:
+                            if next_task.price_record and next_task.price_record == next_record[0]:
+                                task.dependent_tasks |= next_task
+                                break
                     task.valid_group = priceRec.valid_group
                     task._default_control()
 

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <record model="ir.module.category" id="module_category_toonproject">
-            <field name="name">Toonproject</field>
-            <field name="description">The Toon Project addon category</field>
-            <field name="sequence">30</field>
-    </record>
     <record id="animators" model="res.groups">
         <field name="name">Аниматоры</field>
         <field name="comment">кому выдавать задания по анимации</field>
@@ -19,21 +14,27 @@
 
 		<record model="toonproject.tasktype" id="anim">
             <field name="name">мультипликат</field>
+            <field name="sequence">11</field>
         </record>
         <record model="toonproject.tasktype" id="lo">
             <field name="name">lay-out</field>
+            <field name="sequence">10</field>
         </record>
         <record model="toonproject.tasktype" id="composing">
             <field name="name">композ</field>
+            <field name="sequence">12</field>
         </record>
         <record model="toonproject.tasktype" id="riging">
             <field name="name">риг</field>
+            <field name="sequence">7</field>
         </record>
         <record model="toonproject.tasktype" id="drawing">
             <field name="name">графика</field>
+            <field name="sequence">3</field>
         </record>	
         <record model="toonproject.tasktype" id="painting">
             <field name="name">живопись</field>
+            <field name="sequence">4</field>
         </record>
 
 		<record model="toonproject.assettype" id="scene">
