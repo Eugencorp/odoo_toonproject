@@ -425,6 +425,7 @@
         <field name="res_model">toonproject.asset</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form,kanban</field>
+	<field name="limit">300</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Создайте первую сцену, фон или риг
             </p>
