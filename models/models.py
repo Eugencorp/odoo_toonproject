@@ -169,6 +169,7 @@ class asset(models.Model, StoresImages):
     factor = fields.Float(default=1)
 
     size = fields.Float(default=1)
+    size_unit = fields.Many2many('toonproject.measures', store=False)
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
@@ -183,6 +184,10 @@ class asset(models.Model, StoresImages):
     icon_video_url = fields.Char(string='URL иконки:')
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
+    
+    def _get_size_unit(self):
+        for rec in self:
+            rec.size_unit = rec.assettype_id.active_measure
     
     @api.depends('assettype_id')
     def _get_type_color(self):

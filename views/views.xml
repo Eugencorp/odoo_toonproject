@@ -68,13 +68,13 @@
             <form string="Asset Form">
                 <sheet>
                     <group>
-                        <group>
+                        <div class="row"/>
                             <field name="project_id" string="Проект: "/>
                             <field name="name" string="Название"/>
                             <field name="assettype_id" string="Тип:"/>
                             <field name="short_description" string="Краткое описание:"/>
                             <field name="size" string="Размер:"/>
-                        </group>
+                        </div>
                         <group>
                           <group colspan="2">
                             <field name="description" string="Длинное описание:"/>
