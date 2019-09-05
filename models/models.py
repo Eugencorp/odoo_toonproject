@@ -32,8 +32,11 @@ class assettype(models.Model):
     _description = 'asset category, sets wish task types can be created for an asset'
 
     name = fields.Char(string="Тип")
-    description = fields.Text()
+    description = fields.Text(string="Описание")
     valid_tasktypes = fields.Many2many('toonproject.tasktype', string = "Возможные виды работ:")
+    
+    valid_measures = fields.Many2many('toonproject.measures', required = True, string = "Возможные единицы измерения:")
+    
 
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'

@@ -11,44 +11,74 @@
         <field name="comment">кому выдавать задания по фонам</field>
         <field name="category_id" ref="module_category_toonproject"/>
     </record>
+	
+	
+    <record id="pop" model="toonproject.measures">
+		<field name="name">в попугаях</field>
+		<field name="unit_naming">попугаев</field>
+	</record>	
+    <record id="frame" model="toonproject.measures">
+		<field name="name">в кадрах</field>
+		<field name="unit_naming">кадров</field>
+	</record>
+    <record id="sec" model="toonproject.measures">
+		<field name="name">в секундах</field>
+		<field name="unit_naming">секунд</field>
+		<field name="size">25</field>
+		<field name="precision">1</field>
+	</record>
+    <record id="min" model="toonproject.measures">
+		<field name="name">в минутах</field>
+		<field name="unit_naming">минут</field>
+		<field name="size">1500</field>
+		<field name="precision">2</field>
+	</record>	
+    <record id="kf" model="toonproject.measures">
+		<field name="name">в кадрофонах</field>
+		<field name="unit_naming">кадрофонов</field>
+		<field name="precision">1</field>		
+	</record>	
 
-		<record model="toonproject.tasktype" id="anim">
-            <field name="name">мультипликат</field>
-            <field name="sequence">11</field>
-        </record>
-        <record model="toonproject.tasktype" id="lo">
-            <field name="name">lay-out</field>
-            <field name="sequence">10</field>
-        </record>
-        <record model="toonproject.tasktype" id="composing">
-            <field name="name">композ</field>
-            <field name="sequence">12</field>
-        </record>
-        <record model="toonproject.tasktype" id="riging">
-            <field name="name">риг</field>
-            <field name="sequence">7</field>
-        </record>
-        <record model="toonproject.tasktype" id="drawing">
-            <field name="name">графика</field>
-            <field name="sequence">3</field>
-        </record>	
-        <record model="toonproject.tasktype" id="painting">
-            <field name="name">живопись</field>
-            <field name="sequence">4</field>
-        </record>
+	<record model="toonproject.tasktype" id="anim">
+		<field name="name">мультипликат</field>
+		<field name="sequence">11</field>
+	</record>
+	<record model="toonproject.tasktype" id="lo">
+		<field name="name">lay-out</field>
+		<field name="sequence">10</field>
+	</record>
+	<record model="toonproject.tasktype" id="composing">
+		<field name="name">композ</field>
+		<field name="sequence">12</field>
+	</record>
+	<record model="toonproject.tasktype" id="riging">
+		<field name="name">риг</field>
+		<field name="sequence">7</field>
+	</record>
+	<record model="toonproject.tasktype" id="drawing">
+		<field name="name">графика</field>
+		<field name="sequence">3</field>
+	</record>	
+	<record model="toonproject.tasktype" id="painting">
+		<field name="name">живопись</field>
+		<field name="sequence">4</field>
+	</record>
 
-		<record model="toonproject.assettype" id="scene">
-            <field name="name">сцена</field>
-			<field name="valid_tasktypes" eval="[(6,0,[ref('lo'), ref('anim'), ref('composing')])]"/>
-        </record>		
-		<record model="toonproject.assettype" id="bg">
-            <field name="name">фон</field>
-			<field name="valid_tasktypes" eval="[(6,0,[ref('drawing'), ref('painting')])]"/>
-        </record>
-		<record model="toonproject.assettype" id="rig">
-            <field name="name">риг</field>
-			<field name="valid_tasktypes" eval="[(6,0,[ref('riging')])]"/>
-        </record>
+	<record model="toonproject.assettype" id="scene">
+		<field name="name">сцена</field>
+		<field name="valid_tasktypes" eval="[(6,0,[ref('lo'), ref('anim'), ref('composing')])]"/>
+		<field name="valid_measures" eval="[(6,0,[ref('frame'), ref('sec'), ref('min')])]"/>
+	</record>		
+	<record model="toonproject.assettype" id="bg">
+		<field name="name">фон</field>
+		<field name="valid_tasktypes" eval="[(6,0,[ref('drawing'), ref('painting')])]"/>
+		<field name="valid_measures" eval="[(6,0,[ref('kf')])]"/>
+	</record>
+	<record model="toonproject.assettype" id="rig">
+		<field name="name">риг</field>
+		<field name="valid_tasktypes" eval="[(6,0,[ref('riging')])]"/>
+		<field name="valid_measures" eval="[(6,0,[ref('pop')])]"/>
+	</record>
        
 	</data>
 </odoo>
