@@ -238,7 +238,7 @@ class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
     _description = 'main model for work'
-    _order = 'name id'
+    _order = 'project_id,asset_names,tasktype_id'
 
     name = fields.Char(string='Название')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
