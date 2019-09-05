@@ -18,3 +18,4 @@ assettype_user,assettype user,model_toonproject_assettype,group_toonproject_user
 dashboard_user,dashboard user,model_toonproject_dashboard,group_toonproject_user,1,0,0,0
 controler_user,controler user,model_toonproject_controler,group_toonproject_user,1,0,0,0
 measures_user,measures user,model_toonproject_measures,group_toonproject_user,1,0,0,0
+measure_setting_user,measure settings user,model_toonproject_measure_setting,group_toonproject_user,1,1,1,1

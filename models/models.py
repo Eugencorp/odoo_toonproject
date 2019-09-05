@@ -36,7 +36,22 @@ class assettype(models.Model):
     valid_tasktypes = fields.Many2many('toonproject.tasktype', string = "Возможные виды работ:")
     
     valid_measures = fields.Many2many('toonproject.measures', required = True, string = "Возможные единицы измерения:")
+
+    active_measure = fields.Many2one('toonproject.measures', string="В чем измерять", compute="_get_measure_unit", store=False)
     
+    def _get_measure_unit(self):
+        for rec in self:
+            if len(rec.valid_measures)<1:
+                rec.active_measure = self.env['toonproject.measures'].search([])[0]
+            elif len(rec.valid_measures)<2:
+                rec.active_measure = rec.valid_measures[0]
+            else:
+                settings = self.env['toonproject.measure_setting'].search([('user','=',self.env.user.id),('asset_type','=',rec.id)])
+                if len(settings) > 0:
+                    rec.active_measure = settings[0].measure
+                else:
+                    rec.active_measure = rec.valid_measures[0]  
+
 
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
