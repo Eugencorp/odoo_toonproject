@@ -68,12 +68,12 @@
             <form string="Asset Form">
                 <sheet>
                     <group>
-                        <div class="row"/>
-                            <field name="project_id" string="Проект: "/>
-                            <field name="name" string="Название"/>
-                            <field name="assettype_id" string="Тип:"/>
-                            <field name="short_description" string="Краткое описание:"/>
-                            <field name="size" string="Размер:"/>
+                        <div class="row form_fields_align_1" >
+							<label for="project_id" class="col-3 offset-1"/><field name="project_id" class="col-8"/>              
+							<label for="name" class="col-3 offset-1"/><field name="name" class="col-8"/>
+							<label for="assettype_id" class="col-3 offset-1"/><field name="assettype_id"  class="col-8"/>
+							<label for="short_description" class="col-3 offset-1"/><field name="short_description" class="col-8"/>
+                            <label for="size" class="col-3 offset-1"/><span class="col-8"><field name="size" class="not_alone" /><field name="size_unit_naming" readonly="1" class="not_alone"/></span>
                         </div>
                         <group>
                           <group colspan="2">

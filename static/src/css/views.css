@@ -20,3 +20,13 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 	background-color: red;
 	
 }
+
+.form_fields_align_1 .o_form_label {
+	text-align:right;
+	font-weight:bold;
+}
+
+.form_fields_align_1 .o_field_widget.not_alone{
+	width: auto;
+	padding-right: 5pt;
+}

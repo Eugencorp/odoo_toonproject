@@ -163,13 +163,14 @@ class asset(models.Model, StoresImages):
     _name = 'toonproject.asset'
     _description = 'some meaning part of a production: a scene, a background or a rig'
 
-    name = fields.Char(required=True)
-    short_description = fields.Char()
-    description = fields.Text()
-    factor = fields.Float(default=1)
+    name = fields.Char(required=True,string="Название")
+    short_description = fields.Char(string="Краткое содержание")
+    description = fields.Text(string="Описание")
+    factor = fields.Float(default=1,string="Ориентировочная сложность")
 
-    size = fields.Float(default=1)
-    size_unit = fields.Many2many('toonproject.measures', store=False)
+    size = fields.Float(default=1,string="Размер")
+    size_unit = fields.Many2many('toonproject.measures', compute="_get_size_unit", store=False)
+    size_unit_naming = fields.Char(compute="_get_size_unit_naming", store=False)
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
@@ -188,6 +189,10 @@ class asset(models.Model, StoresImages):
     def _get_size_unit(self):
         for rec in self:
             rec.size_unit = rec.assettype_id.active_measure
+            
+    def _get_size_unit_naming(self):
+        for rec in self:
+            rec.size_unit_naming = rec.assettype_id.active_measure.unit_naming           
     
     @api.depends('assettype_id')
     def _get_type_color(self):
