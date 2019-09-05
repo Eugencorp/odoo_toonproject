@@ -154,6 +154,7 @@ class asset(models.Model, StoresImages):
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
+    task_len = fields.Integer(compute="_get_task_len", string="Количество задач", store=True)
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_type_color', store=True)
@@ -165,6 +166,11 @@ class asset(models.Model, StoresImages):
     icon_video_url = fields.Char(string='URL иконки:')
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
+    
+    @api.depends('task_ids')
+    def _get_task_len(self):
+        for rec in self:
+            rec.task_len = len(rec.task_ids)
     
     @api.depends('assettype_id')
     def _get_type_color(self):
