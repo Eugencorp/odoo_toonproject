@@ -157,7 +157,7 @@ class asset(models.Model, StoresImages):
     task_len = fields.Integer(compute="_get_task_len", string="Количество задач", store=True)
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
-    color = fields.Integer(compute='_get_type_color', store=True)
+    color = fields.Integer(compute='_get_color', store=True)
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
@@ -172,8 +172,8 @@ class asset(models.Model, StoresImages):
         for rec in self:
             rec.task_len = len(rec.task_ids)
     
-    @api.depends('assettype_id')
-    def _get_type_color(self):
+    @api.depends('task_ids')
+    def _get_color(self):
         for rec in self:
             if rec.current_status:
                 rec.color = int(rec.current_status[:1])
@@ -468,6 +468,7 @@ class task(models.Model):
                 for asset in rec.asset_ids:
                     ctx = {'task':rec.id, 'status': values.get('status')}
                     asset.with_context(ctx)._get_current_tasktype()
+                    asset._get_color()
         if values.get('status') == '7finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
