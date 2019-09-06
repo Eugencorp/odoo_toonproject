@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
+  <data noupdate="1">
     <record id="animators" model="res.groups">
         <field name="name">Аниматоры</field>
         <field name="comment">кому выдавать задания по анимации</field>
