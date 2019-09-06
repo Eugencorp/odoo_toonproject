@@ -38,7 +38,7 @@ class assettype(models.Model):
 class tasktype(models.Model):
     _name = 'toonproject.tasktype'
     _description = 'task type for wich prices and pipeline are set'
-    _order = "sequence,id"
+    _order = "sequence asc"
 
     name = fields.Char(string="Вид работ")    
     sequence = fields.Integer(default=10)
@@ -48,7 +48,7 @@ class tasktype(models.Model):
 class price(models.Model):
     _name = 'toonproject.price'
     _description = 'some info, such as price, controlers, pipeline and valid worker groups bent to a project and a task type'
-    _order = 'sequence,id'
+    _order = 'sequence asc'
 
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='set null')
     tasktype_id = fields.Many2one('toonproject.tasktype', string="Вид работ", ondelete='set null')
