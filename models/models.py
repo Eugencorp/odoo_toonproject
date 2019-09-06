@@ -248,6 +248,7 @@ class task(models.Model):
 
     name = fields.Char(string='Название')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
+    tasktype_sequence = fields.Integer(string="#", compute="_get_tasktype_sequence", store=True)
     factor = fields.Float(default=1, string='Сложность')
     short_description = fields.Char(string='Краткое содержание')
     description = fields.Text(string='Описание задачи')
@@ -277,6 +278,11 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    
+    @api.depends('tasktype_id')
+    def _get_tasktype_sequence(self):
+        for rec in self:
+            rec.tasktype_sequence = res.tasktype_id.sequence
     
     @api.depends('asset_ids')
     def _get_asset_names(self):
