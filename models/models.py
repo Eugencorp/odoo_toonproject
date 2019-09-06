@@ -282,7 +282,7 @@ class task(models.Model):
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
         for rec in self:
-            rec.tasktype_sequence = res.tasktype_id.sequence
+            rec.tasktype_sequence = rec.tasktype_id.sequence
     
     @api.depends('asset_ids')
     def _get_asset_names(self):
