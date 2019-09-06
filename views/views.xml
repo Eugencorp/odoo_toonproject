@@ -91,8 +91,9 @@
                     </group>
                     <label for="task_ids"/>
                     <field name="task_ids" context="{'default_asset_ids':[id]}">
-                      <tree class="no_open" default_order="tasktype_id">
+                      <tree class="no_open" default_order="tasktype_sequence">
                         <button name="open_task_view_py" string="смотреть" type="object"/>
+			<field name="tasktype_sequence" invisible="1"/>
                         <field name="name" string="задача"/>
                         <field name="tasktype_id" string="вид работ"/>
                         <field name="worker_id" string="исполнитель"/>
@@ -303,6 +304,7 @@
       <field name="model">toonproject.task</field>
       <field name="arch" type="xml">
         <tree>
+	  <field name="tasktype_sequence" invisible="1"/>
           <field name="project_id" string="проект"/>
           <field name="name" string="задача"/>
           <field name="short_description" string="содержание"/>
