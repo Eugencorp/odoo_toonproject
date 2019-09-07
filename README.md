@@ -14,7 +14,7 @@ Clone this repository to your Odoo addons folder as toonproject.
 * [ ] Разные единицы измерения метража (кадры/секунды/минуты) - ветка [measure_units](../../tree/measure_units)
 * [ ] **Общий механизм загрузки видео и исходников** (включая разграничение прав на эту операцию) - ветка [file_fields](../../tree/file_fields)
 #### Коннекторы:
-  * [ ] Коннектор с Owncloud (через Webdav) ветка [file_upload](../../tree/file_upload)
+  * [ ] Коннектор с Owncloud (через Webdav)
   * [ ] Коннектор с Syncsketch (пока неизвестно, как)
   * [ ] Коннектор с Synology (через Webdav или FTP?..)
   * [ ] Коннектор с Keyframe Pro (пока в порядке бреда; Keyframe Pro сохраняет проекты в читабельном формате JSON, можно было бы сделать online-читалку для этих проектов. Правда, к Odoo это прямого отношения не имеет, и это совсем не просто. Но это проще, чем создавать с нуля новый Syncsketch.)
