@@ -148,6 +148,7 @@
                         </page>
                         <page string="Результат">
                           <group>
+				<field name="pay_date" string="оплачено" attrs="{'readonly':[('isManager','=',False)]}"/>
                           </group>
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
