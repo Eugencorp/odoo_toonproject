@@ -55,6 +55,7 @@
                         </field>
                         <field name="valid_group" string="Группа исполнителей"
                           domain="[('category_id','=', %(module_category_toonproject)d)]"/>
+						<field name="preview_path" widget="url" />
                     </group>
                 </sheet>
             </form>
@@ -148,9 +149,17 @@
                           </group>
                         </page>
                         <page string="Результат">
-                          <group>
-				<field name="pay_date" string="оплачено" attrs="{'readonly':[('isManager','=',False)]}"/>
-                          </group>
+                          <div class="row">
+								<label for="pay_date" class="col-2" style="text-align: right;" />
+								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
+								<div class="col-4">
+									<div style="text-align: center; font-weight:bold;">Preview:</div>
+									<field name="preview"  widget="url" />
+								</div>
+								<div class="col-3">
+									<div style="text-align: center; font-weight:bold;">Исходники:</div>
+								</div>
+                          </div>
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>

@@ -59,6 +59,8 @@ class price(models.Model):
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
     
+    preview_path = fields.Char(string="Где хранятся preview")
+    
     def _default_sequence(self):
             prices=self.env['toonproject.price'].search([],order="sequence desc",limit=1)
             return len(prices)>0 and (prices[0].sequence+1) or 10
@@ -162,7 +164,7 @@ class asset(models.Model, StoresImages):
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
     preceding_preview = fields.Char(string="preview")
-    
+    #last_preview = fields.Char(string="последнее preview", compute="_get_last_preview", store=False)
     
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
@@ -171,6 +173,18 @@ class asset(models.Model, StoresImages):
     
     icon_video = fields.Binary(compute='_compute_image', store=True, attachment=False)
     
+    def _get_last_preview(self):
+        for rec in self:
+            my_tasks = [task for task in rec.task_ids if task.tasktype_id in rec.assettype_id.valid_tasktypes]
+            my_tasks.sort(reverse=True, key=lambda task: task.price_record.sequence )
+            found_preview = False
+            for task in my_tasks:
+                if task.preview:
+                    rec.last_preview = task.preview
+                    found_preview = True
+            if not found_preview:
+                rec.last_preview = rec.preceding_preview
+
     @api.depends('task_ids')
     def _get_task_len(self):
         for rec in self:
@@ -267,7 +281,7 @@ class task(models.Model):
 
     compute_price_method = fields.Selection([('first','по первому из материалов'),('sum', 'по сумме соизмеримых материалов')], default = 'sum', string = 'Метод рассчета')
     computed_price = fields.Float(compute='_compute_price',string='Стоимость')
-    pay_date = fields.Date(string='Оплачено')
+    pay_date = fields.Date(string='Оплачено:')
     asset_names = fields.Char(string="Названия материалов", compute="_get_asset_names", store=True)
 
     
@@ -282,6 +296,8 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    
+    preview = fields.Char()
     
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
