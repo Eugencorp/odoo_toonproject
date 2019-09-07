@@ -171,6 +171,7 @@ class asset(models.Model, StoresImages):
     size = fields.Float(default=1,string="Размер")
     size_unit = fields.Many2many('toonproject.measures', compute="_get_size_unit", store=False)
     size_unit_naming = fields.Char(compute="_get_size_unit_naming", store=False)
+    size_precision = fields.Char(compute="_get_size_precision", store=False)
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")
@@ -192,8 +193,13 @@ class asset(models.Model, StoresImages):
             
     def _get_size_unit_naming(self):
         for rec in self:
-            rec.size_unit_naming = rec.assettype_id.active_measure.unit_naming           
-    
+            rec.size_unit_naming = rec.assettype_id.active_measure.unit_naming   
+
+    def _get_size_precision(self):
+        for rec in self:
+            rec.size_precision = rec.assettype_id.active_measure.precision 
+
+   
     @api.depends('assettype_id')
     def _get_type_color(self):
         for rec in self:
