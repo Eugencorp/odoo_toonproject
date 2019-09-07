@@ -161,6 +161,10 @@ class asset(models.Model, StoresImages):
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
+    preceding_preview = fields.Char(string="preview")
+    
+    
+    
     icon_image = fields.Binary(string='Иконка:', attachment=False)
     
     icon_video_url = fields.Char(string='URL иконки:')

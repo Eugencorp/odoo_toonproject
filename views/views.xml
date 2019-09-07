@@ -74,19 +74,20 @@
                             <field name="assettype_id" string="Тип:"/>
                             <field name="short_description" string="Краткое описание:"/>
                             <field name="size" string="Размер:"/>
+							<field name="factor" string="Ориентировочная сложность"/>
                         </group>
                         <group>
-                          <group colspan="2">
-                            <field name="description" string="Длинное описание:"/>
-                            <field name="factor" string="Ориентировочная сложность"/>
-                          </group>
-                            <group>
-                                <field name="icon_image" widget="image"/>
-                            </group>
-                            <group>
-                                <field colspan="2" name="icon_video" widget="image"/>
-                                <field colspan="2" name="icon_video_url" />
-                            </group>                            
+							<div class="row">
+							<label for="description" class="col-12"/>
+                            <field name="description" string="Длинное описание:" class="col-12"/>
+							<div class="col-6">
+								<field name="icon_image" widget="image"/>
+							</div>
+							<div class="col-6">
+								<field colspan="2" name="icon_video" widget="image"/>
+							</div>
+                            <field name="preceding_preview" widget ="url" class="col-12" />
+                            </div>                       
                         </group>
                     </group>
                     <label for="task_ids"/>

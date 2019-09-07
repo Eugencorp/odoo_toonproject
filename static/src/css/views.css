@@ -20,3 +20,7 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 	background-color: red;
 	
 }
+
+.o_form_view .row label.o_form_label {
+	font-weight: bold;
+}
