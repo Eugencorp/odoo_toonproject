@@ -55,6 +55,7 @@
                         </field>
                         <field name="valid_group" string="Группа исполнителей"
                           domain="[('category_id','=', %(module_category_toonproject)d)]"/>
+						<field name="preview_path" widget="url" />
                     </group>
                 </sheet>
             </form>
@@ -74,19 +75,20 @@
                             <field name="assettype_id" string="Тип:"/>
                             <field name="short_description" string="Краткое описание:"/>
                             <field name="size" string="Размер:"/>
+							<field name="factor" string="Ориентировочная сложность"/>
                         </group>
                         <group>
-                          <group colspan="2">
-                            <field name="description" string="Длинное описание:"/>
-                            <field name="factor" string="Ориентировочная сложность"/>
-                          </group>
-                            <group>
-                                <field name="icon_image" widget="image"/>
-                            </group>
-                            <group>
-                                <field colspan="2" name="icon_video" widget="image"/>
-                                <field colspan="2" name="icon_video_url" />
-                            </group>                            
+							<div class="row">
+							<label for="description" class="col-12"/>
+                            <field name="description" string="Длинное описание:" class="col-12"/>
+							<div class="col-6">
+								<field name="icon_image" widget="image"/>
+							</div>
+							<div class="col-6">
+								<field colspan="2" name="icon_video" widget="image"/>
+							</div>
+                            <field name="preceding_preview" widget ="url" class="col-12" />
+                            </div>                       
                         </group>
                     </group>
                     <label for="task_ids"/>
@@ -147,9 +149,17 @@
                           </group>
                         </page>
                         <page string="Результат">
-                          <group>
-				<field name="pay_date" string="оплачено" attrs="{'readonly':[('isManager','=',False)]}"/>
-                          </group>
+                          <div class="row">
+								<label for="pay_date" class="col-2" style="text-align: right;" />
+								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
+								<div class="col-4">
+									<div style="text-align: center; font-weight:bold;">Preview:</div>
+									<field name="preview"  widget="url" />
+								</div>
+								<div class="col-3">
+									<div style="text-align: center; font-weight:bold;">Исходники:</div>
+								</div>
+                          </div>
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
