@@ -165,7 +165,7 @@ class asset(models.Model, StoresImages):
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
     
     preceding_preview = fields.Char(string="preview")
-    #last_preview = fields.Char(string="последнее preview", compute="_get_last_preview", store=False)
+    last_preview = fields.Char(string="последнее preview", compute="_get_last_preview", store=False)
     
     
     icon_image = fields.Binary(string='Иконка:', attachment=False)
