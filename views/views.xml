@@ -82,26 +82,36 @@
 							<label for="description" class="col-12"/>
                             <field name="description" string="Длинное описание:" class="col-12"/>
 							<div class="col-6">
+								<div style="text-align: center; font-weight:bold;">Иконка:</div>
 								<field name="icon_image" widget="image"/>
 							</div>
-							<div class="col-6">
-								<field colspan="2" name="icon_video" widget="image"/>
+							<div class="smallpreview col-6">
+								<div style="text-align: center; font-weight:bold;">Исходное видео:</div> 
+								<field name="preceding_preview"  widget="video_preview" />
 							</div>
-                            <field name="preceding_preview" widget ="url" class="col-12" />
+
                             </div>                       
                         </group>
                     </group>
-                    <label for="task_ids"/>
-                    <field name="task_ids" context="{'default_asset_ids':[id]}">
-                      <tree class="no_open" default_order="tasktype_sequence">
-                        <button name="open_task_view_py" string="смотреть" type="object"/>
-			<field name="tasktype_sequence" invisible="1"/>
-                        <field name="name" string="задача"/>
-                        <field name="tasktype_id" string="вид работ"/>
-                        <field name="worker_id" string="исполнитель"/>
-                        <field name="status" string="статус"/>
-                      </tree>
-                    </field>
+					<div class="row">
+						<div class="col-9">
+							<label for="task_ids"/>
+							<field name="task_ids" context="{'default_asset_ids':[id]}">
+							  <tree class="no_open" default_order="tasktype_sequence">
+								<button name="open_task_view_py" string="смотреть" type="object"/>
+					<field name="tasktype_sequence" invisible="1"/>
+								<field name="name" string="задача"/>
+								<field name="tasktype_id" string="вид работ"/>
+								<field name="worker_id" string="исполнитель"/>
+								<field name="status" string="статус"/>
+							  </tree>
+							</field>
+						</div>
+						<div class="smallpreview col-3">
+							<div style="text-align: center; font-weight:bold;">Последнее видео:</div> 
+							<field name="last_preview"  widget="video_preview" />							
+						</div>
+					</div>
                   <script>
                       jQuery('.no_open .o_data_row td').click(function(evt) { evt.stopPropagation(); });
                   </script>
@@ -154,7 +164,7 @@
 								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
 								<div class="col-4">
 									<div style="text-align: center; font-weight:bold;">Preview:</div>
-									<field name="preview"  widget="video_preview" />
+									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 								</div>
 								<div class="col-3">
 									<div style="text-align: center; font-weight:bold;">Исходники:</div>
