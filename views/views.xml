@@ -154,7 +154,7 @@
 								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
 								<div class="col-4">
 									<div style="text-align: center; font-weight:bold;">Preview:</div>
-									<field name="preview"  widget="url" />
+									<field name="preview"  widget="video_preview" />
 								</div>
 								<div class="col-3">
 									<div style="text-align: center; font-weight:bold;">Исходники:</div>
