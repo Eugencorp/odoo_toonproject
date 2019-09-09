@@ -382,11 +382,13 @@
                                     <div class="row">
                                       <div class="col-md-8">
                                           <field name="assettype_id"/>
-                                          <field name="name"/>
+                                          <b><field name="name"/></b>
                                           <br/>
                                           <field name="size"/>
                                           <br/>
                                           <field name="short_description"/>
+                                          <br/>
+                                          <span class="smallstatus"><field name="current_status"/></span>										  
                                       </div>
                                       <div class="col-md-3">
                                           <div class="o_kanban_image">

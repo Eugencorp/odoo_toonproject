@@ -30,7 +30,7 @@ class DashboardForm(models.Model):
     @api.multi
     def _my_control(self):
         for rec in self:
-            control_tasks =  self.env['toonproject.task'].search([('status','=','4control')])
+            control_tasks =  self.env['toonproject.task'].search([('status','=','6control')])
             tasks = self.env['toonproject.task']
             for task in control_tasks:
                 if task.isControler:
