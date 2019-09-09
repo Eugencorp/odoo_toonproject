@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
 from odoo import tools
 from odoo.exceptions import ValidationError
+import pdb
 
 class group(models.Model):
     _name = 'res.groups'
@@ -223,6 +224,7 @@ class asset(models.Model, StoresImages):
                         if pseudo_task['status'] > '1pending':
                             task_types.append(pseudo_task)
                             break
+            #pdb.set_trace()
             if len(task_types):
                 task_types.sort(key=lambda task: task['status'])
                 rec.current_tasktype = task_types[0]['tasktype_id']
@@ -257,6 +259,13 @@ class asset(models.Model, StoresImages):
             complex_name = record.assettype_id.name + ' ' + record.name
             res.append((record.id, complex_name))
         return res
+
+    @api.multi
+    def write(self, values):
+        if self.env.context.get('btn'):
+            return super(asset, self.sudo()).write(values)            
+        return super(asset, self).write(values)
+
 
 class task(models.Model):
     _name = 'toonproject.task'
@@ -468,6 +477,8 @@ class task(models.Model):
 
     @api.multi
     def write(self, values):
+        
+        #pdb.set_trace()
         if (not self.env.context.get('btn')) and \
                 self.env.user.id != SUPERUSER_ID and \
                 not self.env.user.has_group('toonproject.group_toonproject_manager'):
@@ -486,9 +497,9 @@ class task(models.Model):
         if values.get('status'):
             for rec in self:
                 for asset in rec.asset_ids:
-                    ctx = {'task':rec.id, 'status': values.get('status')}
+                    ctx = {'task':rec.id, 'status': values.get('status'), 'btn':True}
                     asset.with_context(ctx)._get_current_tasktype()
-                    asset._get_color()
+                    asset.with_context(ctx)._get_color()
         if values.get('status') == '7finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:

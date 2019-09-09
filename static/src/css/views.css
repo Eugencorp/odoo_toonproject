@@ -25,6 +25,7 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 	font-weight: bold;
 }
 
+
 .o_video_preview video {
 	width: 360px;
 	margin-top: 10px;
@@ -32,4 +33,10 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 
 .smallpreview .o_video_preview video {
 	width: 240px;
+}
+
+.smallstatus {
+	font-size: smaller;
+	font-style: italic;
+
 }
