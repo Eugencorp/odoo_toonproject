@@ -56,6 +56,10 @@
                         <field name="valid_group" string="Группа исполнителей"
                           domain="[('category_id','=', %(module_category_toonproject)d)]"/>
 						<field name="preview_path" widget="url" />
+						<field name="preview_controler" widget="url"/>
+						<field name="preview_upload_path"/>
+						<field name="preview_login"/>
+						<field name="preview_password" password="True"/>
                     </group>
                 </sheet>
             </form>
@@ -165,8 +169,11 @@
 								<div class="col-4">
 									<div style="text-align: center; font-weight:bold;">Preview:</div>
 									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+									<div attrs="{'invisible':[('isWorker','=',False)]}">
+										<input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
+									</div>
 								</div>
-								<div class="col-3">
+								<div class="col-3" >
 									<div style="text-align: center; font-weight:bold;">Исходники:</div>
 								</div>
                           </div>
@@ -185,6 +192,7 @@
                         </page>
                         <page string="Служебное" groups="toonproject.group_toonproject_admin">
                           <group>
+							<field name="id" id="task_id" invisible="1"/>
                             <field name="isManager"  invisible="0"/>
                             <field name="isControler" invisible="0"/>
                             <field name="isWorker" invisible="0"/>
@@ -196,6 +204,22 @@
                     <script>
                       jQuery('td.o_td_label+td').each(function(i,el){el.style.width = null;});
                       jQuery('table.o_group').each(function(i,el){el.style.width = 'auto';});
+					  jQuery('#preview_file').change(function(e){
+						const fd = new FormData();
+						Array.from(e.target.files).forEach((file) => {
+							fd.append(e.target.name, file, file.name);  
+						});
+						fd.append('task',  jQuery('[name=id]').text());
+						const xhr = new XMLHttpRequest();
+						xhr.onload = () => {
+							if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+								alert("Готово!");
+							} else alert(xhr.status);
+						};	
+						adress = 'toonproject/webdav';						
+						xhr.open('POST', adress, true);
+						xhr.send(fd);
+					  });
                     </script>
                     <group col="3">
                       <div>

@@ -61,6 +61,12 @@ class price(models.Model):
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
     
     preview_path = fields.Char(string="Где хранятся preview")
+    preview_controler = fields.Char(string="Адрес обработчика загрузок preview")
+    preview_upload_path = fields.Char(string="Куда загружать preview")
+    preview_login = fields.Char(string="login для preview")
+    preview_password = fields.Char(string="password для preview")
+    
+    
     
     def _default_sequence(self):
             prices=self.env['toonproject.price'].search([],order="sequence desc",limit=1)
