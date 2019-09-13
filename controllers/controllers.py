@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 import requests
+import os
 
 class Toonproject(http.Controller):
     @http.route('/toonproject/webdav', auth='user', method=['POST', 'GET'], csrf=False)
@@ -15,7 +16,10 @@ class Toonproject(http.Controller):
             login = task.price_record.preview_login
             password = task.price_record.preview_password
             upload_path = task.price_record.preview_upload_path
-            response = requests.put(upload_path + 'another_video.mp4', 
+            filename, extension = os.path.splitext(name)
+            if task.preview_filename:
+                filename = task.preview_filename
+            response = requests.put(upload_path + filename + extension, 
                 data=data, auth=(login, password))
             return("Got file " + name +'; Result: ' + str(response.status_code));
         return "No files found"
