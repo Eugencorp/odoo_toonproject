@@ -313,6 +313,7 @@ class task(models.Model):
     color = fields.Integer(compute='_raw_tasktype', store=True)
     
     preview = fields.Char()
+    preview_name = fields.Char(string="Файл preview по умолчанию")
     
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
@@ -562,7 +563,8 @@ class CreateTasksWizard(models.TransientModel):
                             'short_description': asset.short_description,
                             'description': asset.description,
                             'factor': asset.factor,
-                            'project_id': asset.project_id.id
+                            'project_id': asset.project_id.id,
+                            'preview_name': asset.name
                         }
                     )
             for task in created:
