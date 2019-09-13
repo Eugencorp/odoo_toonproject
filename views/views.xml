@@ -188,6 +188,7 @@
                               <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                               <field name="computed_price" string="Cтоимость:"/>
                             </group>
+                            <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}"/>
                           </group>
                         </page>
                         <page string="Служебное" groups="toonproject.group_toonproject_admin">
