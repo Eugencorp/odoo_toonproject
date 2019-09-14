@@ -164,18 +164,18 @@
                         </page>
                         <page string="Результат">
                           <div class="row">
-								<label for="pay_date" class="col-2" style="text-align: right;" />
-								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
-								<div class="col-4">
-									<div style="text-align: center; font-weight:bold;">Preview:</div>
-									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
-									<div attrs="{'invisible':[('isWorker','=',False)]}">
-										<input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
-									</div>
-								</div>
-								<div class="col-3" >
-									<div style="text-align: center; font-weight:bold;">Исходники:</div>
-								</div>
+                            <label for="pay_date" class="col-2" style="text-align: right;" />
+                            <field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <div class="col-4">
+                              <div style="text-align: center; font-weight:bold;">Preview:</div>
+                              <field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+                              <div attrs="{'invisible':[('isWorker','=',False)]}">
+                                <input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
+                              </div>
+                            </div>
+                            <div class="col-3" >
+                              <div style="text-align: center; font-weight:bold;">Исходники:</div>
+                            </div>
                           </div>
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
@@ -183,12 +183,13 @@
                             <group>
                               <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                               <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию для perview" />
                             </group>
                             <group>
                               <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                               <field name="computed_price" string="Cтоимость:"/>
                             </group>
-                            <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}"/>
+
                           </group>
                         </page>
                         <page string="Служебное" groups="toonproject.group_toonproject_admin">
@@ -205,22 +206,22 @@
                     <script>
                       jQuery('td.o_td_label+td').each(function(i,el){el.style.width = null;});
                       jQuery('table.o_group').each(function(i,el){el.style.width = 'auto';});
-					  jQuery('#preview_file').change(function(e){
-						const fd = new FormData();
-						Array.from(e.target.files).forEach((file) => {
-							fd.append(e.target.name, file, file.name);  
-						});
-						fd.append('task',  jQuery('[name=id]').text());
-						const xhr = new XMLHttpRequest();
-						xhr.onload = () => {
-							if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
-								alert("Готово!");
-							} else alert(xhr.status);
-						};	
-						adress = 'toonproject/webdav';						
-						xhr.open('POST', adress, true);
-						xhr.send(fd);
-					  });
+                      jQuery('#preview_file').change(function(e){
+                      const fd = new FormData();
+                      Array.from(e.target.files).forEach((file) => {
+                        fd.append(e.target.name, file, file.name);
+                      });
+                      fd.append('task',  jQuery('[name=id]').text());
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert(xhr.response);
+                        } else alert(xhr.status);
+                      };
+                      adress = 'toonproject/webdav';
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      });
                     </script>
                     <group col="3">
                       <div>

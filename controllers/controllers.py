@@ -19,9 +19,12 @@ class Toonproject(http.Controller):
             filename, extension = os.path.splitext(name)
             if task.preview_filename:
                 filename = task.preview_filename
+            readpath = task.price_record.preview_path + filename + extension
             response = requests.put(upload_path + filename + extension, 
                 data=data, auth=(login, password))
-            return("Got file " + name +'; Result: ' + str(response.status_code));
+            if response.status_code >= 200 and response.status_code < 300:
+                task.preview = readpath
+                return(readpath);
         return "No files found"
         
 
