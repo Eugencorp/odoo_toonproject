@@ -765,3 +765,63 @@ class CombineTasksWizard(models.TransientModel):
         elif self.delete_or_archive == "delete":
             target_recs.unlink()
         return{}
+
+class EditPricesWizard(models.TransientModel):
+    _name = 'toonproject.editprices_wizard'
+    _description = "Wizard: Edit multiple prices at once"
+
+    def _get_default_field(self,fieldName):
+        target_recs = self.env['toonproject.price'].browse(self._context.get('active_ids'))
+        found_val = ''
+        for price in target_recs:
+            if price[fieldName]:
+                if found_val and found_val != price['fieldName']:
+                    return ''
+                else:
+                    found_val = price[fieldName]
+        return found_val
+
+    def _get_preview_path(self):
+        return self._get_default_field('preview_path')
+
+    def _get_preview_upload_path(self):
+        return self._get_default_field('preview_upload_path')
+
+    def _get_preview_controler(self):
+        return self._get_default_field('preview_controler')
+
+    def _get_preview_login(self):
+        return self._get_default_field('preview_login')
+
+    def _get_preview_password(self):
+        return self._get_default_field('preview_password')
+
+    preview_path = fields.Char(string="Где хранятся preview", default=_get_preview_path)
+    preview_controler = fields.Char(string="Адрес обработчика загрузок preview", default=_get_preview_controler)
+    preview_upload_path = fields.Char(string="Куда загружать preview", default=_get_preview_upload_path)
+    preview_login = fields.Char(string="login для preview", default=_get_preview_login)
+    preview_password = fields.Char(string="password для preview", default=_get_preview_password)
+
+    enable_preview_path = fields.Boolean(default=False)
+    enable_preview_controler = fields.Boolean(default=False)
+    enable_preview_upload_path = fields.Boolean(default=False)
+    enable_preview_login = fields.Boolean(default=False)
+    enable_preview_password = fields.Boolean(default=False)
+
+    @api.multi
+    def apply_prices(self):
+        values = {}
+        if self.enable_preview_path:
+            values.update({'preview_path': self.preview_path})
+        if self.enable_preview_controler:
+            values.update({'preview_controler': self.preview_controler})
+        if self.enable_preview_upload_path:
+            values.update({'preview_upload_path': self.preview_upload_path})
+        if self.enable_preview_login:
+            values.update({'preview_login': self.preview_login})
+        if self.enable_preview_password:
+            values.update({'preview_password': self.preview_password})
+        target_recs = self.env['toonproject.price'].browse(self._context.get('active_ids'))
+        for rec in target_recs:
+            rec.write(values)
+        return {}

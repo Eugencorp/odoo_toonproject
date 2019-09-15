@@ -611,6 +611,40 @@
 		</field>
 	</record>
 
+  <record model="ir.ui.view" id="editprices_wizard_form_view">
+		<field name="name">editprices_wizard.form</field>
+		<field name="model">toonproject.editprices_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Изменить настройки выбранных процессов">
+        <div class="row">
+          <div class="col-md-6">
+            <field name="enable_preview_path"/> <label for="preview_path"/>
+            <field name="preview_path" attrs="{'readonly':[('enable_preview_path','=',False)]}" />
+            <br/>
+            <field name="enable_preview_controler"/> <label for="preview_controler"/>
+            <field name="preview_controler" attrs="{'readonly':[('enable_preview_controler','=',False)]}" />
+            <br/>
+            <field name="enable_preview_upload_path"/> <label for="preview_upload_path"/>
+            <field name="preview_upload_path" attrs="{'readonly':[('enable_preview_upload_path','=',False)]}" />
+            <br/>
+            <field name="enable_preview_login"/> <label for="preview_login"/>
+            <field name="preview_login" attrs="{'readonly':[('enable_preview_login','=',False)]}" />
+            <br/>
+            <field name="enable_preview_password"/> <label for="preview_password"/>
+            <field name="preview_password" attrs="{'readonly':[('enable_preview_password','=',False)]}" password="True" />
+            <br/>
+          </div>
+        </div>
+				<footer>
+					<button name="apply_prices" type="object"
+							string="Изменить" class="oe_highlight"/>
+					or
+					<button special="cancel" string="Отмена"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
   <record model="ir.ui.view" id="combinetasks_wizard_form_view">
 		<field name="name">combinetasks_wizard.form</field>
 		<field name="model">toonproject.combinetasks_wizard</field>
@@ -766,6 +800,15 @@
 				target="new"
         groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
+
+  <act_window id="launch_editprices_wizard"
+    name="Редактировать выбранное..."
+    src_model="toonproject.price"
+    res_model="toonproject.editprices_wizard"
+    view_mode="form"
+    target="new"
+    groups="toonproject.group_toonproject_manager"
+    key2="client_action_multi"/>
 
     <template id="assets_end" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
