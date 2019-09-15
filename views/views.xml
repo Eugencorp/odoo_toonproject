@@ -200,6 +200,7 @@
                             <field name="isWorker" invisible="0"/>
                             <field name="isValidWorker" invisible="0"/>
                             <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
+                            <field name="preview_controler" />
                           </group>
                         </page>
                     </notebook>
@@ -223,7 +224,7 @@
                         } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
                         jQuery('html').unblock();
                       };
-                      adress = 'toonproject/webdav';
+                      adress = jQuery('[name=preview_controler]').text();
                       xhr.open('POST', adress, true);
                       xhr.send(fd);
                       jQuery('html').block();

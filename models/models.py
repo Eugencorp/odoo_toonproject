@@ -314,6 +314,7 @@ class task(models.Model):
     
     preview = fields.Char()
     preview_filename = fields.Char(string="Файл preview по умолчанию")
+    preview_controler = fields.Char(compute='_get_preview_controler', store=False)
     
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
@@ -413,6 +414,10 @@ class task(models.Model):
     def _get_price_record(self):
         for rec in self:
             rec.price_record = rec.findPriceInProject()
+
+    def _get_preview_controler(self):
+        for rec in self:
+            rec.preview_controler = rec.price_record.preview_controler
 
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
