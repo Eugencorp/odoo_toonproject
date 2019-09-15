@@ -216,10 +216,11 @@
                       xhr.onload = () => {
                         if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
                           alert("Файл загружен");
-                          video = jQuery('.o_video_preview video').attr('src', xhr.response);
+                          video = jQuery('.o_video_preview video');
+                          video.attr('src', xhr.response);
                           video[0].load();
                           jQuery('.o_video_preview').removeClass('o_field_empty');
-                        } else alert('Что-то пошло не так.\n Ошибка: " + xhr.status);
+                        } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
                       };
                       adress = 'toonproject/webdav';
                       xhr.open('POST', adress, true);
