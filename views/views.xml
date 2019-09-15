@@ -221,10 +221,12 @@
                           video[0].load();
                           jQuery('.o_video_preview').removeClass('o_field_empty');
                         } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
+                        jQuery('html').unblock();
                       };
                       adress = 'toonproject/webdav';
                       xhr.open('POST', adress, true);
                       xhr.send(fd);
+                      jQuery('html').block();
                       });
                     </script>
                     <group col="3">
