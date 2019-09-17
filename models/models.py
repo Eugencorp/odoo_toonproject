@@ -45,6 +45,7 @@ class tasktype(models.Model):
     sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
+    line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице")
 
 class price(models.Model):
     _name = 'toonproject.price'
@@ -163,6 +164,8 @@ class asset(models.Model, StoresImages):
     color = fields.Integer(compute='_get_color', store=True)
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
+    line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице", compute="_get_line_color", store=True)
+
     
     preceding_preview = fields.Char(string="preview")
     last_preview = fields.Char(string="последнее preview", compute="_get_last_preview", store=False)
@@ -226,11 +229,18 @@ class asset(models.Model, StoresImages):
                             break
             #pdb.set_trace()
             if len(task_types):
+                task_types.sort(key=lambda task: task['tasktype_id'].sequence, reverse=True)
                 task_types.sort(key=lambda task: task['status'])
                 rec.current_tasktype = task_types[0]['tasktype_id']
                 rec.current_status = task_types[0]['status']
             else:
                 rec.current_status = '1pending'
+
+    @api.depends('current_tasktype')
+    def _get_line_color(self):
+        for rec in self:
+            rec.line_color = rec.current_tasktype.line_color
+
 
     @api.multi
     @api.depends('icon_video_url')

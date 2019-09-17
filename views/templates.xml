@@ -4,6 +4,7 @@
             <xpath expr="." position="inside">
                 <script src="/toonproject/static/src/js/widgets.js" type="text/javascript" />
                 <link href="/toonproject/static/src/css/views.css" rel="stylesheet" type="text/css"/>
+				<link href="/toonproject/static/src/css/colored_table.css" rel="stylesheet" type="text/css"/>
             </xpath>
         </template>
 

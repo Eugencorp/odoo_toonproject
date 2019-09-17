@@ -257,9 +257,12 @@
         <field name="arch" type="xml">
             <form string="Asset Form">
                 <sheet>
-					<field name="name" />
-					<field name="description" />
-					<field name="valid_assettypes" widget="many2many_checkboxes"  string="Применимо к" />
+					<group>
+						<field name="name" />
+						<field name="description" />
+						<field name="valid_assettypes" widget="many2many_checkboxes"  string="Применимо к" />
+						<field name="line_color"/>
+					</group>
 				</sheet>
 			</form>
 		</field>
@@ -308,8 +311,9 @@
       <field name="name">asset.list</field>
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
-        <tree>
-	  <field name="project_id" string="проект"/>
+        <tree class="colored" decoration-danger="line_color=='pink'" decoration-warning="line_color=='orange'" decoration-success="line_color=='green'" decoration-primary="line_color=='gray'" decoration-info="line_color=='blue'" decoration-it="current_status=='3progress'" decoration-bf="current_status>'3progress'">
+		  <field name="line_color" invisible="1"/>
+		  <field name="project_id" string="проект"/>
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>

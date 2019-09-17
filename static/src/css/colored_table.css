@@ -1,0 +1,64 @@
+.colored table tbody tr.text-danger {
+	background-color: lightpink;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-danger.text-it {
+	background-color: hotpink;
+}
+.colored table tbody tr.text-danger.text-bf {
+	background-color: deeppink;
+}
+
+.colored table tbody tr.text-warning {
+	background-color: gold;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-warning.text-it {
+	background-color: orange;
+}
+.colored table tbody tr.text-warning.text-bf {
+	background-color: darkorange;
+}
+
+.colored table tbody tr.text-success {
+	background-color: palegreen;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-success.text-it {
+	background-color: mediumspringgreen;
+}
+.colored table tbody tr.text-success.text-bf {
+	background-color: mediumseagreen;
+}
+
+.colored table tbody tr.text-info {
+	background-color: lightskyblue;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-info.text-it {
+	background-color: deepskyblue;
+}
+.colored table tbody tr.text-info.text-bf {
+	background-color: dodgerblue;
+}
+
+.colored table tbody tr.text-primary {
+	background-color: gainsboro;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-primary.text-it {
+	background-color: silver;
+}
+.colored table tbody tr.text-primary.text-bf {
+	background-color: darkgray;
+}
