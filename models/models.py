@@ -315,9 +315,27 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    first_sametype_affecting_task = fields.Many2one('toonproject.task', compute='_get_first_sametype_affecting_task', store=True, string='Первая задача цепочки')
     
     preview = fields.Char()
     
+    @api.depends('affecting_tasks')
+    def _get_first_sametype_affecting_task(self):
+        for rec in self:
+            cur = rec
+            while True:
+                sametype_tasks = [task for task in cur.affecting_tasks if task.tasktype_id == rec.tasktype_id]
+                sametype_tasks.sort(key=lambda task: abs(rec.id-task.id))
+                if len(sametype_tasks):
+                    cur = sametype_tasks[0]
+                else:
+                    rec.first_sametype_affecting_task = cur
+                    break
+            for task in rec.dependent_tasks:
+                if task.tasktype_id == rec.tasktype_id:
+                    task._get_first_sametype_affecting_task()
+                    
+                    
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
         for rec in self:
