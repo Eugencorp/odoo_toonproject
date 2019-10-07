@@ -224,15 +224,19 @@ class asset(models.Model, StoresImages):
                         pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
-                        if pseudo_task['status'] > '1pending':
-                            task_types.append(pseudo_task)
-                            break
+                        #if pseudo_task['status'] > '1pending':
+                        task_types.append(pseudo_task)
+                        break
             #pdb.set_trace()
             if len(task_types):
-                task_types.sort(key=lambda task: task['tasktype_id'].sequence, reverse=True)
-                task_types.sort(key=lambda task: task['status'])
-                rec.current_tasktype = task_types[0]['tasktype_id']
-                rec.current_status = task_types[0]['status']
+                task_types = list(filter(lambda task: task['status'] > '1pending', task_types))
+                if len(task_types):
+                    task_types.sort(key=lambda task: task['tasktype_id'].sequence, reverse=True)
+                    task_types.sort(key=lambda task: task['status'])
+                    rec.current_tasktype = task_types[0]['tasktype_id']
+                    rec.current_status = task_types[0]['status']
+                else:
+                    rec.current_status = '1pending'
             else:
                 rec.current_status = None
 
