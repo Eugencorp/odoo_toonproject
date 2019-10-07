@@ -234,7 +234,7 @@ class asset(models.Model, StoresImages):
                 rec.current_tasktype = task_types[0]['tasktype_id']
                 rec.current_status = task_types[0]['status']
             else:
-                rec.current_status = '1pending'
+                rec.current_status = None
 
     @api.depends('current_tasktype')
     def _get_line_color(self):

@@ -719,6 +719,21 @@
 				target="new"
         groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
+				
+    <record id="toonproject_update_assets" model="ir.actions.server">
+        <field name="name">Обновить</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_asset"/>		
+        <field name="binding_model_id" ref="model_toonproject_asset"/>
+        <field name="state">code</field>
+        <field name="code">
+model = env['toonproject.asset']
+env.add_todo(model._fields['current_status'], model.search([]))
+env.add_todo(model._fields['color'], model.search([]))
+model.recompute()
+env.cr.commit()
+        </field>
+    </record>			
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."
