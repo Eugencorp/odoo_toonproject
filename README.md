@@ -5,7 +5,7 @@ work in progress.
 
 ## Instalation
 
-Clone this repository to your Odoo addons folder as toonproject.
+Clone this repository to your Odoo addons folder as **toonproject**.
 
 ## To be done
 
