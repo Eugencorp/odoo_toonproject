@@ -411,7 +411,10 @@ class task(models.Model):
         for rec in self:
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
             if not rec.worker_id.id:
-                rec.isValidWorker = (not rec.valid_group) or (self.env.user.id in rec.valid_group.users.ids)
+                if rec.valid_group:
+                    rec.isValidWorker = (self.env.user.id in rec.valid_group.users.ids)
+                else:
+                    rec.isValidWorker = False
 
     def getMainAsset(self):
         #find first asset have legal tasktype
