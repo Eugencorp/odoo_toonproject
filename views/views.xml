@@ -729,7 +729,7 @@
         <field name="state">code</field>
         <field name="code">
 model = env['toonproject.asset']
-env.add_todo(model._fields['current_status'], model.search([]))
+env.add_todo(model._fields['current_status'], records)
 env.add_todo(model._fields['color'], model.search([]))
 model.recompute()
 env.cr.commit()
