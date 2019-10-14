@@ -311,7 +311,8 @@
       <field name="name">asset.list</field>
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
-        <tree class="colored" decoration-danger="line_color=='pink'" decoration-warning="line_color=='orange'" decoration-success="line_color=='green'" decoration-primary="line_color=='gray'" decoration-info="line_color=='blue'" decoration-it="current_status=='3progress'" decoration-bf="current_status>'3progress'">
+        <tree class="colored" decoration-danger="line_color=='pink'" decoration-warning="line_color=='orange'" decoration-success="line_color=='green'" decoration-primary="line_color=='gray'" decoration-info="line_color=='blue'" 
+		decoration-it="'3progress'>=current_status>='2ready'" decoration-bf="current_status>='3progress'" >
 		  <field name="line_color" invisible="1"/>
 		  <field name="project_id" string="проект"/>
           <field name="assettype_id" string="тип"/>
@@ -719,6 +720,21 @@
 				target="new"
         groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
+				
+    <record id="toonproject_update_assets" model="ir.actions.server">
+        <field name="name">Обновить</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_asset"/>		
+        <field name="binding_model_id" ref="model_toonproject_asset"/>
+        <field name="state">code</field>
+        <field name="code">
+model = env['toonproject.asset']
+env.add_todo(model._fields['current_status'], records)
+env.add_todo(model._fields['color'], model.search([]))
+model.recompute()
+env.cr.commit()
+        </field>
+    </record>			
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."
