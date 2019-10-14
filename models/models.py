@@ -162,8 +162,9 @@ class asset(models.Model, StoresImages):
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_color', store=True)
-    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
-    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True, string='Статус')
+    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True, string = "Текущая задача")
+    current_worker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Исполнитель")
     line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице", compute="_get_line_color", store=True)
 
     
@@ -221,7 +222,7 @@ class asset(models.Model, StoresImages):
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
                     if valid_tasktype == task.tasktype_id:
-                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
+                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status, 'worker_id':task.worker_id}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
                         task_types.append(pseudo_task)
@@ -235,6 +236,7 @@ class asset(models.Model, StoresImages):
                 if i >= len(task_types):
                     i = i - 1                
                 rec.current_tasktype = task_types[i]['tasktype_id']
+                rec.current_worker = task_types[i]['worker_id']
                 rec.current_status = task_types[i]['status']
             else:
                 rec.current_status = None

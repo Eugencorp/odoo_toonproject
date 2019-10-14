@@ -320,7 +320,8 @@
           <field name="short_description" string="краткое описание:"/>
           <field name="size" string="размер" sum="общий размер"/>
           <field name="current_tasktype" string="текущая задача"/>
-          <field name="current_status" string="текущий статус"/>
+          <field name="current_worker" string="исполнитель"/>		  
+          <field name="current_status" string="статус"/>
         </tree>
       </field>
     </record>
@@ -730,7 +731,7 @@
         <field name="code">
 model = env['toonproject.asset']
 env.add_todo(model._fields['current_status'], records)
-env.add_todo(model._fields['color'], model.search([]))
+env.add_todo(model._fields['color'], records)
 model.recompute()
 env.cr.commit()
         </field>
