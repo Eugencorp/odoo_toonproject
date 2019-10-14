@@ -321,8 +321,21 @@ class task(models.Model):
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
     first_sametype_affecting_task = fields.Many2one('toonproject.task', compute='_get_first_sametype_affecting_task', store=True, string='Первая задача цепочки')
+    pause_reason = fields.Char(compute='_get_pause_reason', store=True, string = 'Причина паузы')
     
     preview = fields.Char()
+    
+    @api.depends('affecting_tasks')
+    def _get_pause_reason(self):  
+        for rec in self:
+            reasons = []            
+            if rec.status == '1pending':
+                for reason in rec.affecting_tasks:
+                    if reason.status < '7finished' and reason.tasktype_id != rec.tasktype_id:
+                        if reason.getMainAsset() != rec.getMainAsset():
+                            reasons.append(reason)
+                reasons.sort(key=lambda task: task.name) 
+            rec.pause_reason = ", ".join([task.name for task in reasons])        
     
     @api.depends('affecting_tasks')
     def _get_first_sametype_affecting_task(self):

@@ -189,7 +189,8 @@
                             <field name="isControler" invisible="0"/>
                             <field name="isWorker" invisible="0"/>
                             <field name="isValidWorker" invisible="0"/>
-                            <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
+                            <field name="price_record" string="расценка"/>
+							<field name="pause_reason" />
                           </group>
                         </page>
                     </notebook>
@@ -735,7 +736,21 @@ env.add_todo(model._fields['color'], records)
 model.recompute()
 env.cr.commit()
         </field>
-    </record>			
+    </record>
+
+    <record id="toonproject_update_tasks" model="ir.actions.server">
+        <field name="name">Обновить</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_task"/>		
+        <field name="binding_model_id" ref="model_toonproject_task"/>
+        <field name="state">code</field>
+        <field name="code">
+model = env['toonproject.task']
+env.add_todo(model._fields['pause_reason'], records)
+model.recompute()
+env.cr.commit()
+        </field>
+    </record>	
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."
