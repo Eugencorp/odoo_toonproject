@@ -169,7 +169,7 @@
                             <div class="col-4">
                               <div style="text-align: center; font-weight:bold;">Preview:</div>
                               <field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
-                              <div attrs="{'invisible':[('isWorker','=',False)]}">
+                              <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
                                 <input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
                               </div>
                             </div>
@@ -183,7 +183,7 @@
                             <group>
                               <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                               <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
-                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию для perview" />
+                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию для preview" />
                             </group>
                             <group>
                               <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
