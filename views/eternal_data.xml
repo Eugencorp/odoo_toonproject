@@ -5,5 +5,9 @@
         <field name="name">webdav</field>
 		<field name="path">/toonproject/webdav</field>
     </record>
+    <record id="ftp" model="toonproject.upload_interface">
+        <field name="name">ftp</field>
+		<field name="path">/toonproject/ftp</field>
+    </record>	
   </data>
 </odoo>

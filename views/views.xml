@@ -85,7 +85,8 @@
 						<div class="param">					
 							<label for="preview_upload_path"/>
 							<field name="preview_upload_path"/>
-							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews</i></div>
+							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews/</i>
+							или <i>ftp://192.168.0.1/previews</i></div>
 						</div>
 						
 						<div class="param_subgroup">
