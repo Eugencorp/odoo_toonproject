@@ -807,11 +807,11 @@ class EditPricesWizard(models.TransientModel):
     def _get_preview_password(self):
         return self._get_default_field('preview_password')
 
-    preview_path = fields.Char(string="Где хранятся preview", default=_get_preview_path)
-    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок preview", default=_get_preview_controler)
-    preview_upload_path = fields.Char(string="Куда загружать preview", default=_get_preview_upload_path)
-    preview_login = fields.Char(string="login для preview", default=_get_preview_login)
-    preview_password = fields.Char(string="password для preview", default=_get_preview_password)
+    preview_path = fields.Char(string="Внешний доступ через http", default=_get_preview_path)
+    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=_get_preview_controler)
+    preview_upload_path = fields.Char(string="Куда загружать", default=_get_preview_upload_path)
+    preview_login = fields.Char(string="login", default=_get_preview_login)
+    preview_password = fields.Char(string="password", default=_get_preview_password)
 
     enable_preview_path = fields.Boolean(default=False)
     enable_preview_controler = fields.Boolean(default=False)

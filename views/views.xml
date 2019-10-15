@@ -42,25 +42,56 @@
         <field name="arch" type="xml">
             <form string="Price Form">
                 <sheet>
-                    <group>
-                        <field name="project_id" string="Проект"/>
-                        <field name="tasktype_id" string="Процесс"/>
-                        <field name="value" string="Стоимость"/>
-                        <!--<field name="next_tasktype" string="Следующий процесс"/>-->
-                        <field name="controlers" string="контроль" context="{'default_price':id}" >
-                          <tree>
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                          </tree>
-                        </field>
-                        <field name="valid_group" string="Группа исполнителей"
-                          domain="[('category_id','=', %(module_category_toonproject)d)]"/>
-						<field name="preview_path" widget="url" />
-						<field name="preview_controler"/>
-						<field name="preview_upload_path"/>
-						<field name="preview_login"/>
-						<field name="preview_password" password="True"/>
-                    </group>
+					<label for="project_id"/>
+					<field name="project_id" string="Проект"/>
+					<br/>
+					
+					<label for="tasktype_id"/>
+					<field name="tasktype_id" string="Процесс"/>
+					<br/>
+					
+					<label for="value"/>
+					<field name="value" string="Стоимость"/>
+					<br/>						
+					
+					<label for="controlers"/>
+					<field name="controlers" string="контроль" context="{'default_price':id}" >
+					  <tree>
+						<field name="sequence" widget="handle"/>
+						<field name="name"/>
+					  </tree>
+					</field>
+					<br/>
+					
+					<label for="valid_group"/>
+					<field name="valid_group" string="Группа исполнителей"
+					  domain="[('category_id','=', %(module_category_toonproject)d)]"/>
+					<div class="param_group"> 
+						<h2>Загрузка preview</h2>
+						
+						<div class="param">
+							<label for="preview_path"/>
+							<field name="preview_path" widget="url" />
+							<div>Например: <i>http://192.168.0.1/www/previews/</i></div>
+						</div>
+						
+						<div class="param">
+							<label for="preview_controler"/>
+							<field name="preview_controler"/>
+						</div>
+						
+						<div class="param">					
+							<label for="preview_upload_path"/>
+							<field name="preview_upload_path"/>
+							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews</i></div>
+						</div>
+						
+						<div class="param_subgroup">
+							<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+							<label for="preview_login"/><field name="preview_login"/><br/>
+							<label for="preview_password"/><field name="preview_password" password="True"/>
+						</div>
+					</div>
                 </sheet>
             </form>
         </field>
