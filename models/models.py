@@ -6,6 +6,8 @@ from odoo import SUPERUSER_ID
 from odoo import tools
 from odoo.exceptions import ValidationError
 import pdb
+from odoo import http
+import requests
 
 class group(models.Model):
     _name = 'res.groups'
@@ -67,12 +69,13 @@ class price(models.Model):
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
     
-    preview_path = fields.Char(string="Где хранятся preview")
+    preview_path = fields.Char(string="Внешний доступ через http")
     #preview_controler = fields.Char(string="Адрес обработчика загрузок preview")
-    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок preview", default=None)
-    preview_upload_path = fields.Char(string="Куда загружать preview")
-    preview_login = fields.Char(string="login для preview")
-    preview_password = fields.Char(string="password для preview")
+    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=None)
+    preview_controler_path = fields.Char(compute = '_get_preview_controler_path')
+    preview_upload_path = fields.Char(string="Куда загружать")
+    preview_login = fields.Char(string="login")
+    preview_password = fields.Char(string="password")
     
     
     
@@ -88,8 +91,16 @@ class price(models.Model):
         for rec in self:
             res.append((rec.id, rec.tasktype_id.name + ' по проекту ' + rec.project_id.name))
         return res
-
-
+    
+    @api.depends('preview_controler')    
+    def _get_preview_controler_path(self):
+        for rec in self:
+            if rec.preview_controler:
+                rec.preview_controler_path = rec.preview_controler.path
+            else:
+                rec.preview_controler_path = ''
+    
+  
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
