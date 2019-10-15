@@ -56,7 +56,7 @@
                         <field name="valid_group" string="Группа исполнителей"
                           domain="[('category_id','=', %(module_category_toonproject)d)]"/>
 						<field name="preview_path" widget="url" />
-						<field name="preview_controler" widget="url"/>
+						<field name="preview_controler"/>
 						<field name="preview_upload_path"/>
 						<field name="preview_login"/>
 						<field name="preview_password" password="True"/>
