@@ -197,8 +197,8 @@
                           <group>
                             <field name="short_description" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
-						                <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
-                            <field name="computed_price" string="Cтоимость:"/>
+			    <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="computed_price" string="Cтоимость:" attrs="{'invisible':[('isManager','=',False),('isWorker','=',False),'|',('isValidWorker','=',False), ('worker_id','>',0)]}" />
                           </group>
                         </page>
                         <page string="Контроль">
@@ -252,8 +252,11 @@
                             <field name="isControler" invisible="0"/>
                             <field name="isWorker" invisible="0"/>
                             <field name="isValidWorker" invisible="0"/>
-                            <field name="price_record" string="расценка" groups="toonproject.group_toonproject_admin"/>
+
+                            <field name="price_record" string="расценка"/>
                             <field name="preview_controler" />
+							              <field name="pause_reason" />
+
                           </group>
                         </page>
                     </notebook>
@@ -321,7 +324,7 @@
                       </div>
                     </group>
                     <group>
-                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('isValidWorker','!=',True),('status','!=', '2ready'),('status','!=', '4torevision')]}" class="btn-success"/>
+                        <button name="button_start" string="взять в работу" type="object" attrs="{'invisible':['|',('isValidWorker','!=',True),'&amp;',('status','!=', '2ready'),('status','!=', '4torevision')]}" class="btn-success"/>
                         <button name="button_control" string="отправить в проверку" type="object" attrs="{'invisible':['|',('isWorker','!=',True), ('status','!=', '3progress'),('status','!=','5inrevision')]}" class="btn-danger"/>
                         <button name="button_reject" string="вернуть на доработку" type="object" attrs="{'invisible':['|',('status','!=', '6control'),('isControler','!=',True)]}" class="btn-danger"/>
                         <button name="button_accept" string="принять" type="object" attrs="{'invisible':['|',('status','!=', '6control'),('isControler','!=',True)]}" class="btn-success"/>
@@ -343,9 +346,12 @@
         <field name="arch" type="xml">
             <form string="Asset Form">
                 <sheet>
-					<field name="name" />
-					<field name="description" />
-					<field name="valid_assettypes" widget="many2many_checkboxes"  string="Применимо к" />
+					<group>
+						<field name="name" />
+						<field name="description" />
+						<field name="valid_assettypes" widget="many2many_checkboxes"  string="Применимо к" />
+						<field name="line_color"/>
+					</group>
 				</sheet>
 			</form>
 		</field>
@@ -394,14 +400,17 @@
       <field name="name">asset.list</field>
       <field name="model">toonproject.asset</field>
       <field name="arch" type="xml">
-        <tree>
-	  <field name="project_id" string="проект"/>
+        <tree class="colored" decoration-danger="line_color=='pink'" decoration-warning="line_color=='orange'" decoration-success="line_color=='green'" decoration-primary="line_color=='gray'" decoration-info="line_color=='blue'" 
+		decoration-it="'3progress'>=current_status>='2ready'" decoration-bf="current_status>='3progress'" >
+		  <field name="line_color" invisible="1"/>
+		  <field name="project_id" string="проект"/>
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
           <field name="size" string="размер" sum="общий размер"/>
           <field name="current_tasktype" string="текущая задача"/>
-          <field name="current_status" string="текущий статус"/>
+          <field name="current_worker" string="исполнитель"/>		  
+          <field name="current_status" string="статус"/>
         </tree>
       </field>
     </record>
@@ -424,7 +433,7 @@
           <field name="work_start" string="начата"/>
           <field name="real_finish" string="закончена"/>
           <field name="write_date" string="последние изменения"/>
-          <field name="computed_price" string="стоимость" sum="сумма:"/>
+          <field name="computed_price" string="стоимость" sum="сумма:" groups="toonproject.group_toonproject_manager" />
           <field name="pay_date" string="оплачено"/>
         </tree>
       </field>
@@ -835,6 +844,35 @@
 				target="new"
         groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
+				
+    <record id="toonproject_update_assets" model="ir.actions.server">
+        <field name="name">Обновить</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_asset"/>		
+        <field name="binding_model_id" ref="model_toonproject_asset"/>
+        <field name="state">code</field>
+        <field name="code">
+model = env['toonproject.asset']
+env.add_todo(model._fields['current_status'], records)
+env.add_todo(model._fields['color'], records)
+model.recompute()
+env.cr.commit()
+        </field>
+    </record>
+
+    <record id="toonproject_update_tasks" model="ir.actions.server">
+        <field name="name">Обновить</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_task"/>		
+        <field name="binding_model_id" ref="model_toonproject_task"/>
+        <field name="state">code</field>
+        <field name="code">
+model = env['toonproject.task']
+env.add_todo(model._fields['pause_reason'], records)
+model.recompute()
+env.cr.commit()
+        </field>
+    </record>	
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."

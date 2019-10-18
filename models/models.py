@@ -54,6 +54,7 @@ class tasktype(models.Model):
     sequence = fields.Integer(default=10)
     description = fields.Text()
     valid_assettypes = fields.Many2many('toonproject.assettype', string = "Над чем производятся работы:")
+    line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице")
 
 class price(models.Model):
     _name = 'toonproject.price'
@@ -186,8 +187,11 @@ class asset(models.Model, StoresImages):
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
 
     color = fields.Integer(compute='_get_color', store=True)
-    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True)
-    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True)
+    current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True, string='Статус')
+    current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True, string = "Текущая задача")
+    current_worker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Исполнитель")
+    line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице", compute="_get_line_color", store=True)
+
     
     preceding_preview = fields.Char(string="preview")
     last_preview = fields.Char(string="последнее preview", compute="_get_last_preview", store=False)
@@ -243,19 +247,30 @@ class asset(models.Model, StoresImages):
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
                     if valid_tasktype == task.tasktype_id:
-                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status}
+                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status, 'worker_id':task.worker_id}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
-                        if pseudo_task['status'] > '1pending':
-                            task_types.append(pseudo_task)
-                            break
-            #pdb.set_trace()
-            if len(task_types):
+                        task_types.append(pseudo_task)
+                        break
+            if len(task_types):              
+                task_types.sort(key=lambda task: task['tasktype_id'].sequence, reverse=True)
                 task_types.sort(key=lambda task: task['status'])
-                rec.current_tasktype = task_types[0]['tasktype_id']
-                rec.current_status = task_types[0]['status']
+                i = 0
+                while i < len(task_types) and task_types[i]['status'] <= '1pending':
+                    i = i + 1
+                if i >= len(task_types):
+                    i = i - 1                
+                rec.current_tasktype = task_types[i]['tasktype_id']
+                rec.current_worker = task_types[i]['worker_id']
+                rec.current_status = task_types[i]['status']
             else:
-                rec.current_status = '1pending'
+                rec.current_status = None
+
+    @api.depends('current_tasktype')
+    def _get_line_color(self):
+        for rec in self:
+            rec.line_color = rec.current_tasktype.line_color
+
 
     @api.multi
     @api.depends('icon_video_url')
@@ -330,11 +345,42 @@ class task(models.Model):
     isManager = fields.Boolean(compute='_is_manager', store=False, default=True)
 
     color = fields.Integer(compute='_raw_tasktype', store=True)
+    first_sametype_affecting_task = fields.Many2one('toonproject.task', compute='_get_first_sametype_affecting_task', store=True, string='Первая задача цепочки')
+    pause_reason = fields.Char(compute='_get_pause_reason', store=True, string = 'Причина паузы')
     
     preview = fields.Char()
     preview_filename = fields.Char(string="Файл preview по умолчанию")
     preview_controler = fields.Char(compute='_get_preview_controler', store=False)
     
+    @api.depends('affecting_tasks')
+    def _get_pause_reason(self):  
+        for rec in self:
+            reasons = []            
+            if rec.status == '1pending':
+                for reason in rec.affecting_tasks:
+                    if reason.status < '7finished' and reason.tasktype_id != rec.tasktype_id:
+                        if reason.getMainAsset() != rec.getMainAsset():
+                            reasons.append(reason)
+                reasons.sort(key=lambda task: task.name) 
+            rec.pause_reason = ", ".join([task.name for task in reasons])        
+    
+    @api.depends('affecting_tasks')
+    def _get_first_sametype_affecting_task(self):
+        for rec in self:
+            cur = rec
+            while True:
+                sametype_tasks = [task for task in cur.affecting_tasks if task.tasktype_id == rec.tasktype_id]
+                sametype_tasks.sort(key=lambda task: abs(rec.id-task.id))
+                if len(sametype_tasks):
+                    cur = sametype_tasks[0]
+                else:
+                    rec.first_sametype_affecting_task = cur
+                    break
+            for task in rec.dependent_tasks:
+                if task.tasktype_id == rec.tasktype_id:
+                    task._get_first_sametype_affecting_task()
+                    
+                    
     @api.depends('tasktype_id')
     def _get_tasktype_sequence(self):
         for rec in self:
@@ -410,7 +456,10 @@ class task(models.Model):
         for rec in self:
             rec.isValidWorker = (self.env.user.id == rec.worker_id.id)
             if not rec.worker_id.id:
-                rec.isValidWorker = (not rec.valid_group) or (self.env.user.id in rec.valid_group.users.ids)
+                if rec.valid_group:
+                    rec.isValidWorker = (self.env.user.id in rec.valid_group.users.ids)
+                else:
+                    rec.isValidWorker = False
 
     def getMainAsset(self):
         #find first asset have legal tasktype

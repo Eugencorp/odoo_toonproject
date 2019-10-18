@@ -1,0 +1,80 @@
+.colored table tbody tr.text-danger {
+	background-color: #fae1f0;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-danger.text-it {
+	background-color: #f5c3e0;
+}
+.colored table tbody tr.text-danger.text-bf {
+	background-color: #cb82ac;
+}
+.colored table tbody tr.text-danger.text-bf.text-it {
+	background-color: #ee99ca;
+}
+
+.colored table tbody tr.text-warning {
+	background-color: #ffe8dc;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-warning.text-it {
+	background-color: #ffd0b9;
+}
+.colored table tbody tr.text-warning.text-bf {
+	background-color: #d99574;
+}
+.colored table tbody tr.text-warning.text-bf.text-it {
+	background-color: #ffaf88;
+}
+
+.colored table tbody tr.text-success {
+	background-color: #e9f6dd;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-success.text-it {
+	background-color: #d2ecba;
+}
+.colored table tbody tr.text-success.text-bf {
+	background-color: #98be75;
+}
+.colored table tbody tr.text-success.text-bf.text-it {
+	background-color: #b3df89;
+}
+
+
+.colored table tbody tr.text-info {
+	background-color: #daf2f6;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-info.text-it {
+	background-color: #b5e5ec;
+}
+.colored table tbody tr.text-info.text-bf {
+	background-color: #6fb4bd;
+}
+.colored table tbody tr.text-info.text-bf.text-it {
+	background-color: #82d3de;
+}
+
+.colored table tbody tr.text-primary {
+	background-color: #ebebeb;
+	color: unset !important;
+	font-style: unset !important;
+	font-weight: unset !important;
+}
+.colored table tbody tr.text-primary.text-it {
+	background-color: #d6d6d6;
+}
+.colored table tbody tr.text-primary.text-bf {
+	background-color: #9e9e9e;
+}
+.colored table tbody tr.text-primary.text-bf.text-it {
+	background-color: #bababa;
+}
