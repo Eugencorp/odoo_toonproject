@@ -40,3 +40,25 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 	font-style: italic;
 
 }
+
+.param {
+    padding: 5px 0px;
+}
+
+.param_group {
+	padding: 10px;
+	background-color: #eee;
+	margin: 5px 0;
+}
+
+.param_subgroup {
+    padding: 10px 0px;
+}
+
+.param_subgroup h3{
+	font-size:10pt;
+}
+
+.param_group h2{
+	font-size:12pt;
+}

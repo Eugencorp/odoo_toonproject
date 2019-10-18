@@ -6,11 +6,20 @@ from odoo import SUPERUSER_ID
 from odoo import tools
 from odoo.exceptions import ValidationError
 import pdb
+from odoo import http
+import requests
 
 class group(models.Model):
     _name = 'res.groups'
     _inherit = 'res.groups'
     max_tasks = fields.Integer(string="Количество одновременных заданий")
+
+class upload_interface(models.Model):
+    _name = 'toonproject.upload_interface'
+    _description = 'Simple model for storing paths to file upload controlers'
+    
+    name = fields.Char()
+    path = fields.Char()
 
 class controler(models.Model):
     _name = 'toonproject.controler'
@@ -61,7 +70,15 @@ class price(models.Model):
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
     
-    preview_path = fields.Char(string="Где хранятся preview")
+    preview_path = fields.Char(string="Внешний доступ через http")
+    #preview_controler = fields.Char(string="Адрес обработчика загрузок preview")
+    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=None)
+    preview_controler_path = fields.Char(compute = '_get_preview_controler_path')
+    preview_upload_path = fields.Char(string="Куда загружать")
+    preview_login = fields.Char(string="login")
+    preview_password = fields.Char(string="password")
+    
+    
     
     def _default_sequence(self):
             prices=self.env['toonproject.price'].search([],order="sequence desc",limit=1)
@@ -75,8 +92,16 @@ class price(models.Model):
         for rec in self:
             res.append((rec.id, rec.tasktype_id.name + ' по проекту ' + rec.project_id.name))
         return res
-
-
+    
+    @api.depends('preview_controler')    
+    def _get_preview_controler_path(self):
+        for rec in self:
+            if rec.preview_controler:
+                rec.preview_controler_path = rec.preview_controler.path
+            else:
+                rec.preview_controler_path = ''
+    
+  
 
 class cartoon(models.Model):
     _name = 'toonproject.cartoon'
@@ -324,6 +349,8 @@ class task(models.Model):
     pause_reason = fields.Char(compute='_get_pause_reason', store=True, string = 'Причина паузы')
     
     preview = fields.Char()
+    preview_filename = fields.Char(string="Файл preview по умолчанию")
+    preview_controler = fields.Char(compute='_get_preview_controler', store=False)
     
     @api.depends('affecting_tasks')
     def _get_pause_reason(self):  
@@ -455,6 +482,13 @@ class task(models.Model):
     def _get_price_record(self):
         for rec in self:
             rec.price_record = rec.findPriceInProject()
+
+    def _get_preview_controler(self):
+        for rec in self:
+            if rec.price_record.preview_controler:
+                rec.preview_controler = rec.price_record.preview_controler.path
+            else:
+                rec.preview_controler = None
 
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
@@ -605,7 +639,8 @@ class CreateTasksWizard(models.TransientModel):
                             'short_description': asset.short_description,
                             'description': asset.description,
                             'factor': asset.factor,
-                            'project_id': asset.project_id.id
+                            'project_id': asset.project_id.id,
+                            'preview_filename': asset.name
                         }
                     )
             for task in created:
@@ -801,3 +836,66 @@ class CombineTasksWizard(models.TransientModel):
         elif self.delete_or_archive == "delete":
             target_recs.unlink()
         return{}
+
+class EditPricesWizard(models.TransientModel):
+    _name = 'toonproject.editprices_wizard'
+    _description = "Wizard: Edit multiple prices at once"
+
+    def _get_default_field(self,fieldName):
+        target_recs = self.env['toonproject.price'].browse(self._context.get('active_ids'))
+        found_val = ''
+        for price in target_recs:
+            if price[fieldName]:
+                if found_val and found_val != price['fieldName']:
+                    return ''
+                else:
+                    found_val = price[fieldName]
+        return found_val
+
+    def _get_preview_path(self):
+        return self._get_default_field('preview_path')
+
+    def _get_preview_upload_path(self):
+        return self._get_default_field('preview_upload_path')
+
+    def _get_preview_controler(self):
+        return self._get_default_field('preview_controler')
+
+    def _get_preview_login(self):
+        return self._get_default_field('preview_login')
+
+    def _get_preview_password(self):
+        return self._get_default_field('preview_password')
+
+    preview_path = fields.Char(string="Внешний доступ через http", default=_get_preview_path)
+    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=_get_preview_controler)
+    preview_upload_path = fields.Char(string="Куда загружать", default=_get_preview_upload_path)
+    preview_login = fields.Char(string="login", default=_get_preview_login)
+    preview_password = fields.Char(string="password", default=_get_preview_password)
+
+    enable_preview_path = fields.Boolean(default=False)
+    enable_preview_controler = fields.Boolean(default=False)
+    enable_preview_upload_path = fields.Boolean(default=False)
+    enable_preview_login = fields.Boolean(default=False)
+    enable_preview_password = fields.Boolean(default=False)
+
+    @api.multi
+    def apply_prices(self):
+        values = {}
+        if self.enable_preview_path:
+            values.update({'preview_path': self.preview_path})
+        if self.enable_preview_controler:
+            values.update({'preview_controler': self.preview_controler})
+        if self.enable_preview_upload_path:
+            values.update({'preview_upload_path': self.preview_upload_path})
+        if self.enable_preview_login:
+            values.update({'preview_login': self.preview_login})
+        if self.enable_preview_password:
+            values.update({'preview_password': self.preview_password})
+        target_recs = self.env['toonproject.price'].browse(self._context.get('active_ids'))
+        for rec in target_recs:
+            rec.write(values)
+        return {}
+        
+        
+    

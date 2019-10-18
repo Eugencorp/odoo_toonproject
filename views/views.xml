@@ -42,22 +42,79 @@
         <field name="arch" type="xml">
             <form string="Price Form">
                 <sheet>
-                    <group>
-                        <field name="project_id" string="Проект"/>
-                        <field name="tasktype_id" string="Процесс"/>
-                        <field name="value" string="Стоимость"/>
-                        <!--<field name="next_tasktype" string="Следующий процесс"/>-->
-                        <field name="controlers" string="контроль" context="{'default_price':id}" >
-                          <tree>
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                          </tree>
-                        </field>
-                        <field name="valid_group" string="Группа исполнителей"
-                          domain="[('category_id','=', %(module_category_toonproject)d)]"/>
-						<field name="preview_path" widget="url" />
-                    </group>
+					<field name="id" id="price_id" invisible="1"/>
+					<label for="project_id"/>
+					<field name="project_id" string="Проект"/>
+					<br/>
+					
+					<label for="tasktype_id"/>
+					<field name="tasktype_id" string="Процесс"/>
+					<br/>
+					
+					<label for="value"/>
+					<field name="value" string="Стоимость"/>
+					<br/>						
+					
+					<label for="controlers"/>
+					<field name="controlers" string="контроль" context="{'default_price':id}" >
+					  <tree>
+						<field name="sequence" widget="handle"/>
+						<field name="name"/>
+					  </tree>
+					</field>
+					<br/>
+					
+					<label for="valid_group"/>
+					<field name="valid_group" string="Группа исполнителей"
+					  domain="[('category_id','=', %(module_category_toonproject)d)]"/>
+					<div class="param_group"> 
+						<h2>Загрузка preview</h2>
+						
+						<div class="param">
+							<label for="preview_path"/>
+							<field name="preview_path" widget="url" />
+							<div>Например: <i>http://192.168.0.1/www/previews/</i></div>
+						</div>
+						
+						<div class="param">
+							<label for="preview_controler"/>
+							<field name="preview_controler"/>
+							<field name="preview_controler_path" invisible="1" />
+						</div>
+						
+						<div class="param">					
+							<label for="preview_upload_path"/>
+							<field name="preview_upload_path"/>
+							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews/</i>
+							или <i>ftp://192.168.0.1/previews</i></div>
+						</div>
+						
+						<div class="param_subgroup">
+							<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+							<label for="preview_login"/><field name="preview_login"/><br/>
+							<label for="preview_password"/><field name="preview_password" password="True"/>
+						</div>
+						
+						<button id="test_preview_connection" string="Проверить соединение" icon="fa-television"/>
+					</div>
                 </sheet>
+				<script>
+                      jQuery('#test_preview_connection').click(function(e){
+                      const fd = new FormData();
+                      fd.append('price',  jQuery('[name=id]').text());
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert("Все зашибись!");
+                        } else alert("Что-то пошло не так.\n Ошибка " + xhr.status + "\n" + xhr.responseText);  
+						jQuery('html').unblock();
+                      };
+                      adress = jQuery('[name=preview_controler_path]').text();
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      jQuery('html').block();
+                      });
+                </script>
             </form>
         </field>
     </record>
@@ -160,15 +217,18 @@
                         </page>
                         <page string="Результат">
                           <div class="row">
-								<label for="pay_date" class="col-2" style="text-align: right;" />
-								<field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
-								<div class="col-4">
-									<div style="text-align: center; font-weight:bold;">Preview:</div>
-									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
-								</div>
-								<div class="col-3">
-									<div style="text-align: center; font-weight:bold;">Исходники:</div>
-								</div>
+                            <label for="pay_date" class="col-2" style="text-align: right;" />
+                            <field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <div class="col-4">
+                              <div style="text-align: center; font-weight:bold;">Preview:</div>
+                              <field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+                              <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
+                                <input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
+                              </div>
+                            </div>
+                            <div class="col-3" >
+                              <div style="text-align: center; font-weight:bold;">Исходники:</div>
+                            </div>
                           </div>
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
@@ -176,27 +236,55 @@
                             <group>
                               <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                               <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
+                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию для preview" />
                             </group>
                             <group>
                               <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                               <field name="computed_price" string="Cтоимость:"/>
                             </group>
+
                           </group>
                         </page>
                         <page string="Служебное" groups="toonproject.group_toonproject_admin">
                           <group>
+							<field name="id" id="task_id" invisible="1"/>
                             <field name="isManager"  invisible="0"/>
                             <field name="isControler" invisible="0"/>
                             <field name="isWorker" invisible="0"/>
                             <field name="isValidWorker" invisible="0"/>
+
                             <field name="price_record" string="расценка"/>
-							<field name="pause_reason" />
+                            <field name="preview_controler" />
+							              <field name="pause_reason" />
+
                           </group>
                         </page>
                     </notebook>
                     <script>
                       jQuery('td.o_td_label+td').each(function(i,el){el.style.width = null;});
                       jQuery('table.o_group').each(function(i,el){el.style.width = 'auto';});
+                      jQuery('#preview_file').change(function(e){
+                      const fd = new FormData();
+                      Array.from(e.target.files).forEach((file) => {
+                        fd.append(e.target.name, file, file.name);
+                      });
+                      fd.append('task',  jQuery('[name=id]').text());
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert("Файл загружен");
+                          video = jQuery('.o_video_preview video');
+                          video.attr('src', xhr.response);
+                          video[0].load();
+                          jQuery('.o_video_preview').removeClass('o_field_empty');
+                        } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
+                        jQuery('html').unblock();
+                      };
+                      adress = jQuery('[name=preview_controler]').text();
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      jQuery('html').block();
+                      });
                     </script>
                     <group col="3">
                       <div>
@@ -585,6 +673,40 @@
 		</field>
 	</record>
 
+  <record model="ir.ui.view" id="editprices_wizard_form_view">
+		<field name="name">editprices_wizard.form</field>
+		<field name="model">toonproject.editprices_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Изменить настройки выбранных процессов">
+        <div class="row">
+          <div class="col-md-6">
+            <field name="enable_preview_path"/> <label for="preview_path"/>
+            <field name="preview_path" attrs="{'readonly':[('enable_preview_path','=',False)]}" />
+            <br/>
+            <field name="enable_preview_controler"/> <label for="preview_controler"/>
+            <field name="preview_controler" attrs="{'readonly':[('enable_preview_controler','=',False)]}" />
+            <br/>
+            <field name="enable_preview_upload_path"/> <label for="preview_upload_path"/>
+            <field name="preview_upload_path" attrs="{'readonly':[('enable_preview_upload_path','=',False)]}" />
+            <br/>
+            <field name="enable_preview_login"/> <label for="preview_login"/>
+            <field name="preview_login" attrs="{'readonly':[('enable_preview_login','=',False)]}" />
+            <br/>
+            <field name="enable_preview_password"/> <label for="preview_password"/>
+            <field name="preview_password" attrs="{'readonly':[('enable_preview_password','=',False)]}" password="True" />
+            <br/>
+          </div>
+        </div>
+				<footer>
+					<button name="apply_prices" type="object"
+							string="Изменить" class="oe_highlight"/>
+					or
+					<button special="cancel" string="Отмена"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
   <record model="ir.ui.view" id="combinetasks_wizard_form_view">
 		<field name="name">combinetasks_wizard.form</field>
 		<field name="model">toonproject.combinetasks_wizard</field>
@@ -769,6 +891,15 @@ env.cr.commit()
 				target="new"
         groups="toonproject.group_toonproject_manager"
 				key2="client_action_multi"/>
+
+  <act_window id="launch_editprices_wizard"
+    name="Редактировать выбранное..."
+    src_model="toonproject.price"
+    res_model="toonproject.editprices_wizard"
+    view_mode="form"
+    target="new"
+    groups="toonproject.group_toonproject_manager"
+    key2="client_action_multi"/>
 
     <template id="assets_end" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">

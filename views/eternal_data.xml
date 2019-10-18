@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data noupdate="0">
-
+    <record id="webdav" model="toonproject.upload_interface">
+        <field name="name">webdav</field>
+		<field name="path">/toonproject/webdav</field>
+    </record>
+    <record id="ftp" model="toonproject.upload_interface">
+        <field name="name">ftp</field>
+		<field name="path">/toonproject/ftp</field>
+    </record>	
   </data>
 </odoo>
