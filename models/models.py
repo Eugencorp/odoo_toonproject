@@ -173,6 +173,9 @@ class StoresImages():
 class asset(models.Model, StoresImages):
     _name = 'toonproject.asset'
     _description = 'some meaning part of a production: a scene, a background or a rig'
+    _order = 'sequence asc, id'
+    
+    sequence = fields.Integer(string = "порядок в монтаже")
 
     name = fields.Char(required=True)
     short_description = fields.Char()
