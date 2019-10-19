@@ -414,6 +414,8 @@
         </tree>
       </field>
     </record>
+	
+
     
     <record model="ir.ui.view" id="task_list">
       <field name="name">task.list</field>
@@ -551,6 +553,8 @@
             </p>
         </field>
     </record>
+	
+
 
     <record model="ir.actions.act_window" id="tasktypes_list_action">
         <field name="name">Виды работ</field>
@@ -622,6 +626,9 @@
     <menuitem id="groups_menu" name="Группы пользователей" parent="lists_menu"
                   action="groups_list_action"
                   groups="toonproject.group_toonproject_manager"/>
+    <menuitem id="video_menu" name="Видео" parent="main_toonproject_menu"/>	
+    <!--<menuitem id="show_playlist_menu" name="Смотреть монтаж" parent="video_menu"
+                  action="assets_playlist_action"/>--> 	
 
 	<record model="ir.ui.view" id="createtasks_wizard_form_view">
 		<field name="name">createtasks_wizard.form</field>

@@ -126,29 +126,45 @@ class Toonproject(http.Controller):
         return self.eval_upload_and_check(kw, self.upload_ftp)
         
     @http.route('/toonproject/playlist', auth='user', method=['POST', 'GET'], csrf=False)    
-    def playlist(self, current, finish, start, **kw):
-        if not current or not start or not finish:
+    def playlist(self, current, **kw):
+        if not current:
             return http.Response("Not enough parameters", status=404)
-        start = int(start)
-        finish = int(finish)
+        step = kw.get('step')
+        start = kw.get('start')
+        finish = kw.get('finish')            
+        if start: 
+            start = int(start)
+        if finish:
+            finish = int(finish)
         current = int(current)
+        if step:
+            step = int(step)
         current_scene = http.request.env['toonproject.asset'].search([('id','=', current)])
         if not current_scene:
             return http.Response("No asset found", status=404)
         type = current_scene.assettype_id
         project = current_scene.project_id
-        start_scene = http.request.env['toonproject.asset'].search([('id','=', start)])
-        finish_scene = http.request.env['toonproject.asset'].search([('id','=', finish)])
-        if not start_scene:
-            return http.Response("No start asset found", status=404)
-        if not finish_scene:
-            return http.Response("No finish asset found", status=404) 
-        if start_scene.assettype_id != type or finish_scene.assettype_id != type:
-            return http.Response("Selected assets of different types", status=500)     
-        if start_scene.project_id != project or finish_scene.project_id != project:
-            return http.Response("Selected assets from different projects", status=500) 
-        
         all_scenes = http.request.env['toonproject.asset'].search([('project_id','=', project.id),('assettype_id','=',type.id)])
+        if not step and not start:
+            start = all_scenes[0].id
+        if not step and not finish:
+            finish = all_scenes[len(all_scenes)-1].id
+        if not step:
+            if not start in all_scenes.ids or not finish in all_scenes.ids:
+                return http.Response("Start or finish ids not in same project or not of same type", status=404)                
+        else:
+            for i in range(len(all_scenes)):
+                if all_scenes[i].id == current:
+                    ns = i - step
+                    if ns < 0:
+                        ns = 0
+                    start = all_scenes[ns].id
+                    nf = i + step
+                    if nf >= len(all_scenes):
+                        nf = len(all_scenes)-1
+                    finish = all_scenes[nf].id
+                    break
+        
         r = False
         active_id = 0
         playlist_array = []
