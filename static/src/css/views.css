@@ -62,3 +62,7 @@ table.o_list_view tbody tr:not(.o_data_row) td:not(.o_field_x2many_list_row_add)
 .param_group h2{
 	font-size:12pt;
 }
+
+.task-video-buttons {
+	margin: 5px 0;
+}

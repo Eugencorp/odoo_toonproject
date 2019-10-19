@@ -350,10 +350,13 @@ class task(models.Model):
     color = fields.Integer(compute='_raw_tasktype', store=True)
     first_sametype_affecting_task = fields.Many2one('toonproject.task', compute='_get_first_sametype_affecting_task', store=True, string='Первая задача цепочки')
     pause_reason = fields.Char(compute='_get_pause_reason', store=True, string = 'Причина паузы')
+    main_asset = fields.Many2one('toonproject.asset', compute='_get_main_asset', string='Главный из материалов')
     
     preview = fields.Char()
     preview_filename = fields.Char(string="Файл preview по умолчанию")
     preview_controler = fields.Char(compute='_get_preview_controler', store=False)
+    
+    
     
     @api.depends('affecting_tasks')
     def _get_pause_reason(self):  
@@ -471,6 +474,12 @@ class task(models.Model):
                 if valid_tasktype == self.tasktype_id:
                     return asset
         return None
+        
+    @api.depends('asset_ids')
+    def _get_main_asset(self):
+        for rec in self:
+            a = rec.getMainAsset()
+            rec.main_asset = a
 
     def findPriceInProject(self):
         project = self.project_id
