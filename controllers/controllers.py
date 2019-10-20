@@ -125,6 +125,63 @@ class Toonproject(http.Controller):
     def ftp(self, **kw):
         return self.eval_upload_and_check(kw, self.upload_ftp)
         
+    @http.route('/toonproject/playlist', auth='user', method=['POST', 'GET'], csrf=False)    
+    def playlist(self, current, **kw):
+        if not current:
+            return http.Response("Not enough parameters", status=404)
+        step = kw.get('step')
+        start = kw.get('start')
+        finish = kw.get('finish')            
+        if start: 
+            start = int(start)
+        if finish:
+            finish = int(finish)
+        current = int(current)
+        if step:
+            step = int(step)
+        current_scene = http.request.env['toonproject.asset'].search([('id','=', current)])
+        if not current_scene:
+            return http.Response("No asset found", status=404)
+        type = current_scene.assettype_id
+        project = current_scene.project_id
+        all_scenes = http.request.env['toonproject.asset'].search([('project_id','=', project.id),('assettype_id','=',type.id)])
+        if not step and not start:
+            start = all_scenes[0].id
+        if not step and not finish:
+            finish = all_scenes[len(all_scenes)-1].id
+        if not step:
+            if not start in all_scenes.ids or not finish in all_scenes.ids:
+                return http.Response("Start or finish ids not in same project or not of same type", status=404)                
+        else:
+            for i in range(len(all_scenes)):
+                if all_scenes[i].id == current:
+                    ns = i - step
+                    if ns < 0:
+                        ns = 0
+                    start = all_scenes[ns].id
+                    nf = i + step
+                    if nf >= len(all_scenes):
+                        nf = len(all_scenes)-1
+                    finish = all_scenes[nf].id
+                    break
+        
+        r = False
+        active_id = 0
+        playlist_array = []
+        for scene in all_scenes:
+            if scene.id == start:
+                r = True
+            if r:
+                new_item = {'name': scene.name, 'sources':[{'src': scene.last_preview}]}
+                if scene.last_preview:                    
+                    playlist_array.append(new_item)
+            if scene.id == current:
+                active_id = len(playlist_array)-1
+            if scene.id == finish:
+                break
+            
+        
+        return http.request.render('toonproject.playlist',{'active_id':active_id, 'playlist_array':playlist_array})        
 
 # class Toonproject(http.Controller):
 #     @http.route('/toonproject/toonproject/', auth='public')

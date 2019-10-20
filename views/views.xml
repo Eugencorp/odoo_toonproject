@@ -127,6 +127,7 @@
                 <sheet>
                     <group>
                         <group>
+							<field name="id" invisible="1"/>
                             <field name="project_id" string="Проект: "/>
                             <field name="name" string="Название"/>
                             <field name="assettype_id" string="Тип:"/>
@@ -166,11 +167,20 @@
 						</div>
 						<div class="smallpreview col-3">
 							<div style="text-align: center; font-weight:bold;">Последнее видео:</div> 
-							<field name="last_preview"  widget="video_preview" />							
+							<field name="last_preview"  widget="video_preview" />
+							<div style="text-align: center;"><button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" /></div>							
 						</div>
 					</div>
                   <script>
                       jQuery('.no_open .o_data_row td').click(function(evt) { evt.stopPropagation(); });
+					  jQuery('#open_playlist_button').click(function(e){
+						var id = jQuery('[name=id]');
+						if(id &amp;&amp; id.text()) {
+							var url = "/toonproject/playlist?step=3" + decodeURIComponent('%26') + "current=" + id.text();
+							var win = window.open(url, '_blank');
+							win.focus();
+						}
+					  });
                   </script>
                 </sheet>
             </form>
@@ -225,6 +235,9 @@
                               <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
                                 <input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
                               </div>
+							  <div class="task-video-buttons">
+								<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
+							  </div>
                             </div>
                             <div class="col-3" >
                               <div style="text-align: center; font-weight:bold;">Исходники:</div>
@@ -255,7 +268,8 @@
 
                             <field name="price_record" string="расценка"/>
                             <field name="preview_controler" />
-							              <field name="pause_reason" />
+							<field name="pause_reason" />
+							<field name="main_asset"/>
 
                           </group>
                         </page>
@@ -285,6 +299,17 @@
                       xhr.send(fd);
                       jQuery('html').block();
                       });
+					  jQuery('#open_playlist_button').click(function(e){
+						var main_asset = jQuery('[name=main_asset]').attr('href');
+						if(main_asset) {
+							var found = main_asset.match(/#id=(\d+).*/);
+							if(found){
+								var url = "/toonproject/playlist?step=3" + decodeURIComponent('%26') + "current=" + found[1];
+								var win = window.open(url, '_blank');
+								win.focus();
+							}
+						}
+					  });
                     </script>
                     <group col="3">
                       <div>
@@ -414,6 +439,8 @@
         </tree>
       </field>
     </record>
+	
+
     
     <record model="ir.ui.view" id="task_list">
       <field name="name">task.list</field>
@@ -551,6 +578,8 @@
             </p>
         </field>
     </record>
+	
+
 
     <record model="ir.actions.act_window" id="tasktypes_list_action">
         <field name="name">Виды работ</field>
@@ -622,6 +651,9 @@
     <menuitem id="groups_menu" name="Группы пользователей" parent="lists_menu"
                   action="groups_list_action"
                   groups="toonproject.group_toonproject_manager"/>
+    <menuitem id="video_menu" name="Видео" parent="main_toonproject_menu"/>	
+    <!--<menuitem id="show_playlist_menu" name="Смотреть монтаж" parent="video_menu"
+                  action="assets_playlist_action"/>--> 	
 
 	<record model="ir.ui.view" id="createtasks_wizard_form_view">
 		<field name="name">createtasks_wizard.form</field>

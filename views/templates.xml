@@ -5,8 +5,68 @@
                 <script src="/toonproject/static/src/js/widgets.js" type="text/javascript" />
                 <link href="/toonproject/static/src/css/views.css" rel="stylesheet" type="text/css"/>
 				<link href="/toonproject/static/src/css/colored_table.css" rel="stylesheet" type="text/css"/>
-            </xpath>
+			</xpath>
         </template>
+		
+		<template id="playlist">
+			<head>
+				<link href="/toonproject/static/src/css/video-js.css" rel="stylesheet" type="text/css"/>
+				<link href="/toonproject/static/src/css/videojs-playlist-ui.css" rel="stylesheet" type="text/css"/>
+				<script src="/toonproject/static/src/js/video.js" type="text/javascript" />
+				<script src="/toonproject/static/src/js/videojs-playlist.js" type="text/javascript" />
+				<script src="/toonproject/static/src/js/videojs-playlist-ui.js" type="text/javascript" />
+				<style>
+					body {
+						background: silver;
+						}
+					#playlist-window-ui .vjs-playlist-thumbnail {
+							height: 32pt;
+						}
+					.vjs-selected .vjs-playlist-thumbnail-placeholder {
+							background: red;
+						}
+					#playlist-window-ui .vjs-playlist-now-playing-text,
+					#playlist-window-ui .vjs-up-next-text {
+							display: none;
+						}
+				</style>
+			</head>
+			<body>
+				<table border='0'>
+					<tr><td>
+						<video id='vjs-player' class='video-js' controls='1' preload='auto' width='960' height='540'
+						data-setup='{}'>
+						</video>
+					</td><td width='100%'>
+						<div class="vjs-playlist" id="playlist-window-ui">
+						</div>
+					</td></tr>
+				</table>
+				<script>
+						var active_id = <t t-esc="active_id"/>;
+						var playlist_array = [];
+					<t t-foreach="playlist_array" t-as="playlist_item">
+						playlist_array.push(<t t-esc="playlist_item" />);
+					</t>
+				</script>
+				<script>
+				window.onload = function() {
+					var player = videojs('vjs-player');				 
+					player.playlist(playlist_array);					 
+					player.playlist.currentItem(active_id);
+					player.playlist.repeat(true);
+					player.playlist.autoadvance(0);
+					videojs(document.querySelector('video')).playlistUi();
+				}
+				</script>
+			  
+			  
+			  
+			  
+			  
+			  
+			</body>		
+		</template>
 
         <!-- <template id="listing"> -->
         <!--   <ul> -->
