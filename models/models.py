@@ -215,6 +215,7 @@ class asset(models.Model, StoresImages):
                 if task.preview:
                     rec.last_preview = task.preview
                     found_preview = True
+                    break
             if not found_preview:
                 rec.last_preview = rec.preceding_preview
 
