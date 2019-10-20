@@ -23,7 +23,7 @@ class DashboardForm(models.Model):
             ready_tasks =  self.env['toonproject.task'].search([('status','=','2ready')])
             tasks = self.env['toonproject.task']
             for task in ready_tasks:
-                if ((not task.valid_group) or self.env.user.id in task.valid_group.users.ids) and (not task.worker_id or task.worker_id == self.env.uid):
+                if ((not task.valid_group) or self.env.user.id in task.valid_group.users.ids) and (not task.worker_id.id or task.worker_id.id == self.env.uid):
                     tasks |= task
             rec.valid_tasks = tasks
 
