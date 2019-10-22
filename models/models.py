@@ -495,14 +495,13 @@ class task(models.Model):
     def _get_price_record(self):
         for rec in self:
             rec.price_record = rec.findPriceInProject()
-
+            
     def _get_preview_controler(self):
         for rec in self:
             if rec.price_record.preview_controler:
                 rec.preview_controler = rec.price_record.preview_controler.path
             else:
                 rec.preview_controler = None
-
 
     @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
     def _compute_price(self):
