@@ -233,7 +233,8 @@
                               <div style="text-align: center; font-weight:bold;">Preview:</div>
                               <field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
                               <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
-                                <input type="file" class="form-control" name="uploaded_file" id="preview_file"/>
+                                <button id="set_default_preview_button" string="DEF" class="btn-primary" style="float:right;"/>
+								<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
                               </div>
 							  <div class="task-video-buttons">
 								<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
@@ -299,6 +300,24 @@
                       xhr.send(fd);
                       jQuery('html').block();
                       });
+					  jQuery('#set_default_preview_button').click(function(e){
+						var t = jQuery('[name=id]').text();
+						var url = "/toonproject/default_preview?t=" + t;
+						const xhr = new XMLHttpRequest();
+						xhr.onload = () => {
+							if(xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+							  video = jQuery('.o_video_preview video');
+							  video.attr('src', xhr.response);
+							  video[0].load();	
+							  jQuery('.o_video_preview').removeClass('o_field_empty');
+							}
+							else alert(xhr.response);
+							jQuery('html').unblock();
+						};
+						xhr.open('GET', url, true);
+						xhr.send()
+						jQuery('html').block();
+					  });
 					  jQuery('#open_playlist_button').click(function(e){
 						var main_asset = jQuery('[name=main_asset]').attr('href');
 						if(main_asset) {
