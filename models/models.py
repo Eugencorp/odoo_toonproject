@@ -4,10 +4,12 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
 from odoo import tools
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, Warning
 import pdb
 from odoo import http
 import requests
+from dateutil.parser import parse as parsedate
+import pytz
 
 class group(models.Model):
     _name = 'res.groups'
@@ -564,6 +566,54 @@ class task(models.Model):
                 if record.compute_price_method == 'first':
                     break                
             record.computed_price = sm
+            
+    
+    
+    def check_forced_file(self, file_purpose):
+        warning_subject = 'preview'
+        the_url = self.preview
+        if file_purpose == 'mainsource':
+            the_url = self.mainsource
+            warning_subject = 'исходника'
+        if not the_url:
+            if not self.preview_filename:
+                return False, "Вы не загрузили файл " + warning_subject
+            if file_purpose == 'preview':
+                if self.price_record and self.price_record.preview_path:
+                    the_url = self.price_record.preview_path + self.preview_filename + '.mp4'
+            if file_purpose == 'mainsource':
+                if self.price_record and self.price_record.mainsource_path and self.price_record.mainsource_ext:
+                    the_url = self.price_record.preview_path + self.mainsource_filename + self.price_record.mainsource_ext
+        if not the_url: 
+            return False, "Вы не загрузили файл " + warning_subject
+        responce = requests.head(the_url)
+        if responce.status_code < 200 or responce.status_code >= 300:
+            return False, "Не обнаружен файл " + the_url + '\n Похоже, что вы забыли загрузить ' + warning_subject
+        if file_purpose == 'preview': 
+            self.preview = the_url
+        elif file_purpose == 'mainsource': 
+            self.mainsource = the_url 
+        got_string_date = responce.headers['Last-Modified']
+        last_control_date = None
+        messages = self.env['mail.message'].search([('model','=','toonproject.task'),('res_id','=',self.id)])
+        for message in messages:
+            for track in message.tracking_value_ids:
+                if track.new_value_char == 'в проверку':
+                    last_control_date = message.date
+                    break
+            if last_control_date:
+                break
+        if last_control_date and got_string_date:
+            got_date = parsedate(got_string_date)
+            control_date = pytz.UTC.localize(last_control_date)
+            if control_date > got_date:
+                m = 'Загруженный файл ' + warning_subject + ' датирован ' + got_string_date
+                m = m + ".\n это раньше, чем последняя дата проверки этого задания."
+                m = m + "Похоже, что вы забыли загрузить новую версию или загрузили старую. "
+                m = m + "Задание будет отправлено на проверку, но вы можете снова получить старые правки. "
+                m = m + "Пожалуйста, проверьте файл и, если нужно, загрузите новую версию, пока не поздно."
+                return True, m 
+        return True, False
     
     @api.multi
     def button_start(self):
@@ -578,11 +628,21 @@ class task(models.Model):
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
-    def button_control(self):
+    def button_control(self):        
         ctx = {'btn': True}
+        warning_message = False
         for rec in self:
+            if rec.price_record and rec.price_record.check_preview:
+                check, warning_message =  rec.check_forced_file('preview')
+                if not check:
+                    raise Warning(warning_message)
+            if rec.price_record and rec.price_record.check_mainsource:
+                check, warning_message =  rec.check_forced_file('mainsource')
+                if not check:
+                    raise Warning(warning_message)                  
             rec.with_context(ctx).write({'status': '6control'})
-
+        if warning_message:
+            raise Warning(warning_message)
     @api.multi
     def button_reject(self):
         ctx = {'btn': True}
