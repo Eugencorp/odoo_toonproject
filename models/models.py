@@ -858,7 +858,7 @@ class EditPricesWizard(models.TransientModel):
         found_val = ''
         for price in target_recs:
             if price[fieldName]:
-                if found_val and found_val != price['fieldName']:
+                if found_val and found_val != price[fieldName]:
                     return ''
                 else:
                     found_val = price[fieldName]
@@ -897,7 +897,7 @@ class EditPricesWizard(models.TransientModel):
         if self.enable_preview_path:
             values.update({'preview_path': self.preview_path})
         if self.enable_preview_controler:
-            values.update({'preview_controler': self.preview_controler})
+            values.update({'preview_controler': self.preview_controler.id})
         if self.enable_preview_upload_path:
             values.update({'preview_upload_path': self.preview_upload_path})
         if self.enable_preview_login:
