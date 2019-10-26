@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="fileserver_setting_form_view">
+        <field name="name">fileserver_setting.form</field>
+        <field name="model">toonproject.fileserver_setting</field>
+        <field name="arch" type="xml">
+            <form string="Fileserver Form">
+                <sheet>
+					<span id="fileserver_id"><field name="id" invisible="1"/></span>
+					<div class="param">
+						<label for="name"/>
+						<field name="name" />
+						<div>Например: <i>Мой основной сервер webdav</i></div>
+					</div>					
+					<div class="param">
+						<label for="external_root"/>
+						<field name="external_root" widget="url" />
+						<div>Например: <i>http://192.168.0.1/www/</i></div>
+					</div>
+					
+					<div class="param">
+						<label for="controler"/>
+						<field name="controler"/>
+						<field name="controler_path" invisible="1" />
+					</div>
+					
+					<div class="param">					
+						<label for="upload_root"/>
+						<field name="upload_root"/>
+						<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/</i>
+						или <i>ftp://192.168.0.1/</i></div>
+					</div>
+					
+					<div class="param_subgroup">
+						<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+						<label for="login"/><field name="login"/><br/>
+						<label for="password"/><field name="password" password="True"/>
+					</div>
+					
+					<button id="test_connection" string="Проверить соединение" icon="fa-television"/>
+					
+                </sheet>
+				<script>
+                      jQuery('#test_connection').click(function(e){
+                      const fd = new FormData();
+                      fd.append('setting',  jQuery('#fileserver_id').text());
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert("Все зашибись!");
+                        } else alert("Что-то пошло не так.\n Ошибка " + xhr.status + "\n" + xhr.responseText);  
+						jQuery('html').unblock();
+                      };
+                      adress = jQuery('[name=controler_path]').text();
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      jQuery('html').block();
+                      });				  
+                </script>
+            </form>
+        </field>
+    </record>  
+  </data>
+</odoo>

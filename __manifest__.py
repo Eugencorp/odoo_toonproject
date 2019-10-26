@@ -30,6 +30,7 @@
         'views/templates.xml',
         'views/eternal_data.xml',
         'views/preset_data.xml',
+        'views/fileservers.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
