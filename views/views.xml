@@ -165,7 +165,17 @@
 						<span attrs="{'invisible':[('mainsource_server_setting','!=',False)]}">	
 							<button id="test_mainsource_connection" string="Проверить соединение" icon="fa-television"/>
 						</span>
-					</div>					
+					</div>
+					<div class="param_group"> 
+						<h2>Дополнительные файлы</h2>
+						<div class="param">	
+							<label for="afiles_server_setting"/>
+							<field name="afiles_server_setting"/>
+							<br/>
+							<label for="afiles_subfolder"/>
+							<field name="afiles_subfolder"/>
+						</div>
+					</div>
                 </sheet>
 				<script>
                       jQuery('#test_preview_connection').click(function(e){

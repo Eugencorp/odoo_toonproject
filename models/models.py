@@ -89,7 +89,10 @@ class price(models.Model):
     mainsource_controler_path = fields.Char(compute = '_get_mainsource_controler_path')
     mainsource_upload_path = fields.Char(string="Куда загружать проекты")
     mainsource_login = fields.Char(string="login для проектов")
-    mainsource_password = fields.Char(string="password для проектов")    
+    mainsource_password = fields.Char(string="password для проектов")   
+
+    аfiles_server_setting = fields.Many2one('toonproject.fileserver_setting', string = 'Настройки сервера для дополнительных файлов')
+    afiles_subfolder = fields.Char(string='Подкаталог для дополнительных файлов')
     
     
     def _default_sequence(self):
