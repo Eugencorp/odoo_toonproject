@@ -71,11 +71,13 @@ class Toonproject(http.Controller):
         if pr:
             if param_type == 'preview':
                 return pr.preview_login, pr.preview_password, pr.preview_upload_path, pr.preview_path
+            elif param_type == 'mainsource':
+                return pr.mainsource_login, pr.mainsource_password, pr.mainsource_upload_path, pr.mainsource_path
         else:
             return None, None, None, None
     
     def eval_upload_and_check(self, kw, server_fn):
-        upload_purpose = 'preview'
+        upload_purpose = kw.get('purpose')
         testing_mode = kw.get('price')
         login, password, writepath, readpath  = self.get_server_info(kw, upload_purpose)
         if not writepath or not login or not password:
@@ -90,10 +92,11 @@ class Toonproject(http.Controller):
             name = file.filename
             data = file.read()
             filename, extension = os.path.splitext(name)
-            if upload_purpose == 'preview' and kw.get('task'):
+            if kw.get('task'):
                 task = self.get_task(kw.get('task'))
-                if task and task.preview_filename:
-                    filename = task.preview_filename
+                if upload_purpose:                
+                    if task and task.preview_filename:
+                        filename = task.preview_filename
         write_result = server_fn(login, password, writepath + filename + extension, data)
         if write_result:
             return write_result
@@ -108,8 +111,11 @@ class Toonproject(http.Controller):
             else:
                 return http.Response("Тестовый файл благополучно отправлен, но по внешнему адресу не доступен", status=500)
         else:
-            if upload_purpose == 'preview' and kw.get('task'):
-                task.preview = fullreadpath
+            if kw.get('task'):
+                if upload_purpose == 'preview': 
+                    task.preview = fullreadpath
+                elif upload_purpose == 'mainsource':
+                    task.mainsource = fullreadpath
             return http.Response(fullreadpath, status=200);
         return http.Response("No files found", status=500)
             
@@ -117,7 +123,7 @@ class Toonproject(http.Controller):
     def default_preview(self, t, **kw):
         task = self.get_task(t)
         if not task.preview_filename:
-            return http.Response("Не настроено дефолтное имя для файла preview", status=500)
+            return http.Response("Не настроено дефолтное имя для файла", status=500)
         if not task.price_record or not task.price_record.preview_path:
             return http.Response("Не настроен дефолтный путь к файлу preview", status=500)
         fullpath = task.price_record.preview_path + task.preview_filename + ".mp4"
@@ -126,6 +132,23 @@ class Toonproject(http.Controller):
             return http.Response("Не обнаружен файл " + fullpath, status=500)
         task.preview = fullpath
         return http.Response(fullpath, status=200)
+
+    @http.route('/toonproject/default_mainsource', auth='user', method=['POST', 'GET'], csrf=False) 
+    def default_mainsource(self, t, **kw):
+        task = self.get_task(t)
+        if not task.preview_filename:
+            return http.Response("Не настроено дефолтное имя для файла", status=500)
+        if not task.price_record or not task.price_record.mainsource_path:
+            return http.Response("Не настроен дефолтный путь к файлу исходника", status=500)
+        if not task.price_record.mainsource_ext:
+            return http.Response("Не настроено дефолтное расширение для исходников по этому цеху", status=500)            
+        fullpath = task.price_record.mainsource_path + task.preview_filename + task.price_record.mainsource_ext
+        responce = requests.head(fullpath)
+        if responce.status_code < 200 or responce.status_code >= 300:
+            return http.Response("Не обнаружен файл " + fullpath, status=500)
+        task.mainsource = fullpath
+        return http.Response(fullpath, status=200)
+
 
     @http.route('/toonproject/webdav', auth='user', method=['POST', 'GET'], csrf=False)
     def webdav(self, **kw):

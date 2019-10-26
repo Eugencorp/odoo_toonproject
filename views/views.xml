@@ -69,7 +69,10 @@
 					  domain="[('category_id','=', %(module_category_toonproject)d)]"/>
 					<div class="param_group"> 
 						<h2>Загрузка preview</h2>
-						
+						<div class="param">
+							<label for="check_preview"/>
+							<field name="check_preview"/>
+						</div>
 						<div class="param">
 							<label for="preview_path"/>
 							<field name="preview_path" widget="url" />
@@ -97,11 +100,50 @@
 						
 						<button id="test_preview_connection" string="Проверить соединение" icon="fa-television"/>
 					</div>
+					<div class="param_group"> 
+						<h2>Загрузка главного файла исходника</h2>
+						<div class="param">
+							<label for="mainsource_ext"/>
+							<field name="mainsource_ext"/>
+							<span style="margin-left:10px;">(например: <i>.moho</i>)</span>
+						</div>						
+						<div class="param">
+							<label for="check_mainsource"/>
+							<field name="check_mainsource"/>
+						</div>
+						<div class="param">
+							<label for="mainsource_path"/>
+							<field name="mainsource_path" widget="url" />
+							<div>Например: <i>http://192.168.0.1/www/animation/</i></div>
+						</div>
+						
+						<div class="param">
+							<label for="mainsource_controler"/>
+							<field name="mainsource_controler"/>
+							<field name="mainsource_controler_path" invisible="1" />
+						</div>
+						
+						<div class="param">					
+							<label for="mainsource_upload_path"/>
+							<field name="mainsource_upload_path"/>
+							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/animation/</i>
+							или <i>ftp://192.168.0.1/animation</i></div>
+						</div>
+						
+						<div class="param_subgroup">
+							<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+							<label for="mainsource_login"/><field name="mainsource_login"/><br/>
+							<label for="mainsource_password"/><field name="mainsource_password" password="True"/>
+						</div>
+						
+						<button id="test_mainsource_connection" string="Проверить соединение" icon="fa-television"/>
+					</div>					
                 </sheet>
 				<script>
                       jQuery('#test_preview_connection').click(function(e){
                       const fd = new FormData();
                       fd.append('price',  jQuery('[name=id]').text());
+					  fd.append('purpose',  'preview');
                       const xhr = new XMLHttpRequest();
                       xhr.onload = () => {
                         if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
@@ -114,6 +156,22 @@
                       xhr.send(fd);
                       jQuery('html').block();
                       });
+                      jQuery('#test_mainsource_connection').click(function(e){
+                      const fd = new FormData();
+                      fd.append('price',  jQuery('[name=id]').text());
+					  fd.append('purpose',  'mainsource');
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert("Все зашибись!");
+                        } else alert("Что-то пошло не так.\n Ошибка " + xhr.status + "\n" + xhr.responseText);  
+						jQuery('html').unblock();
+                      };
+                      adress = jQuery('[name=mainsource_controler_path]').text();
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      jQuery('html').block();
+                      });					  
                 </script>
             </form>
         </field>
@@ -152,7 +210,7 @@
                         </group>
                     </group>
 					<div class="row">
-						<div class="col-9">
+						<div class="col-6">
 							<label for="task_ids"/>
 							<field name="task_ids" context="{'default_asset_ids':[id]}">
 							  <tree class="no_open" default_order="tasktype_sequence">
@@ -164,6 +222,12 @@
 								<field name="status" string="статус"/>
 							  </tree>
 							</field>
+						</div>
+						<div class="col-3">
+							<div style="text-align: center; font-weight:bold; margin-bottom:10px;">Исходники</div>
+							<label for="last_mainsource"/>
+							<field name="last_mainsource" widget="url"/>
+							<div style="margin-top:10px;">другие файлы</div>
 						</div>
 						<div class="smallpreview col-3">
 							<div style="text-align: center; font-weight:bold;">Последнее видео:</div> 
@@ -226,22 +290,33 @@
                           </group>
                         </page>
                         <page string="Результат">
+						  <div class="row">
+							<label for="pay_date" class="col-6" style="text-align: right;" />
+                            <field name="pay_date" class= "col-6" attrs="{'readonly':[('isManager','=',False)]}"/>
+						  </div>
                           <div class="row">
-                            <label for="pay_date" class="col-2" style="text-align: right;" />
-                            <field name="pay_date" class= "col-2" attrs="{'readonly':[('isManager','=',False)]}"/>
-                            <div class="col-4">
-                              <div style="text-align: center; font-weight:bold;">Preview:</div>
-                              <field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+                            <div class="col-6">
+                              <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
+							  <div class="row">
+								<div class="col-4 task-video-buttons">
+									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
+								</div>
+								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+							  </div>                  
                               <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
                                 <button id="set_default_preview_button" string="DEF" class="btn-primary" style="float:right;"/>
 								<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
-                              </div>
-							  <div class="task-video-buttons">
-								<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
-							  </div>
+                              </div>				
                             </div>
-                            <div class="col-3" >
-                              <div style="text-align: center; font-weight:bold;">Исходники:</div>
+                            <div class="col-6" >
+                              <div style="text-align: center; font-weight:bold; font-size:larger; margin-bottom:10px">Исходники:</div>
+							  <div style="text-align: center; font-weight:bold; ">Главный:</div>
+							  <field name="mainsource" widget = "url"/>
+                              <div attrs="{'invisible':['|',('mainsource_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
+                                <button id="set_default_mainsource_button" string="DEF" class="btn-primary" style="float:right;"/>
+								<input type="file" class="form-control" name="uploaded_file" id="mainsource_file" style="display:inline;width:85%"/>						
+                              </div>
+							  <div style="text-align: center; font-weight:bold; margin-top:10px;">Остальные:</div>							  
                             </div>
                           </div>
                         </page>
@@ -250,7 +325,7 @@
                             <group>
                               <field name="valid_group" string="Кто может брать в работу" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin" domain="[('category_id','=', %(module_category_toonproject)d)]"/>
                               <field name="compute_price_method" string="Способ рассчета стоимости:" groups="toonproject.group_toonproject_manager,toonproject.group_toonproject_admin"/>
-                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию для preview" />
+                              <field name="preview_filename" attrs="{'readonly': [('isManager', '=', False)]}" string="Имя файла по умолчанию" />
                             </group>
                             <group>
                               <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
@@ -269,6 +344,7 @@
 
                             <field name="price_record" string="расценка"/>
                             <field name="preview_controler" />
+                            <field name="mainsource_controler" />							
 							<field name="pause_reason" />
 							<field name="main_asset"/>
 
@@ -284,6 +360,7 @@
                         fd.append(e.target.name, file, file.name);
                       });
                       fd.append('task',  jQuery('[name=id]').text());
+					  fd.append('purpose', 'preview');
                       const xhr = new XMLHttpRequest();
                       xhr.onload = () => {
                         if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
@@ -329,6 +406,51 @@
 							}
 						}
 					  });
+					  
+					  jQuery('#mainsource_file').change(function(e){
+                      const fd = new FormData();
+                      Array.from(e.target.files).forEach((file) => {
+                        fd.append(e.target.name, file, file.name);
+                      });
+                      fd.append('task',  jQuery('[name=id]').text());
+					  fd.append('purpose', 'mainsource');
+                      const xhr = new XMLHttpRequest();
+                      xhr.onload = () => {
+                        if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+                          alert("Файл загружен");
+						  theurl = jQuery('[name=mainsource]');
+						  theurl.attr('href',xhr.response);
+						  theurl.text(xhr.response);
+						  theurl.removeClass('o_field_empty');
+                        } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
+                        jQuery('html').unblock();
+                      };
+                      adress = jQuery('[name=mainsource_controler]').text();
+                      xhr.open('POST', adress, true);
+                      xhr.send(fd);
+                      jQuery('html').block();
+                      });
+					  jQuery('#set_default_mainsource_button').click(function(e){
+						var t = jQuery('[name=id]').text();
+						var url = "/toonproject/default_mainsource?t=" + t;
+						const xhr = new XMLHttpRequest();
+						xhr.onload = () => {
+							if(xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+							  theurl = jQuery('[name=mainsource]');
+							  theurl.attr('href',xhr.response);
+							  theurl.text(xhr.response);
+							  theurl.removeClass('o_field_empty');
+							}
+							else alert(xhr.response);
+							jQuery('html').unblock();
+						};
+						xhr.open('GET', url, true);
+						xhr.send()
+						jQuery('html').block();
+					  });
+					  
+					  
+					  
                     </script>
                     <group col="3">
                       <div>
@@ -731,6 +853,7 @@
 			<form string="Изменить настройки выбранных процессов">
         <div class="row">
           <div class="col-md-6">
+			<h1>Preview</h1>
             <field name="enable_preview_path"/> <label for="preview_path"/>
             <field name="preview_path" attrs="{'readonly':[('enable_preview_path','=',False)]}" />
             <br/>
@@ -745,6 +868,25 @@
             <br/>
             <field name="enable_preview_password"/> <label for="preview_password"/>
             <field name="preview_password" attrs="{'readonly':[('enable_preview_password','=',False)]}" password="True" />
+			<br/>
+			<h1>Исходник</h1>
+            <field name="enable_mainsource_path"/> <label for="mainsource_path"/>
+            <field name="mainsource_path" attrs="{'readonly':[('enable_mainsource_path','=',False)]}" />
+            <br/>
+            <field name="enable_mainsource_controler"/> <label for="mainsource_controler"/>
+            <field name="mainsource_controler" attrs="{'readonly':[('enable_mainsource_controler','=',False)]}" />
+            <br/>
+            <field name="enable_mainsource_upload_path"/> <label for="mainsource_upload_path"/>
+            <field name="mainsource_upload_path" attrs="{'readonly':[('enable_mainsource_upload_path','=',False)]}" />
+            <br/>
+            <field name="enable_mainsource_login"/> <label for="mainsource_login"/>
+            <field name="mainsource_login" attrs="{'readonly':[('enable_mainsource_login','=',False)]}" />
+            <br/>
+            <field name="enable_mainsource_password"/> <label for="mainsource_password"/>
+            <field name="mainsource_password" attrs="{'readonly':[('enable_mainsource_password','=',False)]}" password="True" />
+			
+			
+			
             <br/>
           </div>
         </div>
