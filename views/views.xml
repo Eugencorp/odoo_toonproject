@@ -169,8 +169,8 @@
 					<div class="param_group"> 
 						<h2>Дополнительные файлы</h2>
 						<div class="param">	
-							<label for="afiles_server_setting"/>
-							<field name="afiles_server_setting"/>
+							<label for="аfiles_server_setting"/>
+							<field name="аfiles_server_setting"/>
 							<br/>
 							<label for="afiles_subfolder"/>
 							<field name="afiles_subfolder"/>
