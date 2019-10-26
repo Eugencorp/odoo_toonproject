@@ -73,32 +73,46 @@
 							<label for="check_preview"/>
 							<field name="check_preview"/>
 						</div>
-						<div class="param">
-							<label for="preview_path"/>
-							<field name="preview_path" widget="url" />
-							<div>Например: <i>http://192.168.0.1/www/previews/</i></div>
-						</div>
-						
-						<div class="param">
-							<label for="preview_controler"/>
-							<field name="preview_controler"/>
-							<field name="preview_controler_path" invisible="1" />
-						</div>
-						
-						<div class="param">					
-							<label for="preview_upload_path"/>
-							<field name="preview_upload_path"/>
-							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews/</i>
-							или <i>ftp://192.168.0.1/previews</i></div>
-						</div>
-						
+						<div class="param">	
+							<label for="preview_server_setting"/>
+							<field name="preview_server_setting"/>
+							<br/>
+							<label for="preview_subfolder"/>
+							<field name="preview_subfolder"/>
+						</div>	
+						<span attrs="{'invisible':[('preview_server_setting','!=',False)]}">
+							<div class="param">
+								<span>Внешний путь к файлам </span>
+								<field name="preview_path" widget="url" />
+								<div>Например: <i>http://192.168.0.1/www/previews/</i></div>
+							</div>
+							
+							<div class="param">
+								<span>Тип интерфейса загрузки </span>
+								<field name="preview_controler"/>
+								<field name="preview_controler_path" invisible="1" />
+							</div>
+							
+							<div class="param">					
+								<span>Адрес для загрузки </span>
+								<field name="preview_upload_path"/>
+								<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/previews/</i>
+								или <i>ftp://192.168.0.1/previews</i></div>
+							</div>
+						</span>
 						<div class="param_subgroup">
-							<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
-							<label for="preview_login"/><field name="preview_login"/><br/>
-							<label for="preview_password"/><field name="preview_password" password="True"/>
+							<h3 attrs="{'invisible':[('preview_server_setting','!=',False)]}">Юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+							<span attrs="{'invisible':[('preview_server_setting','=',False)]}">
+								<label for="preview_custom_user"/><field name="preview_custom_user"/><br/>
+							</span>
+							<span  attrs="{'invisible':[('preview_server_setting','!=',False),('preview_custom_user','=',False)]}">
+								<label for="preview_login"/><field name="preview_login"/><br/>
+								<label for="preview_password"/><field name="preview_password" password="True"/>
+							</span>
 						</div>
-						
-						<button id="test_preview_connection" string="Проверить соединение" icon="fa-television"/>
+						<span attrs="{'invisible':[('preview_server_setting','!=',False)]}">
+							<button id="test_preview_connection" string="Проверить соединение" icon="fa-television"/>
+						</span>
 					</div>
 					<div class="param_group"> 
 						<h2>Загрузка главного файла исходника</h2>
@@ -111,32 +125,46 @@
 							<label for="check_mainsource"/>
 							<field name="check_mainsource"/>
 						</div>
-						<div class="param">
-							<label for="mainsource_path"/>
-							<field name="mainsource_path" widget="url" />
-							<div>Например: <i>http://192.168.0.1/www/animation/</i></div>
-						</div>
-						
-						<div class="param">
-							<label for="mainsource_controler"/>
-							<field name="mainsource_controler"/>
-							<field name="mainsource_controler_path" invisible="1" />
-						</div>
-						
-						<div class="param">					
-							<label for="mainsource_upload_path"/>
-							<field name="mainsource_upload_path"/>
-							<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/animation/</i>
-							или <i>ftp://192.168.0.1/animation</i></div>
-						</div>
-						
+						<div class="param">	
+							<label for="mainsource_server_setting"/>
+							<field name="mainsource_server_setting"/>
+							<br/>
+							<label for="mainsource_subfolder"/>
+							<field name="mainsource_subfolder"/>
+						</div>	
+						<span attrs="{'invisible':[('mainsource_server_setting','!=',False)]}">						
+							<div class="param">
+								<label for="mainsource_path"/>
+								<field name="mainsource_path" widget="url" />
+								<div>Например: <i>http://192.168.0.1/www/animation/</i></div>
+							</div>
+							
+							<div class="param">
+								<label for="mainsource_controler"/>
+								<field name="mainsource_controler"/>
+								<field name="mainsource_controler_path" invisible="1" />
+							</div>
+							
+							<div class="param">					
+								<label for="mainsource_upload_path"/>
+								<field name="mainsource_upload_path"/>
+								<div class="example">Например: <i>http://192.168.0.1:443/remote.php/webdav/animation/</i>
+								или <i>ftp://192.168.0.1/animation</i></div>
+							</div>
+						</span>
 						<div class="param_subgroup">
-							<h3>Общий юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
-							<label for="mainsource_login"/><field name="mainsource_login"/><br/>
-							<label for="mainsource_password"/><field name="mainsource_password" password="True"/>
+							<h3 attrs="{'invisible':[('mainsource_server_setting','!=',False)]}">Юзер, от имени которого будут закачиваться файлы в хранилище:</h3>
+							<span attrs="{'invisible':[('mainsource_server_setting','=',False)]}">
+								<label for="mainsource_custom_user"/><field name="mainsource_custom_user"/><br/>
+							</span>
+							<span  attrs="{'invisible':[('mainsource_server_setting','!=',False),('mainsource_custom_user','=',False)]}">
+								<label for="mainsource_login"/><field name="mainsource_login"/><br/>
+								<label for="mainsource_password"/><field name="mainsource_password" password="True"/>
+							</span>
 						</div>
-						
-						<button id="test_mainsource_connection" string="Проверить соединение" icon="fa-television"/>
+						<span attrs="{'invisible':[('mainsource_server_setting','!=',False)]}">	
+							<button id="test_mainsource_connection" string="Проверить соединение" icon="fa-television"/>
+						</span>
 					</div>					
                 </sheet>
 				<script>
@@ -185,7 +213,7 @@
                 <sheet>
                     <group>
                         <group>
-							<field name="id" invisible="1"/>
+							<span id="asset_id"><field name="id" invisible="1"/></span>
                             <field name="project_id" string="Проект: "/>
                             <field name="name" string="Название"/>
                             <field name="assettype_id" string="Тип:"/>
@@ -215,7 +243,7 @@
 							<field name="task_ids" context="{'default_asset_ids':[id]}">
 							  <tree class="no_open" default_order="tasktype_sequence">
 								<button name="open_task_view_py" string="смотреть" type="object"/>
-					<field name="tasktype_sequence" invisible="1"/>
+								<field name="tasktype_sequence" invisible="1"/>
 								<field name="name" string="задача"/>
 								<field name="tasktype_id" string="вид работ"/>
 								<field name="worker_id" string="исполнитель"/>
@@ -232,19 +260,14 @@
 						<div class="smallpreview col-3">
 							<div style="text-align: center; font-weight:bold;">Последнее видео:</div> 
 							<field name="last_preview"  widget="video_preview" />
-							<div style="text-align: center;"><button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" /></div>							
+							<div style="text-align: center;"><a id="open_playlist_link"><button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" /></a></div>							
 						</div>
 					</div>
                   <script>
                       jQuery('.no_open .o_data_row td').click(function(evt) { evt.stopPropagation(); });
-					  jQuery('#open_playlist_button').click(function(e){
-						var id = jQuery('[name=id]');
-						if(id &amp;&amp; id.text()) {
-							var url = "/toonproject/playlist?step=3" + decodeURIComponent('%26') + "current=" + id.text();
-							var win = window.open(url, '_blank');
-							win.focus();
-						}
-					  });
+					  var id = jQuery('#asset_id');
+					  var playlist_url = "/toonproject/playlist?step=3" + decodeURIComponent('%26') + "current=" + id.text();
+					  jQuery('#open_playlist_link').attr({'href': playlist_url, 'target':'_blank'});
                   </script>
                 </sheet>
             </form>

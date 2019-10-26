@@ -16,13 +16,6 @@ class group(models.Model):
     _inherit = 'res.groups'
     max_tasks = fields.Integer(string="Количество одновременных заданий")
 
-class upload_interface(models.Model):
-    _name = 'toonproject.upload_interface'
-    _description = 'Simple model for storing paths to file upload controlers'
-    
-    name = fields.Char()
-    path = fields.Char()
-
 class controler(models.Model):
     _name = 'toonproject.controler'
     _order = 'sequence,name'
@@ -71,24 +64,32 @@ class price(models.Model):
 
     controlers = fields.One2many('toonproject.controler', 'price', string='контроль')
     
+    preview_server_setting = fields.Many2one('toonproject.fileserver_setting', string = 'Настройки сервера preview')
+    preview_subfolder = fields.Char(string='Подкаталог preview')
+    preview_custom_user = fields.Boolean(string='Отдельный юзер для preview', default = False)
+    
     check_preview = fields.Boolean(string = "Проверять наличие preview при отправке в проверку", default = False)
     
-    preview_path = fields.Char(string="Внешний доступ через http")
-    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=None)
+    preview_path = fields.Char(string="Внешний доступ через http  для preview")
+    preview_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок  для preview", default=None)
     preview_controler_path = fields.Char(compute = '_get_preview_controler_path')
-    preview_upload_path = fields.Char(string="Куда загружать")
-    preview_login = fields.Char(string="login")
-    preview_password = fields.Char(string="password")
+    preview_upload_path = fields.Char(string="Куда загружать preview")
+    preview_login = fields.Char(string="login для preview")
+    preview_password = fields.Char(string="password для preview")
+
+    mainsource_server_setting = fields.Many2one('toonproject.fileserver_setting', string = 'Настройки сервера проектов')
+    mainsource_subfolder = fields.Char(string='Подкаталог проектов')
+    mainsource_custom_user = fields.Boolean(string='Отдельный юзер для проектов', default = False)
 
     check_mainsource = fields.Boolean(string = "Проверять наличие главного файла исходника при отправке в проверку", default = False)
     mainsource_ext = fields.Char(string = "Расширение файла по умолчанию (для поиска)")
     
-    mainsource_path = fields.Char(string="Внешний доступ через http")
-    mainsource_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок", default=None)
+    mainsource_path = fields.Char(string="Внешний доступ через http  для проектов")
+    mainsource_controler = fields.Many2one('toonproject.upload_interface', string="Обработчик загрузок  для проектов", default=None)
     mainsource_controler_path = fields.Char(compute = '_get_mainsource_controler_path')
-    mainsource_upload_path = fields.Char(string="Куда загружать")
-    mainsource_login = fields.Char(string="login")
-    mainsource_password = fields.Char(string="password")    
+    mainsource_upload_path = fields.Char(string="Куда загружать проекты")
+    mainsource_login = fields.Char(string="login для проектов")
+    mainsource_password = fields.Char(string="password для проектов")    
     
     
     def _default_sequence(self):
@@ -529,14 +530,18 @@ class task(models.Model):
             
     def _get_preview_controler(self):
         for rec in self:
-            if rec.price_record.preview_controler:
+            if rec.price_record and rec.price_record.preview_server_setting:
+                rec.preview_controler = rec.price_record.preview_server_setting.controler.path
+            elif rec.price_record and rec.price_record.preview_controler:
                 rec.preview_controler = rec.price_record.preview_controler.path
-            else:
+            else:           
                 rec.preview_controler = None
                 
     def _get_mainsource_controler(self):
         for rec in self:
-            if rec.price_record.mainsource_controler:
+            if rec.price_record and rec.price_record.mainsource_server_setting:
+                rec.mainsource_controler = rec.price_record.mainsource_server_setting.controler.path                
+            elif rec.price_record and rec.price_record.mainsource_controler:
                 rec.mainsource_controler = rec.price_record.mainsource_controler.path
             else:
                 rec.mainsource_controler = None                

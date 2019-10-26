@@ -66,19 +66,62 @@ class Toonproject(http.Controller):
         if kw.get('price'):
             price_string = kw.get('price')
             price_id = int(str.replace(price_string,',',''))
-            pr = http.request.env['toonproject.price'].search([('id', '=', price_id)])            
+            pr = http.request.env['toonproject.price'].search([('id', '=', price_id)]) 
+
+        if kw.get('setting'):
+            setting_string = kw.get('setting')
+            setting_id = int(str.replace(setting_string,',',''))
+            pr = http.request.env['toonproject.fileserver_setting'].search([('id', '=', setting_id)])            
 
         if pr:
             if param_type == 'preview':
+                if pr.preview_server_setting:
+                    login = pr.preview_server_setting.login
+                    password = pr.preview_server_setting.password
+                    subfolder = pr.preview_subfolder
+                    upload_root = pr.preview_server_setting.upload_root
+                    external_root = pr.preview_server_setting.external_root
+                    if upload_root[-1] != '/':
+                        upload_root = upload_root + '/'
+                    if external_root[-1] != '/':
+                        external_root = external_root + '/'                        
+                    if subfolder[-1] != '/':
+                        subfolder = subfolder + '/'
+                    upload_path = upload_root + subfolder
+                    preview_path = external_root + subfolder
+                    if pr.preview_custom_user:
+                        login = pr.preview_login
+                        password = pr.preview_password
+                    return login, password, upload_path, preview_path
                 return pr.preview_login, pr.preview_password, pr.preview_upload_path, pr.preview_path
             elif param_type == 'mainsource':
+                if pr.mainsource_server_setting:
+                    login = pr.mainsource_server_setting.login
+                    password = pr.mainsource_server_setting.password
+                    subfolder = pr.mainsource_subfolder
+                    upload_root = pr.mainsource_server_setting.upload_root
+                    external_root = pr.mainsource_server_setting.external_root
+                    if upload_root[-1] != '/':
+                        upload_root = upload_root + '/'
+                    if external_root[-1] != '/':
+                        external_root = external_root + '/' 
+                    if subfolder[-1] != '/':
+                        subfolder = subfolder + '/'                    
+                    upload_path = upload_root + subfolder
+                    preview_path = external_root + subfolder
+                    if pr.mainsource_custom_user:
+                        login = pr.mainsource_login
+                        password = pr.mainsource_password
+                    return login, password, upload_path, preview_path            
                 return pr.mainsource_login, pr.mainsource_password, pr.mainsource_upload_path, pr.mainsource_path
+            else:
+                return pr.login, pr.password, pr.upload_root, pr.external_root
         else:
             return None, None, None, None
     
     def eval_upload_and_check(self, kw, server_fn):
         upload_purpose = kw.get('purpose')
-        testing_mode = kw.get('price')
+        testing_mode = kw.get('price') or kw.get('setting')
         login, password, writepath, readpath  = self.get_server_info(kw, upload_purpose)
         if not writepath or not login or not password:
             return http.Response("Не могу получить информацию о сервере для загрузки", status=500)
