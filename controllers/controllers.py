@@ -246,13 +246,19 @@ class Toonproject(http.Controller):
         r = False
         active_id = 0
         playlist_array = []
+        previous_file = False
         for scene in all_scenes:
             if scene.id == start:
                 r = True
             if r:
                 new_item = {'name': scene.name, 'sources':[{'src': scene.last_preview}]}
-                if scene.last_preview:                    
-                    playlist_array.append(new_item)
+                if scene.last_preview: 
+                    if scene.last_preview != previous_file:                    
+                        playlist_array.append(new_item)
+                        previous_file = scene.last_preview
+                    elif scene.id == current:
+                        playlist_array.pop()
+                        playlist_array.append(new_item)
             if scene.id == current:
                 active_id = len(playlist_array)-1
             if scene.id == finish:
