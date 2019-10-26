@@ -200,7 +200,7 @@ class asset(models.Model, StoresImages):
     description = fields.Text()
     factor = fields.Float(default=1)
 
-    size = fields.Float(default=1)
+    size = fields.Float(default=1, group_operator="sum")
     
     assettype_id = fields.Many2one('toonproject.assettype', string='Тип', default=1, required=True)
     task_ids = fields.Many2many('toonproject.task', string="Задачи")

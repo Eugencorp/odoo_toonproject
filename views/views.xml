@@ -596,7 +596,7 @@
           <field name="assettype_id" string="тип"/>
           <field name="name" string="название"/>
           <field name="short_description" string="краткое описание:"/>
-          <field name="size" string="размер" sum="общий размер"/>
+          <field name="size" string="размер"  sum="размер"/>
           <field name="current_tasktype" string="текущая задача"/>
           <field name="current_worker" string="исполнитель"/>		  
           <field name="current_status" string="статус"/>
