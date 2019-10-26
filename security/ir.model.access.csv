@@ -24,4 +24,3 @@ assettype_user,assettype user,model_toonproject_assettype,group_toonproject_user
 dashboard_user,dashboard user,model_toonproject_dashboard,group_toonproject_user,1,0,0,0
 controler_user,controler user,model_toonproject_controler,group_toonproject_user,1,0,0,0
 upload_user,upload user,model_toonproject_upload_interface,group_toonproject_user,1,0,0,0
-
