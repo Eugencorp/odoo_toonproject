@@ -321,8 +321,9 @@
                             <div class="col-6">
                               <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
 							  <div class="row">
-								<div class="col-4 task-video-buttons">
-									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
+								<div class="col-4 task-video-buttons" style="margin-top:40px">
+									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
+									<button id="commenting_button" string="Комментировать" class="btn-primary" />
 								</div>
 								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 							  </div>                  
@@ -429,7 +430,9 @@
 							}
 						}
 					  });
-					  
+					  jQuery('#commenting_button').click(function(e){
+						alert('Under construction');
+					  });
 					  jQuery('#mainsource_file').change(function(e){
                       const fd = new FormData();
                       Array.from(e.target.files).forEach((file) => {
