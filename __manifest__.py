@@ -31,6 +31,7 @@
         'views/eternal_data.xml',
         'views/preset_data.xml',
         'views/fileservers.xml',
+        'views/comment_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

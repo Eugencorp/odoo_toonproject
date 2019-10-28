@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<odoo>
+  <data>
+	<template id="commenting">
+		<head>
+			<!-- Required meta tags -->
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+			<!-- Bootstrap CSS -->
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"/>
+			<link rel="stylesheet" href="/toonproject/static/src/css/comment.css" type="text/css"/>
+		</head>
+		<body>
+			<div style="width:calc(100% - 360px);height:100%;">
+				<video id="video" style="width:1280px;height:720px;background:#000;display:block;position:relative;margin:0 auto">
+					<source t-attf-src="video_url" type="video/mp4"></source>
+				</video>
+				<div style="width:1280px;min-height:10px;margin:0 auto">
+					<canvas id="c" width="1280" height="720"></canvas>
+					<div class="timeline">
+						<div class="timeline__drag"></div>
+						<span class="timeline__progress"></span>
+					</div>
+					<div id="frames" style="position: relative;width:100%;height:20px;float:left;background:#f9f9f9;border-left:1px solid #ddd;border-right:1px solid #ddd;"></div>
+					<div style="width:100%;background:#f9f9f9;padding:20px;float:left;border:1px solid #ddd;box-sizing:border-box;">
+						<div style="float:left;">
+							<div class="btn-group" role="group" style="float:left;">
+								<button id="frame-1" class="btn btn-primary"><i class="fas fa-fast-backward"></i> -1</button>
+								<button id="pp" class="video__play btn btn-primary"><i class="fas fa-play"></i></button>
+								<button id="frame+1" class="btn btn-primary"><i class="fas fa-fast-forward"></i> +1</button>
+							</div>
+							<div id="time" style="line-height:18px;padding:10px;float:left;background:#eee;width:200px;height:38px;text-align:center;"></div>
+						</div>
+						<div style="float:right;">
+							<div id="drawing-mode-options" style="float:left;height:38px;line-height:38px;">
+								<div class="custom-control custom-checkbox" style="float:left;height:38px;margin-top:7px;line-height: 1.5;">
+									<input type="checkbox" class="custom-control-input" id="check1" onchange="canvasDisplay()" checked="1" />
+									<label class="custom-control-label" for="check1" style="margin-left: 10px;margin-right:10px;">Отрисовка</label>
+								</div>
+								<div class="custom-control custom-checkbox" style="float:left;height:38px;margin-top:7px;line-height: 1.5;">
+									<input type="checkbox" class="custom-control-input" id="check2" onchange="eraser = this.checked;erase()"/>
+									<label class="custom-control-label" for="check2" style="margin-left: 10px;margin-right:20px;">Ластик</label>
+								</div>
+								<label for="drawing-line-width" style="margin:0;height:38px;float:left;margin-right:10px;">Перо: </label>
+								<span class="lineWidth" style="float:left;margin-right:10px;"> 20 </span>
+								<input type="range" value="20" min="2" max="20" id="drawing-line-width" style="height:38px;float:left;margin-right:20px;"/>
+								<label for="drawing-color" style="margin:0;height:38px;float:left;margin-right:10px;">Цвет:</label>
+								<input type="color" value="#005E7A" id="drawing-color" style="height:38px;float:left;margin-right:20px;"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="right" style="width:360px;height:100%;position:absolute;right:0;top:0;background:rgba(231,231,231,0.975);padding:20px;box-sizing:border-box;border-left:1px solid #ddd;overflow-y:scroll;">
+				<div id="user_in" style="width:100%;height:52px;line-height:50px;background:#f9f9f9;float:left;border:1px solid #eee;padding-left:10px;box-sizing:border-box"><i class="fas fa-circle" style="color:red;"></i> Guest</div>
+				<textarea style="width:100%;border:0;min-height:100px;float:left;border:1px solid #eee;border-top:0;padding:10px;" placeholder="Добавьте комментарий"></textarea>
+				<button id="add-comment" class="btn btn-primary btn-block" style="margin-top:0;float:left;margin-top:10px">Сохранить</button>
+				<div class="btn-group btn-block" role="group" style="float:left;">
+					<button class="btn btn-dark" onclick='shower=2;showComments();'>По кадрам</button>
+					<button class="btn btn-dark" onclick='shower=1;showComments();'>По добавлению</button>
+				</div>
+					<div id="comments" style="width:100%;min-height:5px;float:left;border-top:1px solid #ddd;margin-top:20px;">
+				</div>
+			</div>	
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.4.0/fabric.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.0/utils/Draggable.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.0/TweenMax.min.js"></script>
+			<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+			<script src="/toonproject/static/src/js/comment.js" type="text/javascript" />
+		</body>
+	</template>
+  </data>
+</odoo>
