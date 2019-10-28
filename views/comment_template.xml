@@ -14,7 +14,7 @@
 		<body>
 			<div style="width:calc(100% - 360px);height:100%;">
 				<video id="video" style="width:1280px;height:720px;background:#000;display:block;position:relative;margin:0 auto">
-					<source t-attf-src="video_url" type="video/mp4"></source>
+					<source t-attf-src="{{video_url}}" type="video/mp4"></source>
 				</video>
 				<div style="width:1280px;min-height:10px;margin:0 auto">
 					<canvas id="c" width="1280" height="720"></canvas>

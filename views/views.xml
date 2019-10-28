@@ -431,7 +431,10 @@
 						}
 					  });
 					  jQuery('#commenting_button').click(function(e){
-						alert('Under construction');
+						//alert('Under construction');
+						task_id = jQuery('[name=id]').text();
+						var url = "/toonproject/comment?t=" + task_id
+						var win = window.open(url, '_blank');
 					  });
 					  jQuery('#mainsource_file').change(function(e){
                       const fd = new FormData();
