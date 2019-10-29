@@ -2,15 +2,42 @@
 from odoo import http
 import requests
 import datetime
-
+from dateutil.parser import parse as parsedate
 
 class Toonproject(http.Controller):
+
+    def get_sessions_json(self, sessions):
+        return ""
+
     @http.route('/toonproject/comment', auth='user', method=['POST', 'GET'], csrf=False)    
     def comment(self, t, **kw):
         task = http.request.env['toonproject.task'].search([('id', '=', int(str.replace(t,',','')))])
         if not task:
             return http.Response("Не найдено задания с идентификатором " + t, status=200)
         if not task.preview:
-             return http.Response("Не найдено видео-preview для задания с идентификатором " + t, status=200) 
-                
-        return http.request.render('toonproject.commenting',{'video_url':task.preview})
+             return http.Response("Не найдено видео-preview для задания с идентификатором " + t, status=200)                 
+        video_info = requests.head(task.preview)
+        if video_info.status_code < 200 or video_info.status_code >= 300:
+            return http.Response("Не найден видеофайл по адресу " + video_info, status=200)
+        got_string_date = video_info.headers['Last-Modified']
+        got_date = parsedate(got_string_date)
+        current_user = http.request.env.user
+        #check user rights maybe here
+        prev_sessions = http.request.env['toonproject.comment_session'].search([('task','=',task.id),('video_date','=',got_date)])
+        new_session = http.request.env['toonproject.comment_session'].create({
+                'author': current_user.id, 
+                'date': datetime.datetime.now(),
+                'task': task.id,
+                'video_url': task.preview,
+                'video_date': got_date
+            })
+        new_id = new_session[0].id
+        prev_sessions_json = self.get_sessions_json(prev_sessions)
+        
+        return http.request.render('toonproject.commenting',{
+            'video_url':task.preview,
+            'author_name':current_user.name,
+            'author_id':current_user.id,
+            'session_id':new_id,
+            'prev_json': prev_sessions_json
+            })

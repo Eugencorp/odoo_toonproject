@@ -10,4 +10,5 @@ class comment_session(models.Model):
     date = fields.Datetime(string = 'Время создания')
     task = fields.Many2one('toonproject.task', string = 'Задача')
     video_url = fields.Char(string = 'url видеофайла')
+    video_date = fields.Datetime(string = 'Версия видеофайла')
     json = fields.Char(string = 'содержание правок')
