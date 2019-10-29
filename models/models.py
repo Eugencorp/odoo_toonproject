@@ -352,7 +352,7 @@ class task(models.Model):
     name = fields.Char(string='Название')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
     tasktype_sequence = fields.Integer(string="#", compute="_get_tasktype_sequence", store=True)
-    factor = fields.Float(default=1, string='Сложность', sum='avg')
+    factor = fields.Float(default=1, string='Сложность', sum='avg', group_operator = 'avg')
     short_description = fields.Char(string='Краткое содержание')
     description = fields.Text(string='Описание задачи')
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
@@ -807,11 +807,13 @@ class EditTasksWizard(models.TransientModel):
         [('1pending', 'пауза'), ('2ready', 'в работу'), ('3progress', 'в процессе'), ('4torevision', 'в поправки'),
         ('5inrevision', 'в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], string='Статус', default='1pending',
         )
+    pay_date = fields.Date(string='Оплачено:')
 
     valid_group_chk = fields.Boolean(default=False)
     worker_id_chk = fields.Boolean(default=False)
     factor_chk = fields.Boolean(default=False)
     status_chk = fields.Boolean(default=False)
+    pay_date_chk = fields.Boolean(default=False)
 
     @api.multi
     def apply_tasks(self):
@@ -824,6 +826,8 @@ class EditTasksWizard(models.TransientModel):
             values.update({'factor': self.factor})
         if self.status_chk:
             values.update({'status': self.status})
+        if self.pay_date_chk:
+            values.update({'pay_date': self.pay_date})            
         target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
         for rec in target_recs:
             rec.write(values)
