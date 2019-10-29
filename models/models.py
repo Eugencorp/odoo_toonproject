@@ -256,7 +256,7 @@ class asset(models.Model, StoresImages):
         for rec in self:
             rec.task_len = len(rec.task_ids)
     
-    @api.depends('task_ids')
+    @api.depends('task_ids', 'task_ids.status')
     def _get_color(self):
         for rec in self:
             if rec.current_status:
@@ -264,7 +264,7 @@ class asset(models.Model, StoresImages):
             else:
                 rec.color = 0
 
-    @api.depends('task_ids')
+    @api.depends('task_ids', 'task_ids.status')
     def _get_current_statuses(self):
         for rec in self:
             task_states = []
@@ -276,7 +276,7 @@ class asset(models.Model, StoresImages):
             task_states.sort()
 
 
-    @api.depends('task_ids')
+    @api.depends('task_ids', 'task_ids.worker_id', 'task_ids.status')
     def _get_current_tasktype(self):
         for rec in self:
             task_types = []
@@ -302,7 +302,7 @@ class asset(models.Model, StoresImages):
             else:
                 rec.current_status = None
 
-    @api.depends('current_tasktype')
+    @api.depends('current_tasktype', 'current_tasktype.line_color')
     def _get_line_color(self):
         for rec in self:
             rec.line_color = rec.current_tasktype.line_color
@@ -352,7 +352,7 @@ class task(models.Model):
     name = fields.Char(string='Название')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
     tasktype_sequence = fields.Integer(string="#", compute="_get_tasktype_sequence", store=True)
-    factor = fields.Float(default=1, string='Сложность')
+    factor = fields.Float(default=1, string='Сложность', sum='avg')
     short_description = fields.Char(string='Краткое содержание')
     description = fields.Text(string='Описание задачи')
     project_id = fields.Many2one('toonproject.cartoon', string="Проект", ondelete='restrict', required=True)
@@ -365,7 +365,8 @@ class task(models.Model):
     asset_ids = fields.Many2many('toonproject.asset', string="Материалы")
 
     compute_price_method = fields.Selection([('first','по первому из материалов'),('sum', 'по сумме соизмеримых материалов')], default = 'sum', string = 'Метод рассчета')
-    computed_price = fields.Float(compute='_compute_price',string='Стоимость')
+    computed_price = fields.Float(compute='_compute_price',string='Стоимость',store=True)
+    stored_price = fields.Float(string='Выплаченная сумма', default = 0)
     pay_date = fields.Date(string='Оплачено:')
     asset_names = fields.Char(string="Названия материалов", compute="_get_asset_names", store=True)
 
@@ -391,7 +392,7 @@ class task(models.Model):
     mainsource = fields.Char()
     mainsource_controler = fields.Char(compute='_get_mainsource_controler', store=False)
     
-    @api.depends('affecting_tasks')
+    @api.depends('affecting_tasks','affecting_tasks.status')
     def _get_pause_reason(self):  
         for rec in self:
             reasons = []            
@@ -403,7 +404,7 @@ class task(models.Model):
                 reasons.sort(key=lambda task: task.name) 
             rec.pause_reason = ", ".join([task.name for task in reasons])        
     
-    @api.depends('affecting_tasks')
+    @api.depends('affecting_tasks','affecting_tasks.status')
     def _get_first_sametype_affecting_task(self):
         for rec in self:
             cur = rec
@@ -420,12 +421,12 @@ class task(models.Model):
                     task._get_first_sametype_affecting_task()
                     
                     
-    @api.depends('tasktype_id')
+    @api.depends('tasktype_id','tasktype_id.sequence')
     def _get_tasktype_sequence(self):
         for rec in self:
             rec.tasktype_sequence = rec.tasktype_id.sequence
     
-    @api.depends('asset_ids')
+    @api.depends('asset_ids','asset_ids.name')
     def _get_asset_names(self):
         for rec in self:
             names = ", ".join([asset.name for asset in rec.asset_ids])
@@ -546,9 +547,12 @@ class task(models.Model):
             else:
                 rec.mainsource_controler = None                
 
-    @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id')
+    @api.depends('asset_ids', 'compute_price_method', 'factor', 'tasktype_id', 'pay_date', 'price_record','price_record.value')
     def _compute_price(self):
         for record in self:
+            if record.pay_date:
+                record.computed_price = record.stored_price
+                continue
             sm = 0
             for asset in record.asset_ids:
                 assettype = asset.assettype_id
@@ -707,6 +711,10 @@ class task(models.Model):
                                 break
                         if to_begin:
                             dependent_task.status = "2ready"
+        if values.get('pay_date'):
+            for rec in self:
+                if rec.stored_price == 0:
+                    rec.stored_price = rec.computed_price
         return super(task, self).write(values)
 
     def open_task_view_py(self):
