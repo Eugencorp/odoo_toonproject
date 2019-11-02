@@ -3,11 +3,21 @@ from odoo import http
 import requests
 import datetime
 from dateutil.parser import parse as parsedate
+import json 
 
 class Toonproject(http.Controller):
 
     def get_sessions_json(self, sessions):
-        return ""
+        comments = []
+        for session in sessions:
+            json_string = session.json
+            if json_string:
+                data = json.loads(json_string)
+                for comment in data:
+                    if 'is_new' in comment:
+                        del comment['is_new']
+                    comments.append(comment)
+        return comments
 
     @http.route('/toonproject/comment', auth='user', method=['POST', 'GET'], csrf=False)    
     def comment(self, t, **kw):
@@ -43,7 +53,7 @@ class Toonproject(http.Controller):
             })
             
     @http.route('/toonproject/update_comment_session', auth='user', method=['POST', 'GET'], csrf=False)    
-    def update_comment_session(self, session, json, video_url, user_id, **kw):
+    def update_comment_session(self, session, json_string, video_url, user_id, **kw):
         user_id = int(str.replace(user_id,',',''))
         session = int(str.replace(session,',',''))
         user = http.request.env.user
@@ -57,7 +67,7 @@ class Toonproject(http.Controller):
             return http.Response("неизвестный пользователь", status = 500)
         if comment_session.video_url != video_url:
             return http.Response("неизвестная сессия", status = 500) 
-        comment_session.json = json
+        comment_session.json = json_string
         return http.Response("комментарии сохранены", status = 200)
         
     @http.route('/toonproject/comment_session', auth='user', method=['POST', 'GET'], csrf=False)

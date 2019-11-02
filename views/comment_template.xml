@@ -73,7 +73,9 @@
 			<script>
 			  var comment_session_id = <t t-esc="session_id"/>;
 			  var user_id = <t t-esc="author_id"/>;
-			  var user_name = "<t t-esc="author_name"/>";  
+			  var user_name = "<t t-esc="author_name"/>";
+			  var prev_comments = <t t-esc="prev_json"/>;
+			  localStorage.setItem('comments', JSON.stringify(prev_comments));
 			</script>
 			<script src="/toonproject/static/src/js/comment-add.js" type="text/javascript" />
 
