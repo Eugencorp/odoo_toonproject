@@ -236,12 +236,6 @@ function showComments() {
 
 		document.getElementById('comments').innerHTML = "";
 
-		//var t = 2.451877 * 958 / video.duration;
-
-		//TweenMax.set(timelineProgress, {
-		//            scaleX: t / timeline.offsetWidth
-		//        });
-
 		if (shower === 1) {
 			comments = comments.reverse();
 		} else {
@@ -251,7 +245,7 @@ function showComments() {
 		}
 
 		for (var c = 0; c < comments.length; c++) {
-
+			
 			var transform = comments[c].time * 1280 / video.duration;
 
 			console.log(transform.toFixed(3));
@@ -266,11 +260,12 @@ function showComments() {
 
 }
 
-window.onload = function() {
+//window.onload = function() {
+video.addEventListener('loadedmetadata', (event) => {
 
-	showComments()
+	showComments();
 
-}
+});
 
 function show(e) {
 
