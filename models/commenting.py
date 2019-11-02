@@ -12,3 +12,5 @@ class comment_session(models.Model):
     video_url = fields.Char(string = 'url видеофайла')
     video_date = fields.Datetime(string = 'Версия видеофайла')
     json = fields.Char(string = 'содержание правок')
+    
+    num_comments = fields.Integer(string="комментариев")
