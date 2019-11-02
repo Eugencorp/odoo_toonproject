@@ -211,7 +211,7 @@ class asset(models.Model, StoresImages):
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True, string='Статус')
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True, string = "Текущая задача")
     current_worker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Исполнитель")
-    current_checker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Контролер")
+    current_checker = fields.Many2one('toonproject.controler', compute='_get_current_tasktype', store=True, string="Контролер")
     line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице", compute="_get_line_color", store=True)
 
     
