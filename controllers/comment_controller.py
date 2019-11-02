@@ -41,3 +41,19 @@ class Toonproject(http.Controller):
             'session_id':new_id,
             'prev_json': prev_sessions_json
             })
+            
+    @http.route('/toonproject/update_comment_session', auth='user', method=['POST', 'GET'], csrf=False)    
+    def update_comment_session(self, session, json, video_url, user_id, **kw):
+        user = http.request.env.user
+        if not user.id == user_id:
+            return http.Response("неизвестный пользователь", status = 500)
+        comment_session = http.request.env['toonproject.comment_session'].search([('id','=',session)])
+        if len(comment_session)==0:
+             return http.Response("неизвестная сессия", status = 500)  
+        comment_session = comment_session[0]
+        if comment_session.author.id != user.id:
+            return http.Response("неизвестный пользователь", status = 500)
+        if comment_session.video_url != video_url:
+            return http.Response("неизвестная сессия", status = 500) 
+        comment_session.json = json
+        return http.Response("комментарии сохранены", status = 200)
