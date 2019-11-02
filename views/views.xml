@@ -324,7 +324,7 @@
 								<div class="col-5 task-video-buttons">
 									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
 									<button id="commenting_button" string="Комментировать" class="btn-primary" />
-									<field name = "comments" context="{'group_by':'video_date'}">
+									<field name = "comments" context="{'group_by':'video_date'}" limit="3">
 										<tree><field name="author"/><field name="date"/><button string="..." name = "open_sessions" type="object"/></tree>
 									</field>
 								</div>

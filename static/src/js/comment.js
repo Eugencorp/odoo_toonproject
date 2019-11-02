@@ -226,7 +226,7 @@ drawingLineWidthEl.onchange = function() {
 	document.getElementsByClassName('lineWidth')[0].innerHTML = this.value;
 };
 
-var shower = 1;
+var shower = 2;
 
 function showComments() {
 

@@ -44,9 +44,9 @@
 								</div>
 								<label for="drawing-line-width" style="margin:0;height:38px;float:left;margin-right:10px;">Перо: </label>
 								<span class="lineWidth" style="float:left;margin-right:10px;"> 20 </span>
-								<input type="range" value="20" min="2" max="20" id="drawing-line-width" style="height:38px;float:left;margin-right:20px;"/>
+								<input type="range" value="5" min="2" max="20" id="drawing-line-width" style="height:38px;float:left;margin-right:20px;"/>
 								<label for="drawing-color" style="margin:0;height:38px;float:left;margin-right:10px;">Цвет:</label>
-								<input type="color" value="#005E7A" id="drawing-color" style="height:38px;float:left;margin-right:20px;"/>
+								<input type="color" value="#ff0000" id="drawing-color" style="height:38px;float:left;margin-right:20px;"/>
 							</div>
 						</div>
 					</div>
