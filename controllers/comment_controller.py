@@ -44,6 +44,8 @@ class Toonproject(http.Controller):
             
     @http.route('/toonproject/update_comment_session', auth='user', method=['POST', 'GET'], csrf=False)    
     def update_comment_session(self, session, json, video_url, user_id, **kw):
+        user_id = int(str.replace(user_id,',',''))
+        session = int(str.replace(session,',',''))
         user = http.request.env.user
         if not user.id == user_id:
             return http.Response("неизвестный пользователь", status = 500)

@@ -185,6 +185,8 @@ document.getElementById('add-comment').onclick = function addComment() {
 	//comment.date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 	//comment.time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
+	comment.is_new = true;
+
 	comments.push(comment);
 
 	localStorage.setItem('comments', JSON.stringify(comments));
@@ -196,6 +198,8 @@ document.getElementById('add-comment').onclick = function addComment() {
 	showComments();
 
 	document.getElementsByTagName('textarea')[0].value = "";
+	
+	send_data_to_server();
 
 }
 
