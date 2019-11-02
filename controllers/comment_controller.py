@@ -57,3 +57,31 @@ class Toonproject(http.Controller):
             return http.Response("неизвестная сессия", status = 500) 
         comment_session.json = json
         return http.Response("комментарии сохранены", status = 200)
+        
+    @http.route('/toonproject/comment_session', auth='user', method=['POST', 'GET'], csrf=False)
+    def comment_session(self, session):
+        user = http.request.env.user
+        the_session = http.request.env['toonproject.comment_session'].search([('id', '=', session)])
+        if len(comment_session)==0:
+             return http.Response("неизвестная сессия", status = 500)
+        the_session = the_session[0]
+        video_url = the_session.video_url
+        video_date = the_session.video_date
+        task = the_session.task
+        prev_sessions = http.request.env['toonproject.comment_session'].search([('task','=',task.id),('video_date','=',video_date)])
+        new_session = http.request.env['toonproject.comment_session'].create({
+                'author': user.id,
+                'date': datetime.datetime.now(),
+                'task': task.id,
+                'video_url': video_url,
+                'video_date': video_date
+            })
+        new_id = new_session[0].id
+        prev_sessions_json = self.get_sessions_json(prev_sessions)
+        return http.request.render('toonproject.commenting',{
+            'video_url':video_url,
+            'author_name':user.name,
+            'author_id':user.id,
+            'session_id':new_id,
+            'prev_json': prev_sessions_json
+            })
