@@ -72,6 +72,8 @@ class Toonproject(http.Controller):
         comment_session = comment_session[0]
  
         comment_session.json = json_string
+        if kw.get('num'):
+            comment_session.num_comments = int(kw.get('num'))
         return http.Response(str(comment_session.id), status = 200)
         
     @http.route('/toonproject/comment_session', auth='user', method=['POST', 'GET'], csrf=False)

@@ -152,38 +152,17 @@ document.getElementById("frame-1").onclick = moveByFrameMinus;
 
 var comments = [];
 
-var comment = {};
-
 var today = new Date();
 
 document.getElementById('add-comment').onclick = function addComment() {
 
-	/*editable = JSON.parse(localStorage.getItem('comments'));
-
-	for (var i=0;i<editable.length;i++){
-
-		if ( video.currentTime ==  editable[i].time ) { console.log(true); console.log(editable); editable.splice(i, 1); console.log(editable); }
-
-	}
-
-	localStorage.setItem('comments', JSON.stringify(editable));
-
-	for( var i = 0; i < editable.length; i++){ 
-	if ( editable[i].time === video.currentTime) {
-	editable.splice(i, 1); 
-	}
-	}
-
-	localStorage.setItem('comments', JSON.stringify(editable));*/
+	var comment = {};
 
 	comment.time = video.currentTime;
 	comment.user = document.getElementById("user_in").innerText;
 	comment.message = document.getElementsByTagName('textarea')[0].value;
 
 	comment.draw = JSON.stringify(canvas.toJSON());
-
-	//comment.date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-	//comment.time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
 	comment.is_new = true;
 
