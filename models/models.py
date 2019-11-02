@@ -211,6 +211,7 @@ class asset(models.Model, StoresImages):
     current_status = fields.Selection([('1pending', 'пауза'),('2ready','в работу'),('3progress','в процессе'),('4torevision', 'в поправки'),('5inrevision','в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], default='1pending', compute='_get_current_tasktype', store=True, string='Статус')
     current_tasktype = fields.Many2one('toonproject.tasktype', compute='_get_current_tasktype',store=True, string = "Текущая задача")
     current_worker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Исполнитель")
+    current_checker = fields.Many2one('res.users', compute='_get_current_tasktype', store=True, string="Контролер")
     line_color = fields.Selection([('gray','gray'),('pink','pink'),('orange','orange'),('green','green'),('blue','blue')], string="Цвет в таблице", compute="_get_line_color", store=True)
 
     
@@ -276,14 +277,14 @@ class asset(models.Model, StoresImages):
             task_states.sort()
 
 
-    @api.depends('task_ids', 'task_ids.worker_id', 'task_ids.status')
+    @api.depends('task_ids', 'task_ids.worker_id', 'task_ids.status', 'task_ids.current_control')
     def _get_current_tasktype(self):
         for rec in self:
             task_types = []
             for task in rec.task_ids:
                 for valid_tasktype in rec.assettype_id.valid_tasktypes:
                     if valid_tasktype == task.tasktype_id:
-                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status, 'worker_id':task.worker_id}
+                        pseudo_task = {'tasktype_id':task.tasktype_id, 'status':task.status, 'worker_id':task.worker_id, 'current_checker':task.current_control}
                         if self.env.context.get('task') and self.env.context.get('task')==task.id:
                             pseudo_task.update({'status':self.env.context.get('status')})
                         task_types.append(pseudo_task)
@@ -299,6 +300,7 @@ class asset(models.Model, StoresImages):
                 rec.current_tasktype = task_types[i]['tasktype_id']
                 rec.current_worker = task_types[i]['worker_id']
                 rec.current_status = task_types[i]['status']
+                rec.current_checker = task_types[i]['current_checker']
             else:
                 rec.current_status = None
 
