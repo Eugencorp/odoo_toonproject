@@ -98,23 +98,16 @@ Draggable.create(drag, {
 });
 
 video.ontimeupdate = function() {
+	
 	timeShow();
 
-	if (video.paused == false) {
-
-		checkFrame();
-
-	}
+	checkFrame();
 
 };
 
 function timeShow() {
 
-	document.getElementById("time").innerHTML = Math.floor(video.currentTime / 60) + ":" + Math.floor(video.currentTime);
-
-	document.getElementById("time").innerHTML += "/" + Math.floor(video.duration / 60) + ":" + Math.floor(video.duration);
-
-	document.getElementById("time").innerHTML += "/" + (Math.floor(video.currentTime * 25));
+	document.getElementById("time").innerHTML = (Math.floor(video.currentTime * 25));
 
 	// document.getElementById("time").innerHTML = video.currentTime / 60;
 	// document.getElementById("time").innerHTML += "/" + video.duration / 60;
@@ -282,7 +275,7 @@ function showComments() {
 
 			document.getElementById('frames').innerHTML += '<div onclick="show(this)" sid=' + c + ' class="frames" style="transform: translate3d(' + transform + 'px, 0px, 0px);"></div>'
 
-			document.getElementById('comments').innerHTML += "<div class='comment' onclick='show(this)' sid=" + c + " ><div style='width:240px;float:left;'><i class='fas fa-circle' style='color:red;'></i> " + comments[c].user + "<span><i class='fas fa-stopwatch'></i> " + (comments[c].time).toFixed(2) + "</span></div><button class='btn btn-default' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button></div><div class='commentText'>" + comments[c].message + "</div>"
+            document.getElementById('comments').innerHTML += "<div class='comment'><div style='width:240px;float:left;'><i class='fas fa-circle' style='color:red;'></i> " + comments[c].user + "<span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span></div><button class='btn btn-default' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button></div><div class='commentText' onclick='show(this)' sid=" + c + " >" + comments[c].message + "</div>"
 
 		}
 
@@ -314,7 +307,9 @@ function show(e) {
 
 function checkFrame() {
 
-	var state = false;
+	canvas.clear();
+	canvas.calcOffset();
+	canvas.renderAll();
 
 	if (localStorage.getItem('comments')) {
 
@@ -324,25 +319,21 @@ function checkFrame() {
 
 			//if (parseInt(video.currentTime)-1 <= parseInt(comments[c].time) <= parseInt(video.currentTime)+1){
 
-			if (parseInt(comments[c].time) === parseInt(video.currentTime)) {
+			console.log(Math.floor(comments[c].time * 25));
+			console.log(Math.floor(video.currentTime * 25));
+
+			if ( Math.floor(comments[c].time * 25) === Math.floor(video.currentTime * 25) ) {
+
+				console.log(true);
 
 				canvas.loadFromJSON(comments[c].draw);
 
 				canvas.renderAll();
 				canvas.calcOffset();
-				
-				timetoClear = parseInt(comments[c].time);
 
-			} 
-			
+				//timetoClear = parseInt(comments[c].time);
 
-			/*else {			
-
-			canvas.clear();
-			canvas.calcOffset();
-			canvas.renderAll();
-
-			}*/
+			}
 
 		}
 
