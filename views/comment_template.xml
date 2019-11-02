@@ -53,7 +53,7 @@
 				</div>
 			</div>
 			<div id="right" style="width:360px;height:100%;position:absolute;right:0;top:0;background:rgba(231,231,231,0.975);padding:20px;box-sizing:border-box;border-left:1px solid #ddd;overflow-y:scroll;">
-				<div id="user_in" style="width:100%;height:52px;line-height:50px;background:#f9f9f9;float:left;border:1px solid #eee;padding-left:10px;box-sizing:border-box"><i class="fas fa-circle" style="color:red;"></i> Guest</div>
+				<div id="user_in" style="width:100%;height:52px;line-height:50px;background:#f9f9f9;float:left;border:1px solid #eee;padding-left:10px;box-sizing:border-box"><i class="fas fa-circle" style="color:red;"></i><t t-esc="author_name" /></div>
 				<textarea style="width:100%;border:0;min-height:100px;float:left;border:1px solid #eee;border-top:0;padding:10px;" placeholder="Добавьте комментарий"></textarea>
 				<button id="add-comment" class="btn btn-primary btn-block" style="margin-top:0;float:left;margin-top:10px">Сохранить</button>
 				<div class="btn-group btn-block" role="group" style="float:left;">
@@ -69,6 +69,12 @@
 			<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+			<script>
+			  var comment_session_id = <t t-esc="session_id"/>;
+			  var user_id = <t t-esc="author_id"/>;
+			  var user_name = "<t t-esc="author_name"/>";
+			</script>
 
 			<script src="/toonproject/static/src/js/comment.js" type="text/javascript" />
 		</body>
