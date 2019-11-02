@@ -294,7 +294,7 @@
                           <group>
                             <field name="short_description" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
-			    <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+							<field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:" attrs="{'invisible':[('isManager','=',False),('isWorker','=',False),'|',('isValidWorker','=',False), ('worker_id','>',0)]}" />
                           </group>
                         </page>
@@ -318,12 +318,15 @@
                             <field name="pay_date" class= "col-6" attrs="{'readonly':[('isManager','=',False)]}"/>
 						  </div>
                           <div class="row">
-                            <div class="col-6">
+                            <div class="col-7">
                               <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
 							  <div class="row">
-								<div class="col-4 task-video-buttons" style="margin-top:40px">
+								<div class="col-4 task-video-buttons">
 									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
 									<button id="commenting_button" string="Комментировать" class="btn-primary" />
+									<field name = "comments" context="{'group_by':'video_date'}">
+										<tree><field name="author"/><field name="date"/></tree>
+									</field>
 								</div>
 								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 							  </div>                  
@@ -332,7 +335,7 @@
 								<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
                               </div>				
                             </div>
-                            <div class="col-6" >
+                            <div class="col-5" >
                               <div style="text-align: center; font-weight:bold; font-size:larger; margin-bottom:10px">Исходники:</div>
 							  <div style="text-align: center; font-weight:bold; ">Главный:</div>
 							  <field name="mainsource" widget = "url"/>
