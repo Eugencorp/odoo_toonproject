@@ -61,8 +61,10 @@ class Toonproject(http.Controller):
     @http.route('/toonproject/comment_session', auth='user', method=['POST', 'GET'], csrf=False)
     def comment_session(self, session):
         user = http.request.env.user
+        if type(session) == str:
+            session = int(str.replace(session,',',''))
         the_session = http.request.env['toonproject.comment_session'].search([('id', '=', session)])
-        if len(comment_session)==0:
+        if len(the_session)==0:
              return http.Response("неизвестная сессия", status = 500)
         the_session = the_session[0]
         video_url = the_session.video_url
