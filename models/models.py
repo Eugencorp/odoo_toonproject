@@ -394,6 +394,10 @@ class task(models.Model):
     mainsource = fields.Char()
     mainsource_controler = fields.Char(compute='_get_mainsource_controler', store=False)
     
+
+    comments = fields.One2many('toonproject.comment_session', "task")
+    
+
     @api.depends('affecting_tasks','affecting_tasks.status')
     def _get_pause_reason(self):  
         for rec in self:

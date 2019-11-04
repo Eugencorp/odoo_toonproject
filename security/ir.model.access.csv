@@ -8,6 +8,7 @@ asset_admin,asset admin,model_toonproject_asset,group_toonproject_admin,1,1,1,1
 task_admin,task admin,model_toonproject_task,group_toonproject_admin,1,1,1,1
 tasktype_admin,tasktype admin,model_toonproject_tasktype,group_toonproject_admin,1,1,1,1
 assettype_admin,assettype admin,model_toonproject_assettype,group_toonproject_admin,1,1,1,1
+comment_session_admin,comment session admin,model_toonproject_comment_session,group_toonproject_admin,1,1,1,1
 asset_manager,asset manager,model_toonproject_asset,group_toonproject_manager,1,1,1,0
 task_manager,task manager,model_toonproject_task,group_toonproject_manager,1,1,1,0
 cartoon_manager,cartoon manager,model_toonproject_cartoon,group_toonproject_manager,1,1,0,0
@@ -27,3 +28,4 @@ dashboard_user,dashboard user,model_toonproject_dashboard,group_toonproject_user
 controler_user,controler user,model_toonproject_controler,group_toonproject_user,1,0,0,0
 upload_user,upload user,model_toonproject_upload_interface,group_toonproject_user,1,0,0,0
 fileserver_user,fileserver user,model_toonproject_fileserver_setting,group_toonproject_user,1,0,0,0
+comment_session_user,comment session user,model_toonproject_comment_session,group_toonproject_user,1,1,1,0

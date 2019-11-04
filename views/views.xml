@@ -294,7 +294,7 @@
                           <group>
                             <field name="short_description" string="Краткое содержание:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="description" string="Описание задачи:" attrs="{'readonly':[('isManager','=',False)]}"/>
-			    <field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
+							<field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:" attrs="{'invisible':[('isManager','=',False),('isWorker','=',False),'|',('isValidWorker','=',False), ('worker_id','>',0)]}" />
                           </group>
                         </page>
@@ -318,11 +318,15 @@
                             <field name="pay_date" attrs="{'readonly':[('isManager','=',False)]}"/>
 						  </div>
                           <div class="row">
-                            <div class="col-6">
+                            <div class="col-7">
                               <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
 							  <div class="row">
-								<div class="col-4 task-video-buttons">
-									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
+								<div class="col-5 task-video-buttons">
+									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
+									<button id="commenting_button" string="Комментировать" class="btn-primary" />
+									<field name = "comments" context="{'group_by':'video_date'}" limit="3">
+										<tree><field name="author"/><field name="date"/><button string="..." name = "open_sessions" type="object"/></tree>
+									</field>
 								</div>
 								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 							  </div>                  
@@ -331,7 +335,7 @@
 								<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
                               </div>				
                             </div>
-                            <div class="col-6" >
+                            <div class="col-5" >
                               <div style="text-align: center; font-weight:bold; font-size:larger; margin-bottom:10px">Исходники:</div>
 							  <div style="text-align: center; font-weight:bold; ">Главный:</div>
 							  <field name="mainsource" widget = "url"/>
@@ -429,7 +433,12 @@
 							}
 						}
 					  });
-					  
+					  jQuery('#commenting_button').click(function(e){
+						//alert('Under construction');
+						task_id = jQuery('[name=id]').text();
+						var url = "/toonproject/comment?t=" + task_id
+						var win = window.open(url, '_blank');
+					  });
 					  jQuery('#mainsource_file').change(function(e){
                       const fd = new FormData();
                       Array.from(e.target.files).forEach((file) => {
