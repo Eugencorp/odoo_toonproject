@@ -78,14 +78,14 @@ class Toonproject(http.Controller):
                 if pr.preview_server_setting:
                     login = pr.preview_server_setting.login
                     password = pr.preview_server_setting.password
-                    subfolder = pr.preview_subfolder
+                    subfolder = pr.preview_subfolder or ''
                     upload_root = pr.preview_server_setting.upload_root
                     external_root = pr.preview_server_setting.external_root
                     if upload_root[-1] != '/':
                         upload_root = upload_root + '/'
                     if external_root[-1] != '/':
                         external_root = external_root + '/'                        
-                    if subfolder[-1] != '/':
+                    if subfolder != '' and subfolder[-1] != '/':
                         subfolder = subfolder + '/'
                     upload_path = upload_root + subfolder
                     preview_path = external_root + subfolder
@@ -98,14 +98,14 @@ class Toonproject(http.Controller):
                 if pr.mainsource_server_setting:
                     login = pr.mainsource_server_setting.login
                     password = pr.mainsource_server_setting.password
-                    subfolder = pr.mainsource_subfolder
+                    subfolder = pr.mainsource_subfolder or ''
                     upload_root = pr.mainsource_server_setting.upload_root
                     external_root = pr.mainsource_server_setting.external_root
                     if upload_root[-1] != '/':
                         upload_root = upload_root + '/'
                     if external_root[-1] != '/':
                         external_root = external_root + '/' 
-                    if subfolder[-1] != '/':
+                    if subfolder != '' and subfolder[-1] != '/':
                         subfolder = subfolder + '/'                    
                     upload_path = upload_root + subfolder
                     preview_path = external_root + subfolder
