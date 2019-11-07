@@ -12,7 +12,7 @@ comment_session_admin,comment session admin,model_toonproject_comment_session,gr
 asset_manager,asset manager,model_toonproject_asset,group_toonproject_manager,1,1,1,0
 task_manager,task manager,model_toonproject_task,group_toonproject_manager,1,1,1,0
 cartoon_manager,cartoon manager,model_toonproject_cartoon,group_toonproject_manager,1,1,0,0
-price_manager,price manager,model_toonproject_price,group_toonproject_manager,1,1,0,0
+price_manager,price manager,model_toonproject_price,group_toonproject_manager,1,0,0,0
 upload_manager,upload manager,model_toonproject_upload_interface,group_toonproject_manager,1,1,0,0
 fileserver_manager,fileserver manager,model_toonproject_fileserver_setting,group_toonproject_manager,1,1,0,0
 tasktype_manager,tasktype manager,model_toonproject_tasktype,group_toonproject_manager,1,1,1,0
