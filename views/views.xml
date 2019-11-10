@@ -315,7 +315,7 @@
                         <page string="Результат">
 						  <div class="row">
 							<label for="pay_date" class="col-6" style="text-align: right;" />
-                            <field name="pay_date" class= "col-6" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="pay_date" attrs="{'readonly':[('isManager','=',False)]}"/>
 						  </div>
                           <div class="row">
                             <div class="col-7">
@@ -866,6 +866,11 @@
             <field name="status_chk"/> Статус:
             <field name="status"  attrs="{'readonly':[('status_chk','=',False)]}" style="{width:20%}"/>
             <br/>
+			<span groups="toonproject.group_toonproject_admin">
+				<field name="pay_date_chk"/> Оплачено:
+				<field name="pay_date"  attrs="{'readonly':[('pay_date_chk','=',False)]}" style="{width:20%}"/>
+            </span>
+			<br/>			
           </div>
         </div>
 				<footer>
