@@ -349,9 +349,9 @@
                             <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
                           </group>
                         </page>
-                        <page string="Результат">
+<!--                         <page string="Результат">
 						  
-                        </page>
+                        </page> -->
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
                             <group>
