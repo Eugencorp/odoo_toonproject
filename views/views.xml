@@ -338,22 +338,20 @@
                             <field name="pay_date" attrs="{'readonly':[('isManager','=',False)]}"/>
 						  </div>
                           <div class="row">
-                            <div class="col-7">
-                              <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
-							  <div class="row">
-								<div class="col-4 task-video-buttons">
-									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
-									<button id="commenting_button" string="Комментировать" class="btn-primary" style="margin-bottom:10px" />
+                            <div class="col-6">
+								<div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
+								<div style="text-align: center" class="buttongap">
+									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
+									<div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
+										<button id="set_default_preview_button" string="DEF" class="btn-primary" style="float:right;"/>
+										<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
+									</div>
+									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
+									<button id="commenting_button" string="Комментировать" class="btn-primary" />
 									<button name="task_comments_button" type="object" string="история" class="btn-light" />
 								</div>
-								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
-							  </div>                  
-                              <div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
-                                <button id="set_default_preview_button" string="DEF" class="btn-primary" style="float:right;"/>
-								<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
-                              </div>				
                             </div>
-                            <div class="col-5" >
+                            <div class="col-6" >
                               <div style="text-align: center; font-weight:bold; font-size:larger; margin-bottom:10px">Исходники:</div>
 							  <div style="text-align: center; font-weight:bold; ">Главный:</div>
 							  <field name="mainsource" widget = "url"/>
