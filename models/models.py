@@ -722,6 +722,21 @@ class task(models.Model):
                 if rec.stored_price == 0:
                     rec.stored_price = rec.computed_price
         return super(task, self).write(values)
+    
+    @api.multi
+    def task_comments_button(self):
+            self.ensure_one()
+            action_id = self.env.ref('toonproject.task_comments_action').read()[0]
+            if action_id: 
+                return {
+                    'name': action_id['name'],
+                    'type': action_id['type'],
+                    'res_model': action_id['res_model'], 
+                    'view_type': action_id['view_type'],
+                    'view_mode': action_id['view_mode'],
+                    'domain': [["task", "=", self.id]],
+                    'target': 'new', #without it opens a blank page with list, but with breadcrumb
+                }            
 
     def open_task_view_py(self):
         return {

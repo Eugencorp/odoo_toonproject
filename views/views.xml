@@ -1,7 +1,27 @@
 <?xml version="1.0"?>
 <odoo>
   <data>
-
+  	<record model="ir.ui.view" id="comment_session_custom_list">
+      <field name="name">comment_session.list</field>
+      <field name="model">toonproject.comment_session</field>
+      <field name="arch" type="xml">
+		<tree create="false" import="false">
+			<field name="author"/>
+			<field name="date"/>
+			<button string="..." name = "open_sessions" type="object"/>
+		</tree>									
+      </field>
+    </record>
+	
+    <record model="ir.actions.act_window" id="toonproject.task_comments_action">
+        <field name="name">Комментарии</field>
+        <field name="res_model">toonproject.comment_session</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+		<field name="target">new</field>
+        <field name="view_id" ref="comment_session_custom_list"/>
+    </record>
+	
     <record model="ir.ui.view" id="toonproject_group_form_view">
         <field name="name">group.form</field>
         <field name="model">res.groups</field>
@@ -321,12 +341,10 @@
                             <div class="col-7">
                               <div style="text-align: center; font-weight:bold; font-size:larger;">Preview:</div>
 							  <div class="row">
-								<div class="col-5 task-video-buttons">
+								<div class="col-4 task-video-buttons">
 									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" style="margin-bottom:10px" />
-									<button id="commenting_button" string="Комментировать" class="btn-primary" />
-									<field name = "comments" context="{'group_by':'video_date'}" limit="3">
-										<tree><field name="author"/><field name="date"/><button string="..." name = "open_sessions" type="object"/></tree>
-									</field>
+									<button id="commenting_button" string="Комментировать" class="btn-primary" style="margin-bottom:10px" />
+									<button name="task_comments_button" type="object" string="история" class="btn-light" />
 								</div>
 								<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 							  </div>                  
@@ -555,6 +573,8 @@
 			</form>
 		</field>
 	</record>
+	
+
 
     <record model="ir.ui.view" id="toonproject_group_list">
       <field name="name">group.list</field>
