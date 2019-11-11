@@ -297,23 +297,8 @@
 							<field name="factor" string="Сложность:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="computed_price" string="Cтоимость:" attrs="{'invisible':[('isManager','=',False),('isWorker','=',False),'|',('isValidWorker','=',False), ('worker_id','>',0)]}" />
                           </group>
-                        </page>
-                        <page string="Контроль">
-                          <group>
-                            <field name="controler_names" string="Контролеры:"/>
-                            <field name="current_control" string="Должен проверить:" domain="[('price','=',price_record)]" attrs="{'readonly':[('isManager','=',False)]}"/>
-                          </group>
-                        </page>
-                        <page string="Сроки">
-                          <group>
-                            <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
-                            <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
-                            <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
-                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
-                          </group>
-                        </page>
-                        <page string="Результат">
-						  <div class="row">
+													
+													<div class="row">
 							<label for="pay_date" class="col-6" style="text-align: right;" />
                             <field name="pay_date" attrs="{'readonly':[('isManager','=',False)]}"/>
 						  </div>
@@ -346,6 +331,26 @@
 							  <div style="text-align: center; font-weight:bold; margin-top:10px;">Остальные:</div>							  
                             </div>
                           </div>
+													
+													
+													
+                        </page>
+                        <page string="Контроль">
+                          <group>
+                            <field name="controler_names" string="Контролеры:"/>
+                            <field name="current_control" string="Должен проверить:" domain="[('price','=',price_record)]" attrs="{'readonly':[('isManager','=',False)]}"/>
+                          </group>
+                        </page>
+                        <page string="Сроки">
+                          <group>
+                            <field name="valid_group" string="Кому можно выдавать" attrs="{'invisible':[('worker_id','!=',None)],'readonly':[('isManager','=',False)]}"/>
+                            <field name="work_start" string="принято в работу:" widget="date" attrs="{'readonly':[('isManager','=',False)]}"/>
+                            <field name="plan_finish" string="планируемое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False),'|',('plan_finish','!=',None),('isWorker','=',False)]}"/>
+                            <field name="real_finish" string="фактическое окончание:" widget="date" attrs="{'readonly':[('isManager','=',False)], 'invisible':[('status','!=','5finished'),('isManager','=',False)]}" />
+                          </group>
+                        </page>
+                        <page string="Результат">
+						  
                         </page>
                         <page string="Aдминистрирование" groups="toonproject.group_toonproject_manager">
                           <group>
