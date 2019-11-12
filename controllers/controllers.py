@@ -58,8 +58,8 @@ class Toonproject(http.Controller):
     
     def get_server_info(self, kw, param_type):
         pr = None
-        if kw.get('task'):
-            task = self.get_task(kw.get('task'))
+        if kw.get('task') or kw.get('t'):
+            task = self.get_task(kw.get('task') or kw.get('t'))
             if task:
                 pr = task.price_record
                 
@@ -163,13 +163,17 @@ class Toonproject(http.Controller):
         return http.Response("No files found", status=500)
             
     @http.route('/toonproject/default_preview', auth='user', method=['POST', 'GET'], csrf=False)    
-    def default_preview(self, t, **kw):
+    def default_preview(self, **kw):
+        t = kw.get('t')
+        if not t:
+            return http.Response("Неизвестная задача", status=500)
         task = self.get_task(t)
         if not task.preview_filename:
             return http.Response("Не настроено дефолтное имя для файла", status=500)
-        if not task.price_record or not task.price_record.preview_path:
+        login, password, writepath, readpath  = self.get_server_info(kw, 'preview')
+        if not readpath:
             return http.Response("Не настроен дефолтный путь к файлу preview", status=500)
-        fullpath = task.price_record.preview_path + task.preview_filename + ".mp4"
+        fullpath = readpath + task.preview_filename + ".mp4"
         responce = requests.head(fullpath)
         if responce.status_code < 200 or responce.status_code >= 300:
             return http.Response("Не обнаружен файл " + fullpath, status=500)
