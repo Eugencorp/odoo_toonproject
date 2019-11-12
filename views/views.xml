@@ -422,6 +422,7 @@
                       });
 					  jQuery('#set_default_preview_button').click(function(e){
 						var t = jQuery('[name=id]').text();
+						t = t.replace(/\s/gi,"");
 						var url = "/toonproject/default_preview?t=" + t;
 						const xhr = new XMLHttpRequest();
 						xhr.onload = () => {
@@ -452,7 +453,7 @@
 					  jQuery('#commenting_button').click(function(e){
 						//alert('Under construction');
 						task_id = jQuery('[name=id]').text();
-			    			task_id = task_id.replace(/\s/gi,"");
+			    		task_id = task_id.replace(/\s/gi,"");
 						var url = "/toonproject/comment?t=" + task_id
 						var win = window.open(url, '_blank');
 					  });
