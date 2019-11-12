@@ -49,7 +49,30 @@ class Toonproject(http.Controller):
             
         ftp.storbinary('STOR '+ filename, bio)
         ftp.close()
+    
+    def check_preview_comments(self, task, readpath):
+        comment_sessions = http.request.env['toonproject.comment_session'].search([('task','=', task.id),('video_url','=',readpath)])
+        if len(comment_sessions) > 0:
+            return True
+        return False
         
+    def backup_old_preview(self, task, server_fn, login, password, writepath, fullreadpath):
+        # download readpath, upload it with new name and replace name in any comment_sessions for task with old preview name 
+        comment_sessions = http.request.env['toonproject.comment_session'].search([('task','=', task.id),('video_url','=',fullreadpath)])
+        video_date = comment_sessions[0].video_date
+        date_suffix = str(cs[0].video_date).replace(' ','_').replace('-','').replace(':','')[0:-2]
+        read_response = requests.get(fullreadpath)
+        if read_response.status_code < 200 or read_response.status_code > 300:
+            return read_response
+        path, name = os.path.split(fullreadpath)
+        filename, extension = os.path.splitext(name)
+        new_name = filename + "_" + date_suffix + extension
+        write_result = server_fn(login, password, writepath + new_name, read_response.content)
+        if write_result:
+            return write_result
+        for session in comment_sessions:
+            session.video_url = path + '/' + new_name
+        return False
     
     def get_task(self, task_string):
         task_id = int(str.replace(task_string,',',''))
@@ -130,6 +153,7 @@ class Toonproject(http.Controller):
         filename = "dummy"
         extension = ".txt"
         data = datetime.datetime.now().ctime()
+        task = None
         if kw.get('uploaded_file'):
             file = kw.get('uploaded_file')
             name = file.filename
@@ -140,10 +164,18 @@ class Toonproject(http.Controller):
                 if upload_purpose:                
                     if task and task.preview_filename:
                         filename = task.preview_filename
+        fullreadpath = readpath + filename + extension
+        if task and upload_purpose == 'preview':
+            read_response = requests.head(fullreadpath)
+            if responce.status_code >= 200 and responce.status_code < 300:
+                if self.check_preview_comments(task, fullreadpath):
+                    backup_result = self.backup_old_preview(task, server_fn, login, password, writepath, fullreadpath)
+                    if backup_result:
+                        return backup_result
         write_result = server_fn(login, password, writepath + filename + extension, data)
         if write_result:
             return write_result
-        fullreadpath = readpath + filename + extension        
+                
         if testing_mode:
             read_response = requests.get(fullreadpath)
             if read_response.status_code < 200 or read_response.status_code > 300:
