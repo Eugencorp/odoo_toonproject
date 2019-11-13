@@ -49,7 +49,30 @@ class Toonproject(http.Controller):
             
         ftp.storbinary('STOR '+ filename, bio)
         ftp.close()
+    
+    def check_preview_comments(self, task, readpath):
+        comment_sessions = http.request.env['toonproject.comment_session'].search([('task','=', task.id),('video_url','=',readpath)])
+        if len(comment_sessions) > 0:
+            return True
+        return False
         
+    def backup_old_preview(self, task, server_fn, login, password, writepath, fullreadpath):
+        # download readpath, upload it with new name and replace name in any comment_sessions for task with old preview name 
+        comment_sessions = http.request.env['toonproject.comment_session'].search([('task','=', task.id),('video_url','=',fullreadpath)])
+        video_date = comment_sessions[0].video_date
+        date_suffix = str(video_date).replace(' ','_').replace('-','').replace(':','')[0:-2]
+        read_response = requests.get(fullreadpath)
+        if read_response.status_code < 200 or read_response.status_code > 300:
+            return read_response
+        path, name = os.path.split(fullreadpath)
+        filename, extension = os.path.splitext(name)
+        new_name = filename + "_" + date_suffix + extension
+        write_result = server_fn(login, password, writepath + new_name, read_response.content)
+        if write_result:
+            return write_result
+        for session in comment_sessions:
+            session.video_url = path + '/' + new_name
+        return False
     
     def get_task(self, task_string):
         task_id = int(str.replace(task_string,',',''))
@@ -58,6 +81,7 @@ class Toonproject(http.Controller):
     
     def get_server_info(self, kw, param_type):
         pr = None
+        ss = None
         if kw.get('task') or kw.get('t'):
             task = self.get_task(kw.get('task') or kw.get('t'))
             if task:
@@ -71,53 +95,53 @@ class Toonproject(http.Controller):
         if kw.get('setting'):
             setting_string = kw.get('setting')
             setting_id = int(str.replace(setting_string,',',''))
-            pr = http.request.env['toonproject.fileserver_setting'].search([('id', '=', setting_id)])            
+            ss = http.request.env['toonproject.fileserver_setting'].search([('id', '=', setting_id)])            
 
         if pr:
-            if param_type == 'preview':
-                if pr.preview_server_setting:
-                    login = pr.preview_server_setting.login
-                    password = pr.preview_server_setting.password
-                    subfolder = pr.preview_subfolder or ''
-                    upload_root = pr.preview_server_setting.upload_root
-                    external_root = pr.preview_server_setting.external_root
-                    if upload_root[-1] != '/':
-                        upload_root = upload_root + '/'
-                    if external_root[-1] != '/':
-                        external_root = external_root + '/'                        
-                    if subfolder != '' and subfolder[-1] != '/':
-                        subfolder = subfolder + '/'
-                    upload_path = upload_root + subfolder
-                    preview_path = external_root + subfolder
-                    if pr.preview_custom_user:
-                        login = pr.preview_login
-                        password = pr.preview_password
-                    return login, password, upload_path, preview_path
+            if param_type == 'preview' and not pr.preview_server_setting:
                 return pr.preview_login, pr.preview_password, pr.preview_upload_path, pr.preview_path
-            elif param_type == 'mainsource':
-                if pr.mainsource_server_setting:
-                    login = pr.mainsource_server_setting.login
-                    password = pr.mainsource_server_setting.password
-                    subfolder = pr.mainsource_subfolder or ''
-                    upload_root = pr.mainsource_server_setting.upload_root
-                    external_root = pr.mainsource_server_setting.external_root
-                    if upload_root[-1] != '/':
-                        upload_root = upload_root + '/'
-                    if external_root[-1] != '/':
-                        external_root = external_root + '/' 
-                    if subfolder != '' and subfolder[-1] != '/':
-                        subfolder = subfolder + '/'                    
-                    upload_path = upload_root + subfolder
-                    preview_path = external_root + subfolder
-                    if pr.mainsource_custom_user:
-                        login = pr.mainsource_login
-                        password = pr.mainsource_password
-                    return login, password, upload_path, preview_path            
+                
+            if param_type == 'mainsource' and not pr.mainsource_server_setting:
                 return pr.mainsource_login, pr.mainsource_password, pr.mainsource_upload_path, pr.mainsource_path
-            else:
-                return pr.login, pr.password, pr.upload_root, pr.external_root
-        else:
+                
+            if param_type == 'preview':
+                ss = pr.preview_server_setting            
+            if param_type == 'mainsource':
+                ss = pr.mainsource_server_setting
+                
+        if not ss:
             return None, None, None, None
+            
+        login = ss.login
+        password = ss.password
+        upload_root = ss.upload_root
+        external_root = ss.external_root            
+        if upload_root[-1] != '/':
+            upload_root = upload_root + '/'
+        if external_root[-1] != '/':
+            external_root = external_root + '/'             
+        subfolder = ''
+        
+        if pr:
+            if param_type == 'preview':
+                subfolder = pr.preview_subfolder or ''
+            if param_type == 'mainsource':
+                subfolder = pr.mainsource_subfolder or ''               
+            if param_type == 'preview' and pr.preview_custom_user:
+                login = pr.preview_login
+                password = pr.preview_password     
+            if param_type == 'mainsource' and pr.mainsource_custom_user:
+                login = pr.mainsource_login
+                password = pr.mainsource_password
+
+        if subfolder != '' and subfolder[-1] != '/':
+            subfolder = subfolder + '/'   
+        upload_path = upload_root + subfolder
+        preview_path = external_root + subfolder                
+          
+        return login, password, upload_path, preview_path            
+
+
     
     def eval_upload_and_check(self, kw, server_fn):
         upload_purpose = kw.get('purpose')
@@ -130,6 +154,7 @@ class Toonproject(http.Controller):
         filename = "dummy"
         extension = ".txt"
         data = datetime.datetime.now().ctime()
+        task = None
         if kw.get('uploaded_file'):
             file = kw.get('uploaded_file')
             name = file.filename
@@ -140,10 +165,18 @@ class Toonproject(http.Controller):
                 if upload_purpose:                
                     if task and task.preview_filename:
                         filename = task.preview_filename
+        fullreadpath = readpath + filename + extension
+        if task and upload_purpose == 'preview':
+            read_response = requests.head(fullreadpath)
+            if read_response.status_code >= 200 and read_response.status_code < 300:
+                if self.check_preview_comments(task, fullreadpath):
+                    backup_result = self.backup_old_preview(task, server_fn, login, password, writepath, fullreadpath)
+                    if backup_result:
+                        return backup_result
         write_result = server_fn(login, password, writepath + filename + extension, data)
         if write_result:
             return write_result
-        fullreadpath = readpath + filename + extension        
+                
         if testing_mode:
             read_response = requests.get(fullreadpath)
             if read_response.status_code < 200 or read_response.status_code > 300:
