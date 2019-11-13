@@ -243,7 +243,7 @@ class Toonproject(http.Controller):
         return self.eval_upload_and_check(kw, self.upload_webdav)
 
     @http.route('/toonproject/ftps', auth='user', method=['POST', 'GET'], csrf=False)
-    def ftp(self, **kw):
+    def ftps(self, **kw):
         return self.eval_upload_and_check(kw, self.upload_ftps)
 
     @http.route('/toonproject/ftp', auth='user', method=['POST', 'GET'], csrf=False)
