@@ -81,6 +81,7 @@ class Toonproject(http.Controller):
     
     def get_server_info(self, kw, param_type):
         pr = None
+        ss = None
         if kw.get('task') or kw.get('t'):
             task = self.get_task(kw.get('task') or kw.get('t'))
             if task:
@@ -94,53 +95,53 @@ class Toonproject(http.Controller):
         if kw.get('setting'):
             setting_string = kw.get('setting')
             setting_id = int(str.replace(setting_string,',',''))
-            pr = http.request.env['toonproject.fileserver_setting'].search([('id', '=', setting_id)])            
+            ss = http.request.env['toonproject.fileserver_setting'].search([('id', '=', setting_id)])            
 
         if pr:
-            if param_type == 'preview':
-                if pr.preview_server_setting:
-                    login = pr.preview_server_setting.login
-                    password = pr.preview_server_setting.password
-                    subfolder = pr.preview_subfolder or ''
-                    upload_root = pr.preview_server_setting.upload_root
-                    external_root = pr.preview_server_setting.external_root
-                    if upload_root[-1] != '/':
-                        upload_root = upload_root + '/'
-                    if external_root[-1] != '/':
-                        external_root = external_root + '/'                        
-                    if subfolder != '' and subfolder[-1] != '/':
-                        subfolder = subfolder + '/'
-                    upload_path = upload_root + subfolder
-                    preview_path = external_root + subfolder
-                    if pr.preview_custom_user:
-                        login = pr.preview_login
-                        password = pr.preview_password
-                    return login, password, upload_path, preview_path
+            if param_type == 'preview' and not pr.preview_server_setting:
                 return pr.preview_login, pr.preview_password, pr.preview_upload_path, pr.preview_path
-            elif param_type == 'mainsource':
-                if pr.mainsource_server_setting:
-                    login = pr.mainsource_server_setting.login
-                    password = pr.mainsource_server_setting.password
-                    subfolder = pr.mainsource_subfolder or ''
-                    upload_root = pr.mainsource_server_setting.upload_root
-                    external_root = pr.mainsource_server_setting.external_root
-                    if upload_root[-1] != '/':
-                        upload_root = upload_root + '/'
-                    if external_root[-1] != '/':
-                        external_root = external_root + '/' 
-                    if subfolder != '' and subfolder[-1] != '/':
-                        subfolder = subfolder + '/'                    
-                    upload_path = upload_root + subfolder
-                    preview_path = external_root + subfolder
-                    if pr.mainsource_custom_user:
-                        login = pr.mainsource_login
-                        password = pr.mainsource_password
-                    return login, password, upload_path, preview_path            
+                
+            if param_type == 'mainsource' and not pr.mainsource_server_setting:
                 return pr.mainsource_login, pr.mainsource_password, pr.mainsource_upload_path, pr.mainsource_path
-            else:
-                return pr.login, pr.password, pr.upload_root, pr.external_root
-        else:
+                
+            if param_type == 'preview':
+                ss = pr.preview_server_setting            
+            if param_type == 'mainsource':
+                ss = pr.mainsource_server_setting
+                
+        if not ss:
             return None, None, None, None
+            
+        login = ss.login
+        password = ss.password
+        upload_root = ss.upload_root
+        external_root = ss.external_root            
+        if upload_root[-1] != '/':
+            upload_root = upload_root + '/'
+        if external_root[-1] != '/':
+            external_root = external_root + '/'             
+        subfolder = ''
+        
+        if pr:
+            if param_type == 'preview':
+                subfolder = pr.preview_subfolder or ''
+            if param_type == 'mainsource':
+                subfolder = pr.mainsource_subfolder or ''               
+            if param_type == 'preview' and pr.preview_custom_user:
+                login = pr.preview_login
+                password = pr.preview_password     
+            if param_type == 'mainsource' and pr.mainsource_custom_user:
+                login = pr.mainsource_login
+                password = pr.mainsource_password
+
+        if subfolder != '' and subfolder[-1] != '/':
+            subfolder = subfolder + '/'   
+        upload_path = upload_root + subfolder
+        preview_path = external_root + subfolder                
+          
+        return login, password, upload_path, preview_path            
+
+
     
     def eval_upload_and_check(self, kw, server_fn):
         upload_purpose = kw.get('purpose')
@@ -167,7 +168,7 @@ class Toonproject(http.Controller):
         fullreadpath = readpath + filename + extension
         if task and upload_purpose == 'preview':
             read_response = requests.head(fullreadpath)
-            if responce.status_code >= 200 and responce.status_code < 300:
+            if read_response.status_code >= 200 and read_response.status_code < 300:
                 if self.check_preview_comments(task, fullreadpath):
                     backup_result = self.backup_old_preview(task, server_fn, login, password, writepath, fullreadpath)
                     if backup_result:

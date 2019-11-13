@@ -7,7 +7,8 @@
       <field name="arch" type="xml">
 		<tree create="false" import="false">
 			<field name="author"/>
-			<field name="date"/>
+			<field name="date" string="комментарии" />
+			<field name="video_date" string="видео" />
 			<button string="..." name = "open_sessions" type="object"/>
 		</tree>									
       </field>
