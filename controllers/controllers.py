@@ -16,10 +16,10 @@ class Toonproject(http.Controller):
             return response
     
     def upload_ftp(self, login, password, up_url, data):
-        return common_ftp(self, login, password, up_url, data, False)
+        return self.common_ftp(login, password, up_url, data, False)
         
     def upload_ftps(self, login, password, up_url, data):
-        return common_ftp(self, login, password, up_url, data, True)        
+        return self.common_ftp(login, password, up_url, data, True)        
     
     def common_ftp(self, login, password, up_url, data, FTPS):
         if type(data) == str:
