@@ -60,7 +60,7 @@ class Toonproject(http.Controller):
         # download readpath, upload it with new name and replace name in any comment_sessions for task with old preview name 
         comment_sessions = http.request.env['toonproject.comment_session'].search([('task','=', task.id),('video_url','=',fullreadpath)])
         video_date = comment_sessions[0].video_date
-        date_suffix = str(cs[0].video_date).replace(' ','_').replace('-','').replace(':','')[0:-2]
+        date_suffix = str(video_date).replace(' ','_').replace('-','').replace(':','')[0:-2]
         read_response = requests.get(fullreadpath)
         if read_response.status_code < 200 or read_response.status_code > 300:
             return read_response
