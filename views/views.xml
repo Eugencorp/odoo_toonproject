@@ -344,7 +344,7 @@
 								<div style="text-align: center" class="buttongap">
 									<field name="preview"  widget="video_preview" attrs="{'readonly':[('isManager','=',False)]}" />
 									<div attrs="{'invisible':['|',('preview_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
-										<button id="set_default_preview_button" string="DEF" class="btn-primary" style="float:right;"/>
+										<button id="set_default_preview_button" class="btn-success" style="float:right;" icon="fa-refresh" help="Нажмите, если файл уже был загружен по дефолтному адресу" />
 										<input type="file" class="form-control" name="uploaded_file" id="preview_file" style="display:inline;width:85%"/>						
 									</div>
 									<button id="open_playlist_button" string="Смотреть в монтаже" class="btn-info" />
@@ -357,7 +357,7 @@
 							  <div style="text-align: center; font-weight:bold; ">Главный:</div>
 							  <field name="mainsource" widget = "url"/>
                               <div attrs="{'invisible':['|',('mainsource_controler','=',False), '&amp;', ('isWorker','=',False),('isManager','=',False)]}">
-                                <button id="set_default_mainsource_button" string="DEF" class="btn-primary" style="float:right;"/>
+                                <button id="set_default_mainsource_button" class="btn-success" style="float:right;" icon="fa-refresh" help="Нажмите, если файл уже был загружен по дефолтному адресу" />
 								<input type="file" class="form-control" name="uploaded_file" id="mainsource_file" style="display:inline;width:85%"/>						
                               </div>
 							  <div style="text-align: center; font-weight:bold; margin-top:10px;">Остальные:</div>							  
@@ -410,7 +410,7 @@
                         if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
                           alert("Файл загружен");
                           video = jQuery('.o_video_preview video');
-                          video.attr('src', xhr.response);
+                          video.attr('src', xhr.response + "?" + Math.random());
                           video[0].load();
                           jQuery('.o_video_preview').removeClass('o_field_empty');
                         } else alert("Что-то пошло не так.\n Ошибка: " + xhr.status);
