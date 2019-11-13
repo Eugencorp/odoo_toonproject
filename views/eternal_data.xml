@@ -9,5 +9,9 @@
         <field name="name">ftp</field>
 		<field name="path">/toonproject/ftp</field>
     </record>	
+    <record id="ftps" model="toonproject.upload_interface">
+        <field name="name">ftps</field>
+		<field name="path">/toonproject/ftps</field>
+    </record>	
   </data>
 </odoo>
