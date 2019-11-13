@@ -4,7 +4,7 @@ import requests
 import os
 import datetime
 from urllib.parse import urlparse
-from ftplib import FTP
+from ftplib import FTP, FTP_TLS
 import io
 
 
@@ -16,6 +16,12 @@ class Toonproject(http.Controller):
             return response
     
     def upload_ftp(self, login, password, up_url, data):
+        return common_ftp(self, login, password, up_url, data, False)
+        
+    def upload_ftps(self, login, password, up_url, data):
+        return common_ftp(self, login, password, up_url, data, True)        
+    
+    def common_ftp(self, login, password, up_url, data, FTPS):
         if type(data) == str:
             data = str.encode(data)
         bio = io.BytesIO(data)
@@ -30,6 +36,8 @@ class Toonproject(http.Controller):
             path = path[1:]
         path, filename = os.path.split(path)
         ftp = FTP()
+        if FTPS:
+            ftp = FTP_TLS()
         try:
             ftp.connect(host, port, timeout = 10)
         except socket.gaierror:
@@ -234,7 +242,9 @@ class Toonproject(http.Controller):
     def webdav(self, **kw):
         return self.eval_upload_and_check(kw, self.upload_webdav)
 
-
+    @http.route('/toonproject/ftps', auth='user', method=['POST', 'GET'], csrf=False)
+    def ftp(self, **kw):
+        return self.eval_upload_and_check(kw, self.upload_ftps)
 
     @http.route('/toonproject/ftp', auth='user', method=['POST', 'GET'], csrf=False)
     def ftp(self, **kw):
