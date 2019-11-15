@@ -288,7 +288,7 @@
                             <field name="tasktype_id" string="Тип работ:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="worker_id" string="Исполнитель:" attrs="{'readonly':[('isManager','=',False)]}"/>
                             <field name="status" string="Статус:" attrs="{'readonly':[('isManager','=',False)]}"/>
-				  <field name="-Test String (Will be Removed)-" string="Статус:" attrs="{'readonly':[('isManager','=',False)]}"/>
+				  <field name="status" string="-Test String (Will be Removed)-" attrs="{'readonly':[('isManager','=',False)]}"/>
 				
 				  
                           </group>
