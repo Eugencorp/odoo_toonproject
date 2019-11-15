@@ -429,7 +429,7 @@
 						xhr.onload = () => {
 							if(xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
 							  video = jQuery('.o_video_preview video');
-							  video.attr('src', xhr.response);
+							  video.attr('src', xhr.response + "?" + Math.random());
 							  video[0].load();	
 							  jQuery('.o_video_preview').removeClass('o_field_empty');
 							}
