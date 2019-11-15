@@ -610,7 +610,7 @@ class task(models.Model):
             self.mainsource = the_url 
         got_string_date = responce.headers['Last-Modified']
         last_control_date = None
-        messages = self.env['mail.message'].search([('model','=','toonproject.task'),('res_id','=',self.id)])
+        messages = self.env['mail.message'].sudo().search([('model','=','toonproject.task'),('res_id','=',self.id)])
         for message in messages:
             for track in message.tracking_value_ids:
                 if track.new_value_char == 'в проверку':
