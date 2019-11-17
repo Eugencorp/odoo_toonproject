@@ -81,6 +81,7 @@
 			<script src="/toonproject/static/src/js/comment-add.js" type="text/javascript" />
 
 			<script src="/toonproject/static/src/js/comment.js" type="text/javascript" />
+			  
 		</body>
 	</template>
   </data>
