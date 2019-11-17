@@ -598,7 +598,7 @@ class task(models.Model):
                     the_url = self.price_record.preview_path + self.preview_filename + '.mp4'
             if file_purpose == 'mainsource':
                 if self.price_record and self.price_record.mainsource_path and self.price_record.mainsource_ext:
-                    the_url = self.price_record.preview_path + self.mainsource_filename + self.price_record.mainsource_ext
+                    the_url = self.price_record.preview_path + self.preview_filename + self.price_record.mainsource_ext
         if not the_url: 
             return False, "Вы не загрузили файл " + warning_subject
         responce = requests.head(the_url)
