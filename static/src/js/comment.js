@@ -250,10 +250,12 @@ function showComments() {
 
 			console.log(transform.toFixed(3));
 
-			document.getElementById('frames').innerHTML += '<div onclick="show(this)" sid=' + c + ' class="frames" style="transform: translate3d(' + transform + 'px, 0px, 0px);"></div>'
+			document.getElementById('frames').innerHTML += '<div onclick="show(this)" sid=' + c + ' class="frames" style="transform: translate3d(' + transform + 'px, 0px, 0px);"></div>';
 
-            document.getElementById('comments').innerHTML += "<div class='comment'><div style='width:240px;float:left;'><i class='fas fa-circle' style='color:red;'></i> " + comments[c].user + "<span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span></div><button class='btn btn-default' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button></div><div class='commentText' onclick='show(this)' sid=" + c + " >" + comments[c].message + "</div>"
-
+            var commentString = "<div class='comment'><div style='width:240px;float:left;'><i class='fas fa-circle' style='color:red;'></i> " + comments[c].user + "<span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span></div>";
+			if (comments[c].is_new) commentString += "<button class='btn btn-default' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button>";
+			commentString += "</div><div class='commentText' onclick='show(this)' sid=" + c + " >" + comments[c].message + "</div>";
+			document.getElementById('comments').innerHTML += commentString;
 		}
 
 	}
