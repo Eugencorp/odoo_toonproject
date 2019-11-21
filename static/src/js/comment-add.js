@@ -31,3 +31,25 @@ function send_data_to_server(){
 	xhr.open('POST', adress, true);
 	xhr.send(fd);
 }
+
+function remove_comment(e){
+	if (!confirm("Вы действительно хотите удалить этот комментарий?")) return;
+	
+	var comment_number = e.parentElement.getAttribute('sid');
+	var the_comment = comments[comment_number];
+	var the_draw = JSON.parse(the_comment.draw);
+	if (the_draw['objects'].length == 0) comments.splice(comment_number,1);
+	else the_comment.message = '';
+	
+	localStorage.setItem('comments', JSON.stringify(comments));
+
+	canvas.clear();
+	canvas.calcOffset();
+	canvas.renderAll();
+
+	showComments();
+
+	//document.getElementsByTagName('textarea')[0].value = "";
+	
+	send_data_to_server();
+}

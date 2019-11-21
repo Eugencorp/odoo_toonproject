@@ -60,7 +60,7 @@ body {
 	line-height: 50px;
 	float: left;
 	margin-top: 20px;
-	padding-left: 10px;
+	/*padding-left: 10px;*/
 	padding-right: 10px;
 	border: 1px solid #eee;
 	position:relative;
@@ -71,16 +71,16 @@ body {
 	cursor: pointer
 }
 
-.comment span {
-	float: right;
+.commentTitle span {
+	float: left;
 	background: #007bff;
-	padding: 5px;
+	/*padding: 5px;*/
 	line-height: 30px;
 	color: #fff;
-	margin: 5px;
+	margin: 10px 5px;
 	border-radius: .5rem;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .commentText {
@@ -91,4 +91,8 @@ body {
 	border: 1px solid #eee;
 	border-top: 0;
 	padding: 10px;
+}
+
+.commentTitle {
+	width: 300px;
 }
