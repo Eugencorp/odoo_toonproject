@@ -71,7 +71,7 @@ class Toonproject(http.Controller):
                 'video_date': got_date
             })  
         comment_session = comment_session[0]
- 
+        #data = json.loads(json_string) 
         comment_session.json = json_string
         if kw.get('num'):
             comment_session.num_comments = int(kw.get('num'))

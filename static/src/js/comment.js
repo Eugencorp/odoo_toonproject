@@ -253,6 +253,7 @@ function showComments() {
 
 			document.getElementById('frames').innerHTML += '<div onclick="show(this)" sid=' + c + ' class="frames" style="transform: translate3d(' + transform + 'px, 0px, 0px);"></div>';
 
+			if (comments[c].date == undefined) comments[c].date = " только что";
             var commentString = "<div class='comment' onclick='show(this)' sid=" + c + " ><div class='commentTitle'><span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span><b> " + comments[c].user + " </b>" + comments[c].date + "</div>";
 			if (comments[c].is_new) commentString += "<button class='btn btn-default cross' onclick='remove_comment(this)' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button>";
 			commentString += "</div><div class='commentText' onclick='show(this)' sid=" + c + " >" + comments[c].message + "</div>";
