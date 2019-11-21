@@ -253,7 +253,7 @@ function showComments() {
 
 			document.getElementById('frames').innerHTML += '<div onclick="show(this)" sid=' + c + ' class="frames" style="transform: translate3d(' + transform + 'px, 0px, 0px);"></div>';
 
-            var commentString = "<div class='comment' onclick='show(this)' sid=" + c + " ><div style='width:240px;float:left;'><i class='fas fa-circle' style='color:red;'></i> " + comments[c].user + "<span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span></div>";
+            var commentString = "<div class='comment' onclick='show(this)' sid=" + c + " ><div class='commentTitle'><span><i class='fas fa-stopwatch'></i> " + Math.floor(comments[c].time * 25) + "</span><b> " + comments[c].user + " </b>" + comments[c].date + "</div>";
 			if (comments[c].is_new) commentString += "<button class='btn btn-default cross' onclick='remove_comment(this)' style='float:right;line-height:36px;position:relative;z-index: 99'><i class='fas fa-times'></i></button>";
 			commentString += "</div><div class='commentText' onclick='show(this)' sid=" + c + " >" + comments[c].message + "</div>";
 			document.getElementById('comments').innerHTML += commentString;
