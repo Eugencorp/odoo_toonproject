@@ -260,8 +260,8 @@ class Toonproject(http.Controller):
         if start: 
             start = int(start)
         if finish:
-            finish = int(finish)
-        current = int(current)
+            finish = int(finish)            
+        current = int(str.replace(current,',',''))
         if step:
             step = int(step)
         current_scene = http.request.env['toonproject.asset'].search([('id','=', current)])
