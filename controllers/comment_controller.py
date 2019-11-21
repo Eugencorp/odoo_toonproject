@@ -16,6 +16,7 @@ class Toonproject(http.Controller):
                 for comment in data:
                     if 'is_new' in comment:
                         del comment['is_new']
+                    comment['date'] = session.date.strftime("%d %b %H:%M")
                     comments.append(comment)
         return comments
 
