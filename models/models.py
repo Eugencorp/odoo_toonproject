@@ -757,6 +757,17 @@ class task(models.Model):
                     my_tasks.sort(reverse=True, key=lambda task: task.price_record.sequence )
                     if len(my_tasks) > 0 and my_tasks[0].status < '7finished':
                         rec.affecting_tasks |= my_tasks[0]
+                        
+    @api.multi
+    def link_hookup(self):
+        if len(self) < 2:
+            return
+        tasks = [task for task in self if task.main_asset]
+        if len(tasks) < 2:
+            return        
+        tasks.sort(key=lambda task: task.main_asset)
+        for i in range(1,len(tasks)):
+            tasks[i].affecting_tasks |= tasks[i-1]
 
 
 class CreateTasksWizard(models.TransientModel):
