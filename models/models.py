@@ -747,6 +747,16 @@ class task(models.Model):
             'res_id': self.id,
             'target': 'current',
         }
+        
+    @api.multi
+    def link_asset_tasks(self):
+        for rec in self:
+            for asset in rec.asset_ids:
+                if not asset.assettype_id in rec.tasktype_id.valid_assettypes:
+                    my_tasks = [task for task in asset.task_ids if asset.assettype_id in task.tasktype_id.valid_assettypes]
+                    my_tasks.sort(reverse=True, key=lambda task: task.price_record.sequence )
+                    if len(my_tasks) > 0 and my_tasks[0].status < '7finished':
+                        rec.affecting_tasks |= my_tasks[0]
 
 
 class CreateTasksWizard(models.TransientModel):
