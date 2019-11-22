@@ -10,6 +10,9 @@ var colorField = FieldChar.extend({
     className: 'o_video_preview',
     tagName: 'span',
     supportedFieldTypes: ['char'],
+	events: {
+		'click .video': 'clickVideo',
+	},
 
     init: function () {
         this._super.apply(this, arguments);
@@ -25,7 +28,9 @@ var colorField = FieldChar.extend({
 
     },
 
+	clickVideo: function(ev) {
 
+	},
 });
 
 fieldRegistry.add('video_preview', colorField);

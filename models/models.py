@@ -598,7 +598,7 @@ class task(models.Model):
                     the_url = self.price_record.preview_path + self.preview_filename + '.mp4'
             if file_purpose == 'mainsource':
                 if self.price_record and self.price_record.mainsource_path and self.price_record.mainsource_ext:
-                    the_url = self.price_record.preview_path + self.mainsource_filename + self.price_record.mainsource_ext
+                    the_url = self.price_record.preview_path + self.preview_filename + self.price_record.mainsource_ext
         if not the_url: 
             return False, "Вы не загрузили файл " + warning_subject
         responce = requests.head(the_url)
@@ -610,7 +610,7 @@ class task(models.Model):
             self.mainsource = the_url 
         got_string_date = responce.headers['Last-Modified']
         last_control_date = None
-        messages = self.env['mail.message'].search([('model','=','toonproject.task'),('res_id','=',self.id)])
+        messages = self.env['mail.message'].sudo().search([('model','=','toonproject.task'),('res_id','=',self.id)])
         for message in messages:
             for track in message.tracking_value_ids:
                 if track.new_value_char == 'в проверку':
@@ -722,6 +722,21 @@ class task(models.Model):
                 if rec.stored_price == 0:
                     rec.stored_price = rec.computed_price
         return super(task, self).write(values)
+    
+    @api.multi
+    def task_comments_button(self):
+            self.ensure_one()
+            action_id = self.env.ref('toonproject.task_comments_action').read()[0]
+            if action_id: 
+                return {
+                    'name': action_id['name'],
+                    'type': action_id['type'],
+                    'res_model': action_id['res_model'], 
+                    'view_type': action_id['view_type'],
+                    'view_mode': action_id['view_mode'],
+                    'domain': [["task", "=", self.id]],
+                    'target': 'new', #without it opens a blank page with list, but with breadcrumb
+                }            
 
     def open_task_view_py(self):
         return {
