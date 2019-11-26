@@ -643,7 +643,7 @@ class task(models.Model):
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
-    def button_control(self):        
+    def button_control(self):    
         ctx = {'btn': True}
         warning_message = False
         for rec in self:
@@ -656,8 +656,8 @@ class task(models.Model):
                 if not check:
                     raise Warning(warning_message)                  
             rec.with_context(ctx).write({'status': '6control'})
-        if warning_message:
-            raise Warning(warning_message)
+        #if warning_message:
+            #raise Warning(warning_message)
     @api.multi
     def button_reject(self):
         ctx = {'btn': True}
@@ -683,8 +683,7 @@ class task(models.Model):
 
     @api.multi
     def write(self, values):
-        
-        #pdb.set_trace()
+                
         if (not self.env.context.get('btn')) and \
                 self.env.user.id != SUPERUSER_ID and \
                 not self.env.user.has_group('toonproject.group_toonproject_manager'):
@@ -716,7 +715,11 @@ class task(models.Model):
                                 to_begin = False
                                 break
                         if to_begin:
-                            dependent_task.status = "2ready"
+                            dependent_task.status = "2ready"                    
+        if values.get('status') == '6control':
+            for rec in self:
+                if rec.price_record and len(rec.price_record.controlers) > 0 and not rec.current_control:
+                    rec.current_control = rec.price_record.controlers[0]
         if values.get('pay_date'):
             for rec in self:
                 if rec.stored_price == 0:
