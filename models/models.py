@@ -191,7 +191,7 @@ class StoresImages():
 class asset(models.Model, StoresImages):
     _name = 'toonproject.asset'
     _description = 'some meaning part of a production: a scene, a background or a rig'
-    _order = 'sequence asc, id'
+    _order = 'assettype_id, sequence asc, id'
     
     sequence = fields.Integer(string = "порядок в монтаже")
 
@@ -349,7 +349,7 @@ class task(models.Model):
     _name = 'toonproject.task'
     _inherit = 'mail.thread'
     _description = 'main model for work'
-    _order = 'project_id,asset_names,tasktype_id'
+    _order = 'project_id, name, asset_names,tasktype_id'
 
     name = fields.Char(string='Название')
     tasktype_id = fields.Many2one('toonproject.tasktype',  ondelete='restrict', index=True, required=True, string='Вид работ')
@@ -853,12 +853,14 @@ class EditTasksWizard(models.TransientModel):
         ('5inrevision', 'в поправках'),('6control','в проверку'),('7finished','готово'),('8canceled', 'отменено')], string='Статус', default='1pending',
         )
     pay_date = fields.Date(string='Оплачено:')
+    add_assets = fields.Many2many('toonproject.asset', string='Добавить материалы')
 
     valid_group_chk = fields.Boolean(default=False)
     worker_id_chk = fields.Boolean(default=False)
     factor_chk = fields.Boolean(default=False)
     status_chk = fields.Boolean(default=False)
     pay_date_chk = fields.Boolean(default=False)
+    add_assets_chk = fields.Boolean(default=False)
 
     @api.multi
     def apply_tasks(self):
@@ -872,7 +874,10 @@ class EditTasksWizard(models.TransientModel):
         if self.status_chk:
             values.update({'status': self.status})
         if self.pay_date_chk:
-            values.update({'pay_date': self.pay_date})            
+            values.update({'pay_date': self.pay_date}) 
+        if self.add_assets_chk:
+            new_assets = [(4,asset.id) for asset in self.add_assets]
+            values.update({'asset_ids':new_assets}) 
         target_recs = self.env['toonproject.task'].browse(self._context.get('active_ids'))
         for rec in target_recs:
             rec.write(values)

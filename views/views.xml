@@ -891,7 +891,9 @@
 				<field name="pay_date_chk"/> Оплачено:
 				<field name="pay_date"  attrs="{'readonly':[('pay_date_chk','=',False)]}" style="{width:20%}"/>
             </span>
-			<br/>			
+			<br/>
+            <field name="add_assets_chk"/> Добавить материалы
+            <field name="add_assets"  attrs="{'readonly':[('add_assets_chk','=',False)]}" style="{width:20%}"/>			
           </div>
         </div>
 				<footer>
