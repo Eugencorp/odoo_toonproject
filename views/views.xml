@@ -1115,7 +1115,35 @@ model.recompute()
 env.cr.commit()
         </field>
     </record>
-
+	
+    
+	
+	<record id="toonproject_link_asset_tasks" model="ir.actions.server">
+        <field name="name">Добавить зависимости от задач по дополнительным материалам</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_task"/>		
+        <field name="binding_model_id" ref="model_toonproject_task"/>
+		<field name="groups" ref="toonproject.group_toonproject_manager"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    records.link_asset_tasks()
+        </field>
+    </record>
+	
+	<record id="toonproject_link_hookup_tasks" model="ir.actions.server">
+        <field name="name">Добавить зависимости между задачами, чтобы монтировались</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_toonproject_task"/>		
+        <field name="binding_model_id" ref="model_toonproject_task"/>
+		<field name="groups" ref="toonproject.group_toonproject_manager"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    records.link_hookup()
+        </field>
+    </record>	
+	
     <record id="toonproject_update_tasks" model="ir.actions.server">
         <field name="name">Обновить</field>
         <field name="type">ir.actions.server</field>
@@ -1128,7 +1156,9 @@ env.add_todo(model._fields['pause_reason'], records)
 model.recompute()
 env.cr.commit()
         </field>
-    </record>	
+    </record>
+
+	
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."

@@ -643,7 +643,7 @@ class task(models.Model):
                 'worker_id': rec.worker_id.id|self.env.user.id
             })
     @api.multi
-    def button_control(self):        
+    def button_control(self):    
         ctx = {'btn': True}
         warning_message = False
         for rec in self:
@@ -656,8 +656,8 @@ class task(models.Model):
                 if not check:
                     raise Warning(warning_message)                  
             rec.with_context(ctx).write({'status': '6control'})
-        if warning_message:
-            raise Warning(warning_message)
+        #if warning_message:
+            #raise Warning(warning_message)
     @api.multi
     def button_reject(self):
         ctx = {'btn': True}
@@ -683,8 +683,7 @@ class task(models.Model):
 
     @api.multi
     def write(self, values):
-        
-        #pdb.set_trace()
+                
         if (not self.env.context.get('btn')) and \
                 self.env.user.id != SUPERUSER_ID and \
                 not self.env.user.has_group('toonproject.group_toonproject_manager'):
@@ -716,7 +715,11 @@ class task(models.Model):
                                 to_begin = False
                                 break
                         if to_begin:
-                            dependent_task.status = "2ready"
+                            dependent_task.status = "2ready"                    
+        if values.get('status') == '6control':
+            for rec in self:
+                if rec.price_record and len(rec.price_record.controlers) > 0 and not rec.current_control:
+                    rec.current_control = rec.price_record.controlers[0]
         if values.get('pay_date'):
             for rec in self:
                 if rec.stored_price == 0:
@@ -747,6 +750,27 @@ class task(models.Model):
             'res_id': self.id,
             'target': 'current',
         }
+        
+    @api.multi
+    def link_asset_tasks(self):
+        for rec in self:
+            for asset in rec.asset_ids:
+                if not asset.assettype_id in rec.tasktype_id.valid_assettypes:
+                    my_tasks = [task for task in asset.task_ids if asset.assettype_id in task.tasktype_id.valid_assettypes]
+                    my_tasks.sort(reverse=True, key=lambda task: task.price_record.sequence )
+                    if len(my_tasks) > 0 and my_tasks[0].status < '7finished':
+                        rec.affecting_tasks |= my_tasks[0]
+                        
+    @api.multi
+    def link_hookup(self):
+        if len(self) < 2:
+            return
+        tasks = [task for task in self if task.main_asset]
+        if len(tasks) < 2:
+            return        
+        tasks.sort(key=lambda task: task.main_asset)
+        for i in range(1,len(tasks)):
+            tasks[i].affecting_tasks |= tasks[i-1]
 
 
 class CreateTasksWizard(models.TransientModel):
