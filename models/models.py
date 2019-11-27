@@ -623,7 +623,7 @@ class task(models.Model):
             control_date = pytz.UTC.localize(last_control_date)
             if control_date > got_date:
                 m = 'Загруженный файл ' + warning_subject + ' датирован ' + got_string_date
-                m = m + ".\n это раньше, чем последняя дата проверки этого задания."
+                m = m + ".\n Это раньше, чем последняя дата проверки этого задания."
                 m = m + "Похоже, что вы забыли загрузить новую версию или загрузили старую. "
                 m = m + "Задание будет отправлено на проверку, но вы можете снова получить старые правки. "
                 m = m + "Пожалуйста, проверьте файл и, если нужно, загрузите новую версию, пока не поздно."
@@ -656,7 +656,19 @@ class task(models.Model):
                 if not check:
                     raise Warning(warning_message)                  
             rec.with_context(ctx).write({'status': '6control'})
-        #if warning_message:
+        if warning_message:
+            #query = 'delete from toonproject_alert_wizard'
+            #self.env.cr.execute(query)
+            #value=self.env['toonproject.alert_wizard'].sudo().create({'warning_message':warning_message})
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Внимание!',
+                'res_model': 'toonproject.alert_wizard',
+                'view_mode': 'form',
+                'view_type': 'form',
+                'context':{'warning_message':warning_message},
+                'target': 'new',
+            }
             #raise Warning(warning_message)
     @api.multi
     def button_reject(self):
@@ -1111,5 +1123,12 @@ class EditPricesWizard(models.TransientModel):
             rec.write(values)
         return {}
         
-        
+class AlertWizard(models.TransientModel):
+    _name = 'toonproject.alert_wizard'
+    _description = "Wizard: Display any modal dialog"   
+    
+    def _get_warning_message(self):
+        return self.env.context.get('warning_message') or ''
+
+    warning_message = fields.Char(default=_get_warning_message)
     

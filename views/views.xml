@@ -1156,7 +1156,18 @@ env.cr.commit()
         </field>
     </record>
 
-	
+	<record model="ir.ui.view" id="alert_wizard_form_view">
+		<field name="name">alert_wizard.form</field>
+		<field name="model">toonproject.alert_wizard</field>
+		<field name="arch" type="xml">
+			<form string="Внимание!">
+				<field name="warning_message" readonly="1"/>
+				<footer>
+					<button special="cancel" string="Ясно."/>
+				</footer>
+			</form>
+		</field>
+	</record>
 
 	<act_window id="launch_edittasks_wizard"
 				name="Редактировать выбранное..."
