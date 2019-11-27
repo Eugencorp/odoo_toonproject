@@ -674,8 +674,7 @@ class task(models.Model):
                 order='sequence asc')
             if len(controlers)<1:
                 rec.with_context(ctx).write({
-                    'status': '7finished',
-                    'real_finish': fields.Date.today()
+                    'status': '7finished'
                 })
             else:
                 rec.with_context(ctx).write({'current_control':controlers[0].id})
@@ -715,7 +714,8 @@ class task(models.Model):
                                 to_begin = False
                                 break
                         if to_begin:
-                            dependent_task.status = "2ready"                    
+                            dependent_task.status = "2ready"  
+                rec.real_finish = fields.Date.today()
         if values.get('status') == '6control':
             for rec in self:
                 if rec.price_record and len(rec.price_record.controlers) > 0 and not rec.current_control:
