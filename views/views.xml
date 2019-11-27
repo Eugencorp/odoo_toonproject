@@ -1149,7 +1149,7 @@ if records:
         <field name="state">code</field>
         <field name="code">
 model = env['toonproject.task']
-env.add_todo(model._fields['pause_reason'], records)
+env.add_todo(model._fields['pause_reason','computed_price'], records)
 model.recompute()
 env.cr.commit()
         </field>
