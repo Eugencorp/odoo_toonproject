@@ -704,6 +704,8 @@ class task(models.Model):
                     ctx = {'task':rec.id, 'status': values.get('status'), 'btn':True}
                     asset.with_context(ctx)._get_current_tasktype()
                     asset.with_context(ctx)._get_color()
+                if not rec.work_start and values.get('status') != '1pending' and values.get('status') != '8canceled':
+                    rec.work_start = fields.Date.today()
         if values.get('status') == '7finished':
             for rec in self:
                 for dependent_task in rec.dependent_tasks:
