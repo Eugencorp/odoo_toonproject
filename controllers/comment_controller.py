@@ -70,6 +70,13 @@ class Toonproject(http.Controller):
                 'video_url': video_url,
                 'video_date': got_date
             })  
+            #create message for task thread
+            task_model = http.request.env['toonproject.task'].search([('id','=',task)])
+            if task_model and comment_session:
+                msg = 'добавлены комментарии. <a href="/toonproject/comment_session?session='
+                msg = msg + str(comment_session[0].id)
+                msg = msg + '" target="_blank">Смотреть</a>'
+                task_model.message_post(body = msg, subtype = 'mt_note')
         comment_session = comment_session[0]
         #data = json.loads(json_string) 
         comment_session.json = json_string
