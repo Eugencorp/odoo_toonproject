@@ -1,0 +1,94 @@
+        body {
+            background: #191919;
+            overflow-x: hidden;
+        }
+        
+        .timeline {
+            width: 960px;
+            height: 20px;
+            background-color: black;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .timeline__drag {
+            width: 2px;
+            height: 30px;
+            top: -10px;
+            background-color: transparent;
+            position: absolute;
+            z-index: 2;
+            transform-origin: 0 0;
+        }
+        
+        .timeline__progress {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: green;
+            transform: scaleX(0);
+            transform-origin: 0 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .canvas-container {
+            position: absolute !important;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+        
+        .frames {
+            width: 5px;
+            height: 30px;
+            top: -10px;
+            background-color: red;
+            position: absolute;
+            z-index: 1;
+            transform-origin: 0 0
+        }
+        
+        .frames:hover {
+            cursor: pointer
+        }
+        
+        .comment {
+            width: 100%;
+            height: 42px;
+            line-height: 40px;
+            float: left;
+            margin-top: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border: 1px solid #282828;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .comment:hover {
+            cursor: pointer
+        }
+        
+        .comment span {
+            float: right;
+            background: #6c757d;;
+            line-height: 30px;
+            color: #fff;
+            margin: 5px;
+            border-radius: .5rem;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .commentText {
+            width: 100%;
+            min-height: 50px;
+            float: left;
+            background: #fff;
+            border: 1px solid #282828;
+            border-top: 0;
+            padding: 10px;
+			word-wrap: break-word
+        }
